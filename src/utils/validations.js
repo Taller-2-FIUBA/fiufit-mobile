@@ -1,3 +1,8 @@
+export const validateName = (name) => {
+    const trimmedName = name.trim();
+    return /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/.test(trimmedName);
+}
+
 export const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);

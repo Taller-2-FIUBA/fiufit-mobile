@@ -6,16 +6,42 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest"
   },
   "dependencies": {
+    "@react-navigation/native": "^6.1.6",
+    "@react-navigation/native-stack": "^6.9.12",
+    "@testing-library/react": "^14.0.0",
+    "dotenv": "^16.0.3",
     "expo": "~48.0.9",
     "expo-status-bar": "~1.4.4",
+    "firebase": "^9.19.1",
     "react": "18.2.0",
-    "react-native": "0.71.4"
+    "react-native": "0.71.4",
+    "react-native-config": "^1.5.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/jest-native": "^5.4.2",
+    "@testing-library/react-native": "^12.0.1",
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "jest-expo": "^48.0.2"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-native/extend-expect"
+    ],
+    "transform": {
+      "^.+\\.js$": "babel-jest",
+      "node_modules/(?!(firebase)/)": "babel-jest"
+    },
+    "testMatch": [
+      "<rootDir>/test/**/*.test.js"
+    ]
   },
   "private": true
 }
