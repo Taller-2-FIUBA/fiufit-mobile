@@ -1,0 +1,6 @@
+export const primaryColor = '#012030'
+export const secondaryColor = '#13678A'
+export const textColor  = '#012030'
+export const textBoxColor  = 'white'
+export const buttonTextColor  = 'white'
+export const outlineColor = '#45C4B0'
