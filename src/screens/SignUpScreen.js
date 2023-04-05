@@ -1,5 +1,4 @@
 import {
-    Alert,
     Image,
     KeyboardAvoidingView,
     StyleSheet,
@@ -9,91 +8,35 @@ import {
     TouchableOpacity,
     View
 } from 'react-native'
-import React, {useEffect, useState} from 'react'
-import {validateEmail, validateName, validatePassword} from "../utils/validations";
-import {createUserWithEmailAndPassword, onAuthStateChanged} from "firebase/auth";
-import {auth} from "../config/firebase";
+import React, {useState} from 'react'
+import {validateEmail, validatePassword} from "../utils/validations";
 import {useNavigation} from "@react-navigation/native";
 import {buttonTextColor, primaryColor, secondaryColor, textBoxColor, textColor} from "../consts/colors";
 
 const SignUpScreen = () => {
-    const [name, setName] = useState('')
-    const [surname, setSurname] = useState('')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-
     const navigation = useNavigation();
 
-    useEffect(() => {
-        return onAuthStateChanged(auth, user => {
-            if (user) {
-                navigation.navigate('Home');
-            }
-        });
-    }, [auth, navigation]);
-
-    const validateForm = (name, surname, email, password) => {
-        const validationData = [
-            {value: name, validator: validateName, errorMessage: 'Invalid name'},
-            {value: surname, validator: validateName, errorMessage: 'Invalid surname'},
-            {value: email, validator: validateEmail, errorMessage: 'Invalid email'},
-            {value: password, validator: validatePassword, errorMessage: 'Password must be at least 6 characters long'},
-        ];
-
-        for (const {value, validator, errorMessage} of validationData) {
-            if (!validator(value)) {
-                ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
-                return false;
-            }
-        }
-
-        return true;
-    }
+    const [email, setEmail] = useState('');
+    const [password1, setPassword1] = useState('');
+    const [password2, setPassword2] = useState('');
 
     const handleSignUp = () => {
-        if (!validateForm(name, surname, email, password)) {
+        if (!validateEmail(email)) {
+            ToastAndroid.show('Invalid email', ToastAndroid.SHORT);
             return;
         }
 
-        createUserWithEmailAndPassword(auth, email, password)
-            .then(userCredential => {
-                const user = userCredential.user;
-                console.log("Signed up with: ", user.email);
-                //signUpUser(name, surname, email, user.uid);
-            })
-            .catch(error => {
-                console.log(error);
-                if (error.code === "auth/email-already-in-use") {
-                    Alert.alert("The email address is already in use by another account.");
-                } else {
-                    Alert.alert(error.message);
-                }
-            })
-    }
+        if (!validatePassword(password1) || !validatePassword(password2)) {
+            ToastAndroid.show('Password must be at least 6 digits long', ToastAndroid.SHORT);
+            return;
+        }
 
-    const signUpUser = (name, surname, email, id,) => {
-        const endpoint = '';  // TODO: Add endpoint
-        const body = JSON.stringify({name, surname, email, id});
+        if (password1 !== password2) {
+            ToastAndroid.show('Passwords don\'t match', ToastAndroid.SHORT);
+            return;
+        }
 
-        // TODO: id, email, name, surname, date of birth, weight, username, location
-
-        fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error sending user data');
-                }
-                console.log('User data sent successfully');
-            })
-            .catch(error => {
-                console.log(error);
-                Alert.alert(error.message);
-            });
+        navigation.navigate('UserData', {email: email, password: password1});
     }
 
     return (
@@ -106,18 +49,6 @@ const SignUpScreen = () => {
             />
             <View style={styles.inputContainer}>
                 <TextInput
-                    placeholder={"Name"}
-                    value={name}
-                    onChangeText={text => setName(text)}
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder={"Surname"}
-                    value={surname}
-                    onChangeText={text => setSurname(text)}
-                    style={styles.input}
-                />
-                <TextInput
                     placeholder={"Email"}
                     value={email}
                     onChangeText={text => setEmail(text)}
@@ -125,13 +56,19 @@ const SignUpScreen = () => {
                 />
                 <TextInput
                     placeholder={"Password"}
-                    value={password}
-                    onChangeText={text => setPassword(text)}
+                    value={password1}
+                    onChangeText={text => setPassword1(text)}
+                    style={styles.input}
+                    secureTextEntry
+                />
+                <TextInput
+                    placeholder={"Repeat password"}
+                    value={password2}
+                    onChangeText={text => setPassword2(text)}
                     style={styles.input}
                     secureTextEntry
                 />
             </View>
-
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     onPress={handleSignUp}

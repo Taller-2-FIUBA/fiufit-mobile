@@ -21,3 +21,10 @@ app.
 
 You can now make changes to the code and after saving, the app will be reloaded
 automatically on your phone.
+
+### Testing with jest
+In order to test the app with jest, run the following command on your terminal:
+```
+npm run test
+```
+This will run all the tests in the app and provide you with a coverage report.

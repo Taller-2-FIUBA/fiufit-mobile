@@ -1,26 +1,16 @@
 import {Alert, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
-import React, {useEffect, useState} from 'react'
-import {buttonTextColor, outlineColor, primaryColor, secondaryColor, textBoxColor, textColor} from '../consts/colors';
-import {onAuthStateChanged, signInWithEmailAndPassword} from 'firebase/auth';
-import {validateEmail} from "../utils/validations";
-import {useNavigation} from "@react-navigation/native";
-import {auth} from "../config/firebase";
-import { Image } from 'react-native';
+import React, {useState} from 'react'
+import {buttonTextColor, outlineColor, primaryColor, secondaryColor, textBoxColor, textColor} from '../consts/colors'
+import {validateEmail} from "../utils/validations"
+import {useNavigation} from "@react-navigation/native"
+import { Image } from 'react-native'
+import {baseURL, loginURI} from "../consts/requests";
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
     const navigation = useNavigation();
-
-    useEffect(() => {
-        return onAuthStateChanged(auth, user => {
-            if (user) {
-                navigation.navigate('Home');
-            }
-        });
-    }, [auth, navigation]);
-
 
     const handleSignUpPress = () => {
         navigation.navigate('SignUp');
@@ -37,16 +27,26 @@ const LoginScreen = () => {
             return;
         }
 
-        signInWithEmailAndPassword(auth, email, password)
-            .then(userCredential => {
-                console.log('User logged in');
-                const user = userCredential.user;
-                console.log("Logged in with: ", user.email);
+        console.log("Logging in");
+        fetch(baseURL + loginURI, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({email, password})
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    Alert.alert(data.error);
+                } else {
+                    navigation.navigate('Home', {userId: data.id});
+                }
             })
             .catch(error => {
                 console.log(error);
                 Alert.alert(error.message);
-            })
+            });
     }
 
     return (

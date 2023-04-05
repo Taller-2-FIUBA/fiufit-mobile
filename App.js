@@ -5,6 +5,8 @@ import LoginScreen from "./src/screens/LoginScreen";
 import HomeScreen from "./src/screens/HomeScreen";
 import SignUpScreen from "./src/screens/SignUpScreen";
 import {primaryColor, secondaryColor} from "./src/consts/colors";
+import ProfileScreen from "./src/screens/ProfileScreen";
+import UserDataScreen from "./src/screens/UserDataScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -21,11 +23,21 @@ export default function App() {
                 statusBarColor: secondaryColor
             }} name="SignUp" component={SignUpScreen} />
             <Stack.Screen options={{
+                headerShown: false,
+                statusBarColor: secondaryColor
+            }} name="UserData" component={UserDataScreen} />
+            <Stack.Screen options={{
                 statusBarColor: secondaryColor,
                 headerStyle: {
                     backgroundColor: secondaryColor
                 }
             }} name="Home" component={HomeScreen} />
+            <Stack.Screen options={{
+                statusBarColor: secondaryColor,
+                headerStyle: {
+                    backgroundColor: secondaryColor
+                }
+            }} name="Profile" component={ProfileScreen} />
         </Stack.Navigator>
       </NavigationContainer>
   );
