@@ -1,11 +1,15 @@
 import {
     Image,
     KeyboardAvoidingView,
+    Platform,
     StyleSheet,
     Text,
     TextInput,
     ToastAndroid,
     TouchableOpacity,
+    TouchableWithoutFeedback,
+    Keyboard,
+    SafeAreaView,
     View
 } from 'react-native'
 import React, {useState} from 'react'
@@ -40,9 +44,9 @@ const SignUpScreen = () => {
     }
 
     return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView style={styles.container}
-                              behavior="padding"
-                              keyboardVerticalOffset={-200}>
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <Image
                 source={require('../../resources/logo.png')}
                 style={styles.logo}
@@ -77,7 +81,12 @@ const SignUpScreen = () => {
                     <Text style={styles.buttonText}>Register</Text>
                 </TouchableOpacity>
             </View>
+
         </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
+
+
+
     )
 }
 
