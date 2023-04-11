@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import {View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator} from 'react-native';
 import { Avatar, Card, CardContent, Box, Stack, Paper, styled } from '@mui/material';
 import {primaryColor, secondaryColor} from "../consts/colors";
@@ -6,18 +6,17 @@ import {baseURL, userURI} from "../consts/requests";
 
 
 const ProfileScreen = ({route}) => {
-    state = {
-        profile: null,
-        loading: true,
-        error: null,
-        name: 'John',
-        surname: 'Doe',
-        email: 'johndoe@gmail.com',
-        location: 'Bs. As',
-        height: 1.90,
-        weight: 45,
-        editable: false,
-    };
+    const [userProfile, setUserProfile] = useState({
+        name: '',
+        surname: '',
+        email: '',
+        location: '',
+        height: undefined,
+        weight: undefined
+    });
+    const [loading, setLoading] = useState(true);
+    const [editable, setEditable] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         console.log("Fetching user profile...");
@@ -25,75 +24,72 @@ const ProfileScreen = ({route}) => {
 
         fetch(baseURL + userURI + userId)
             .then((response) => response.json())
-            .then((profile) =>
-                this.setState({ profile: profile, loading: false, error: null })
-            )
-            .catch((error) =>
-                this.setState({ profile: null, loading: false, error: error })
-            );
-      }, []);
+            .then((profile) => {
+                setLoading(false);
+                setUserProfile(profile);
+            })
+            .catch((error) => {
+                setLoading(false);
+                setError(error);
+                console.log("Error: ", error.message);
+            });
+    }, []);
 
 
     toggleEditable = () => {
-        this.setState({ editable: !this.state.editable });
-      };
+        setEditable(!editable);
+    };
 
-      const { profile, loading, error } = this.state;
-        const { name, surname, email, location, height, weight, editable } = this.state;
-
-        if (loading) {
-            return <ActivityIndicator />;
-        }
-
-        if (error) {
-            console.log("Error: ", error.message);
-            return <Text>{error.message}</Text>;
-        }
-
-      return (
-            <View style={styles.profile_container}>
-              <TextInput
-                style={styles.input}
-                value={name}
-                editable={editable}
-                onChangeText={(text) => this.setState({ name: text })}
-              />
-              <TextInput
-                style={styles.input}
-                value={surname}
-                editable={editable}
-                onChangeText={(text) => this.setState({ surname: text })}
-              />
-              <TextInput
-                style={styles.input}
-                value={email}
-                editable={editable}
-                onChangeText={(text) => this.setState({ email: text })}
-              />
-              <TextInput
-                style={styles.input}
-                value={location}
-                editable={editable}
-                onChangeText={(text) => this.setState({ location: text })}
-              />
-              <TextInput
-                style={styles.input}
-                value={height.toString()}
-                editable={editable}
-                onChangeText={(text) => this.setState({ height: number })}
-              />
-              <TextInput
-                style={styles.input}
-                value={weight.toString()}
-                editable={editable}
-                onChangeText={(text) => this.setState({ weight: number })}
-              />
-      
-              <TouchableOpacity style={styles.button} onPress={this.toggleEditable}>
-                <Text style={styles.buttonText}>{editable ? 'Save' : 'Edit'}</Text>
-              </TouchableOpacity>
-            </View>
-          );
+    return (
+        <View>
+            {loading && <ActivityIndicator />}
+            {!loading && error && <Text>{error.message}</Text>}
+            {!loading && !error && 
+                <View style={styles.profile_container}>
+                    <TextInput
+                        style={styles.input}
+                        value={name}
+                        editable={editable}
+                        onChangeText={(text) =>  setUserProfile(...userProfile, {name: text})}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        value={surname}
+                        editable={editable}
+                        onChangeText={(text) => setUserProfile(...userProfile, {surname: text})}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        value={email}
+                        editable={editable}
+                        onChangeText={(text) => setUserProfile(...userProfile, {email: text})}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        value={location}
+                        editable={editable}
+                        onChangeText={(text) => setUserProfile(...userProfile, {location: text})}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        value={height.toString()}
+                        editable={editable}
+                        onChangeText={(text) => setUserProfile(...userProfile, {height: text})}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        value={weight.toString()}
+                        editable={editable}
+                        onChangeText={(text) => setUserProfile(...userProfile, {weight: text})}
+                    />
+            
+                    <TouchableOpacity style={styles.button} onPress={this.toggleEditable}>
+                    <Text style={styles.buttonText}>{editable ? 'Save' : 'Edit'}</Text>
+                    </TouchableOpacity>
+                </View>
+            }   
+        </View>
+    );
 }
       
 const styles = StyleSheet.create({
