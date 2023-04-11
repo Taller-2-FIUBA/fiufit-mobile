@@ -1,7 +1,6 @@
-import React, { Component, useState } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import {View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator} from 'react-native';
-import { Avatar, Card, CardContent, Box, Stack, Paper, styled } from '@mui/material';
-import {primaryColor, secondaryColor} from "../consts/colors";
+import {primaryColor } from "../consts/colors";
 import {baseURL, userURI} from "../consts/requests";
 
 
@@ -48,37 +47,37 @@ const ProfileScreen = ({route}) => {
                 <View style={styles.profile_container}>
                     <TextInput
                         style={styles.input}
-                        value={name}
+                        value={userProfile.name}
                         editable={editable}
                         onChangeText={(text) =>  setUserProfile(...userProfile, {name: text})}
                     />
                     <TextInput
                         style={styles.input}
-                        value={surname}
+                        value={userProfile.surname}
                         editable={editable}
                         onChangeText={(text) => setUserProfile(...userProfile, {surname: text})}
                     />
                     <TextInput
                         style={styles.input}
-                        value={email}
+                        value={userProfile.email}
                         editable={editable}
                         onChangeText={(text) => setUserProfile(...userProfile, {email: text})}
                     />
                     <TextInput
                         style={styles.input}
-                        value={location}
+                        value={userProfile.location}
                         editable={editable}
                         onChangeText={(text) => setUserProfile(...userProfile, {location: text})}
                     />
                     <TextInput
                         style={styles.input}
-                        value={height.toString()}
+                        value={userProfile.height?.toString()}
                         editable={editable}
                         onChangeText={(text) => setUserProfile(...userProfile, {height: text})}
                     />
                     <TextInput
                         style={styles.input}
-                        value={weight.toString()}
+                        value={userProfile.weight?.toString()}
                         editable={editable}
                         onChangeText={(text) => setUserProfile(...userProfile, {weight: text})}
                     />
