@@ -50,8 +50,8 @@ const UserDataScreen = ({route}) => {
         username: '',
         name: '',
         surname: '',
-        height: '',
-        weight: '',
+        height: 0.0,
+        weight: 0,
         birth_date: '',
         location: '',
         registration_date: new Date().toISOString().split('T')[0],
@@ -106,7 +106,7 @@ const UserDataScreen = ({route}) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({user})
+            body: JSON.stringify(user)
         })
             .then(response => response.json())
             .then(data => {
