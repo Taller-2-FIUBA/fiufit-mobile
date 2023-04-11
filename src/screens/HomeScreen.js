@@ -14,7 +14,7 @@ const HomeScreen = ({route}) => {
     }
 
     const handleProfile = () => {
-        navigation.navigate("Profile")
+        navigation.navigate("Profile", {userId: userId})
     }
 
     return (

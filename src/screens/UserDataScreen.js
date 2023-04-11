@@ -77,7 +77,7 @@ const UserDataScreen = ({route}) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({user})
+            body: JSON.stringify(user)
         })
             .then(response => response.json())
             .then(data => {
