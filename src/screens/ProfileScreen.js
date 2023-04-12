@@ -35,8 +35,33 @@ const ProfileScreen = ({route}) => {
     }, []);
 
 
+    const updateProfile = () => {
+        const { userId } = route.params;
+
+        fetch(baseURL + userURI + userId, {
+        method: 'PUT',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userProfile)
+        })
+        .then((response) => response.json())
+        .then((updatedProfile) => {
+            setUserProfile(updatedProfile);
+            setEditable(false);
+        })
+        .catch((error) => {
+            console.log("Error: ", error.message);
+        });
+    };
+
     toggleEditable = () => {
-        setEditable(!editable);
+        if (editable) {
+            updateProfile();
+        } else {
+            setEditable(true);
+        }
     };
 
     return (
@@ -73,17 +98,17 @@ const ProfileScreen = ({route}) => {
                         style={styles.input}
                         value={userProfile.height?.toString()}
                         editable={editable}
-                        onChangeText={(text) => setUserProfile(...userProfile, {height: text})}
+                        onChangeText={(text) => setUserProfile(...userProfile, {height: number})}
                     />
                     <TextInput
                         style={styles.input}
                         value={userProfile.weight?.toString()}
                         editable={editable}
-                        onChangeText={(text) => setUserProfile(...userProfile, {weight: text})}
+                        onChangeText={(text) => setUserProfile(...userProfile, {weight: number})}
                     />
             
-                    <TouchableOpacity style={styles.button} onPress={this.toggleEditable}>
-                    <Text style={styles.buttonText}>{editable ? 'Save' : 'Edit'}</Text>
+                    <TouchableOpacity style={styles.button} onPress={toggleEditable}>
+                        <Text style={styles.buttonText}>{editable ? 'Save' : 'Edit'}</Text>
                     </TouchableOpacity>
                 </View>
             }   
