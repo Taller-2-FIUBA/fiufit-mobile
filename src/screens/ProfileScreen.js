@@ -39,7 +39,7 @@ const ProfileScreen = ({route}) => {
         const { userId } = route.params;
 
         fetch(baseURL + userURI + userId, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json'
