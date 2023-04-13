@@ -18,25 +18,11 @@ export const validateUsername = (username) => {
 }
 
 export const validateHeight = (height) => {
-    const regex = /^\d+([,.]\d{1,2})?$/;
-    const heightFormatted = parseFloat(height.replace(",", "."));
-
-    if (!heightFormatted || heightFormatted <= 0 || heightFormatted > 2.5) {
-        return false;
-    }
-
-    return regex.test(height);
+    return height > 0 && height <= 3;
 }
 
 export const validateWeight = (weight) => {
-    const regex = /^\d+([,.]\d{1,2})?$/;
-    const weightFormatted = parseFloat(weight.replace(",", "."));
-
-    if (!weightFormatted || weightFormatted <= 0 || weightFormatted > 300) {
-        return false;
-    }
-
-    return regex.test(weight);
+    return weight > 20 && weight <= 300;
 }
 
 export const validateDate = (birthDate) => {
