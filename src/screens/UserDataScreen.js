@@ -17,12 +17,14 @@ import {
 } from "../utils/validations";
 import {useNavigation} from "@react-navigation/native";
 import {buttonTextColor, primaryColor, secondaryColor, textBoxColor, textColor} from "../consts/colors";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import {baseURL, signUpURI} from "../consts/requests";
 import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
+import {Picker} from "@react-native-picker/picker";
 
 const UserDataScreen = ({route}) => {
     const navigation = useNavigation();
+    const pickerRef = useRef();
 
     const [date, setDate] = useState(null);
 
@@ -47,6 +49,7 @@ const UserDataScreen = ({route}) => {
     const [user, setUser] = useState(  {
         email: route.params.email,
         password: route.params.password,
+        isAthlete: true,
         username: '',
         name: '',
         surname: '',
@@ -83,7 +86,7 @@ const UserDataScreen = ({route}) => {
 
     const trimUserData = (user) => {
         for (const key in user) {
-            if (user.hasOwnProperty(key)) {
+            if (user.hasOwnProperty(key) && key !== 'isAthlete') {
                 user[key] = user[key].trim();
             }
         }
@@ -151,26 +154,51 @@ const UserDataScreen = ({route}) => {
                     onChangeText={(text) => handleInputChange('username', text)}
                     style={styles.input}
                 />
-                <TextInput
-                    placeholder={"Height"}
-                    value={user.height}
-                    onChangeText={(text) => handleInputChange('height', text)}
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder={"Weight"}
-                    value={user.weight}
-                    onChangeText={(text) => handleInputChange('weight', text)}
-                    style={styles.input}
-                />
-                <TouchableOpacity
-                    style={styles.buttonDate}
-                    onPress={showDatepicker}
-                >
-                    <Text style={{opacity: date ? 1 : 0.6}}>
-                        {date ? date.toISOString().split('T')[0] : "Birthdate"}
-                    </Text>
-                </TouchableOpacity>
+                <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <TextInput
+                        placeholder={"Height"}
+                        value={user.height === 0 ? "" : user.height.toString()}
+                        onChangeText={(text) => handleInputChange('height', text)}
+                        style={{
+                            ...styles.inputHorizontal,
+                            marginRight: 2.5
+                        }}
+                    />
+                    <TextInput
+                        placeholder={"Weight"}
+                        value={user.weight === 0 ? "" : user.weight.toString()}
+                        onChangeText={(text) => handleInputChange('weight', text)}
+                        style={{
+                            ...styles.inputHorizontal,
+                            marginLeft: 2.5
+                        }}
+                    />
+                </View>
+                <View style={{ flexDirection: "row" }}>
+                    <TouchableOpacity
+                        style={styles.buttonDate}
+                        onPress={showDatepicker}
+                    >
+                        <Text style={{ opacity: date ? 1 : 0.6 }}>
+                            {date ? date.toISOString().split("T")[0] : "Birthdate"}
+                        </Text>
+                    </TouchableOpacity>
+                    <View style={{ flex: 1, borderRadius: 10, overflow: 'hidden', height: 50, marginTop: 5, marginLeft: 5 }}>
+                        <Picker
+                            ref={pickerRef}
+                            selectedValue={user.isAthlete}
+                            onValueChange={(itemValue, itemIndex) =>
+                                handleInputChange("isAthlete", itemValue)
+                            }
+                            style={{
+                                backgroundColor: buttonTextColor,
+                            }}
+                        >
+                            <Picker.Item label="Athlete" value={true} />
+                            <Picker.Item label="Trainer" value={false} />
+                        </Picker>
+                    </View>
+                </View>
                 <TextInput
                     placeholder={"Location"}
                     value={user.location}
@@ -216,6 +244,15 @@ const styles = StyleSheet.create({
         marginTop: 5,
         color: textColor,
     },
+    inputHorizontal: {
+        backgroundColor: textBoxColor,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        borderRadius: 10,
+        marginTop: 5,
+        color: textColor,
+        flex: 1,
+    },
     buttonContainer: {
         width: '60%',
         justifyContent: 'center',
@@ -231,7 +268,7 @@ const styles = StyleSheet.create({
     },
     buttonDate: {
         backgroundColor: buttonTextColor,
-        width: '100%',
+        width: '49%',
         padding: 15,
         marginTop: 5,
         borderRadius: 10,
