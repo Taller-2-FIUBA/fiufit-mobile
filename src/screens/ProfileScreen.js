@@ -24,9 +24,9 @@ const ProfileScreen = ({route}) => {
         fetch(baseURL + userURI + '/' + userId)
             .then((response) => response.json())
             .then((profile) => {
-                const profileAux = {"birth_date": "2023-04-14", "email": "valeria@gmail.com", "height": "1.70", "isAthlete": true, "location": "Bs. As.", "name": "Val", "password": "123412", "registration_date": "2023-04-14", "surname": "fiuba", "username": "valfiuba", "weight": "65"};
+                //const profileAux = {"birth_date": "2023-04-14", "email": "valeria@gmail.com", "height": "1.70", "isAthlete": true, "location": "Bs. As.", "name": "Val", "password": "123412", "registration_date": "2023-04-14", "surname": "fiuba", "username": "valfiuba", "weight": "65"};
                 setLoading(false);
-                setUserProfile(profileAux);
+                setUserProfile(profile);
             })
             .catch((error) => {
                 setLoading(false);
