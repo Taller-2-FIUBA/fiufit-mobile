@@ -10,7 +10,6 @@ import {
     View
 } from 'react-native'
 import {
-    validateDate,
     validateHeight, validateLocation,
     validateName,
     validateUsername,
@@ -18,22 +17,46 @@ import {
 } from "../utils/validations";
 import {useNavigation} from "@react-navigation/native";
 import {buttonTextColor, primaryColor, secondaryColor, textBoxColor, textColor} from "../consts/colors";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import {baseURL, signUpURI} from "../consts/requests";
+import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
+import {Picker} from "@react-native-picker/picker";
 
 const UserDataScreen = ({route}) => {
     const navigation = useNavigation();
+    const pickerRef = useRef();
+
+    const [date, setDate] = useState(null);
+
+    const onChange = (event, selectedDate) => {
+        setDate(selectedDate);
+        handleInputChange('birth_date', selectedDate.toISOString().split('T')[0]);
+    };
+
+    const showMode = (currentMode) => {
+        DateTimePickerAndroid.open({
+            value: date || new Date(),
+            onChange,
+            mode: currentMode,
+            is24Hour: true,
+        });
+    };
+
+    const showDatepicker = () => {
+        showMode('date');
+    };
 
     const [user, setUser] = useState(  {
         email: route.params.email,
         password: route.params.password,
+        isAthlete: true,
         username: '',
         name: '',
         surname: '',
-        height: '',
-        weight: '',
-        birth_date: '',  // TODO: Definir formatos para fechas y forma de ingreso
-        location: '',  // TODO: Definir formatos para ubicaciones y forma de ingreso
+        height: 0.0,
+        weight: 0,
+        birth_date: '',
+        location: '',
         registration_date: new Date().toISOString().split('T')[0],
     });
 
@@ -48,9 +71,7 @@ const UserDataScreen = ({route}) => {
             {value: user.username, validator: validateUsername, errorMessage: 'Invalid username'},
             {value: user.height, validator: validateHeight, errorMessage: 'Invalid height'},
             {value: user.weight, validator: validateWeight, errorMessage: 'Invalid weight'},
-            {value: user.birth_date, validator: validateDate, errorMessage: 'Invalid birth date'},
             {value: user.location, validator: validateLocation, errorMessage: 'Invalid location'},
-            {value: user.registration_date, validator: validateDate, errorMessage: 'Invalid registration date'},
         ];
 
         for (const {value, validator, errorMessage} of validationData) {
@@ -63,12 +84,23 @@ const UserDataScreen = ({route}) => {
         return true;
     }
 
+    const trimUserData = (user) => {
+        for (const key in user) {
+            if (user.hasOwnProperty(key) && key !== 'isAthlete') {
+                user[key] = user[key].trim();
+            }
+        }
+    }
+
     const handleSignUp = () => {
+        trimUserData(user);
+
         if (!validateForm(user)) {
             return;
         }
-        navigation.navigate('Home', {user: user});
+
         signUpUser(user);
+        navigation.navigate('Home', {user: user});
     }
 
     const signUpUser = (user) => {
@@ -83,6 +115,7 @@ const UserDataScreen = ({route}) => {
             .then(data => {
                 if (data.error) {
                     Alert.alert(data.error);
+                    navigation.navigate('Login');
                 } else {
                     navigation.navigate('Home', {userId: data.id});
                 }
@@ -90,6 +123,7 @@ const UserDataScreen = ({route}) => {
             .catch(error => {
                 console.log(error);
                 Alert.alert(error.message);
+                navigation.navigate('Login');
             });
     }
 
@@ -120,24 +154,51 @@ const UserDataScreen = ({route}) => {
                     onChangeText={(text) => handleInputChange('username', text)}
                     style={styles.input}
                 />
-                <TextInput
-                    placeholder={"Height"}
-                    value={user.height}
-                    onChangeText={(text) => handleInputChange('height', text)}
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder={"Weight"}
-                    value={user.weight}
-                    onChangeText={(text) => handleInputChange('weight', text)}
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder={"Birth date"}
-                    value={user.birth_date}
-                    onChangeText={(text) => handleInputChange('birth_date', text)}
-                    style={styles.input}
-                />
+                <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <TextInput
+                        placeholder={"Height"}
+                        value={user.height === 0 ? "" : user.height.toString()}
+                        onChangeText={(text) => handleInputChange('height', text)}
+                        style={{
+                            ...styles.inputHorizontal,
+                            marginRight: 2.5
+                        }}
+                    />
+                    <TextInput
+                        placeholder={"Weight"}
+                        value={user.weight === 0 ? "" : user.weight.toString()}
+                        onChangeText={(text) => handleInputChange('weight', text)}
+                        style={{
+                            ...styles.inputHorizontal,
+                            marginLeft: 2.5
+                        }}
+                    />
+                </View>
+                <View style={{ flexDirection: "row" }}>
+                    <TouchableOpacity
+                        style={styles.buttonDate}
+                        onPress={showDatepicker}
+                    >
+                        <Text style={{ opacity: date ? 1 : 0.6 }}>
+                            {date ? date.toISOString().split("T")[0] : "Birthdate"}
+                        </Text>
+                    </TouchableOpacity>
+                    <View style={{ flex: 1, borderRadius: 10, overflow: 'hidden', height: 50, marginTop: 5, marginLeft: 5 }}>
+                        <Picker
+                            ref={pickerRef}
+                            selectedValue={user.isAthlete}
+                            onValueChange={(itemValue, itemIndex) =>
+                                handleInputChange("isAthlete", itemValue)
+                            }
+                            style={{
+                                backgroundColor: buttonTextColor,
+                            }}
+                        >
+                            <Picker.Item label="Athlete" value={true} />
+                            <Picker.Item label="Trainer" value={false} />
+                        </Picker>
+                    </View>
+                </View>
                 <TextInput
                     placeholder={"Location"}
                     value={user.location}
@@ -183,6 +244,15 @@ const styles = StyleSheet.create({
         marginTop: 5,
         color: textColor,
     },
+    inputHorizontal: {
+        backgroundColor: textBoxColor,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        borderRadius: 10,
+        marginTop: 5,
+        color: textColor,
+        flex: 1,
+    },
     buttonContainer: {
         width: '60%',
         justifyContent: 'center',
@@ -195,6 +265,13 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10,
         alignItems: 'center'
+    },
+    buttonDate: {
+        backgroundColor: buttonTextColor,
+        width: '49%',
+        padding: 15,
+        marginTop: 5,
+        borderRadius: 10,
     },
     buttonText: {
         color: buttonTextColor,
