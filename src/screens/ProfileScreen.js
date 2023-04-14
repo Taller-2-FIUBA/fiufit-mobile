@@ -85,8 +85,6 @@ const ProfileScreen = ({route}) => {
                     <TextInput
                         style={styles.input}
                         value={userProfile.email}
-                        editable={editable}
-                        onChangeText={(text) => setUserProfile(...userProfile, {email: text})}
                     />
                     <TextInput
                         style={styles.input}
