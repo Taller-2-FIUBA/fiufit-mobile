@@ -1,6 +1,6 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator} from 'react-native';
-import {primaryColor } from "../consts/colors";
+import {secondaryColor } from "../consts/colors";
 import {baseURL, userURI} from "../consts/requests";
 
 
@@ -21,11 +21,12 @@ const ProfileScreen = ({route}) => {
         console.log("Fetching user profile...");
         const { userId } = route.params;
 
-        fetch(baseURL + userURI + userId)
+        fetch(baseURL + userURI + '/' + userId)
             .then((response) => response.json())
             .then((profile) => {
+                const profileAux = {"birth_date": "2023-04-14", "email": "valeria@gmail.com", "height": "1.70", "isAthlete": true, "location": "Bs. As.", "name": "Val", "password": "123412", "registration_date": "2023-04-14", "surname": "fiuba", "username": "valfiuba", "weight": "65"};
                 setLoading(false);
-                setUserProfile(profile);
+                setUserProfile(profileAux);
             })
             .catch((error) => {
                 setLoading(false);
@@ -37,18 +38,20 @@ const ProfileScreen = ({route}) => {
 
     const updateProfile = () => {
         const { userId } = route.params;
-
-        fetch(baseURL + userURI + userId, {
+        console.log("Update profile: ", userProfile);
+        let copyProfile = {...userProfile};
+        delete copyProfile.email
+        delete copyProfile.isAthlete
+        fetch(baseURL + userURI + '/' + userId, {
         method: 'PATCH',
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(userProfile)
+        body: JSON.stringify(copyProfile)
         })
         .then((response) => response.json())
-        .then((updatedProfile) => {
-            setUserProfile(updatedProfile);
+        .then(() => {
             setEditable(false);
         })
         .catch((error) => {
@@ -64,6 +67,10 @@ const ProfileScreen = ({route}) => {
         }
     };
 
+    const handleInputChange = (key, value) => {
+        setUserProfile({ ...userProfile, [key]: value });
+    };
+
     return (
         <View>
             {loading && <ActivityIndicator />}
@@ -74,35 +81,36 @@ const ProfileScreen = ({route}) => {
                         style={styles.input}
                         value={userProfile.name}
                         editable={editable}
-                        onChangeText={(text) =>  setUserProfile(...userProfile, {name: text})}
+                        onChangeText={(text) => handleInputChange("name", text)}
                     />
                     <TextInput
                         style={styles.input}
                         value={userProfile.surname}
                         editable={editable}
-                        onChangeText={(text) => setUserProfile(...userProfile, {surname: text})}
+                        onChangeText={(text) => handleInputChange("surname", text)}
                     />
                     <TextInput
                         style={styles.input}
                         value={userProfile.email}
+                        editable={false}
                     />
                     <TextInput
                         style={styles.input}
                         value={userProfile.location}
                         editable={editable}
-                        onChangeText={(text) => setUserProfile(...userProfile, {location: text})}
+                        onChangeText={(text) => handleInputChange("location", text)}
                     />
                     <TextInput
                         style={styles.input}
                         value={userProfile.height?.toString()}
                         editable={editable}
-                        onChangeText={(text) => setUserProfile(...userProfile, {height: number})}
+                        onChangeText={(text) => handleInputChange("height", text)}
                     />
                     <TextInput
                         style={styles.input}
                         value={userProfile.weight?.toString()}
                         editable={editable}
-                        onChangeText={(text) => setUserProfile(...userProfile, {weight: number})}
+                        onChangeText={(text) => handleInputChange("weight", text)}
                     />
             
                     <TouchableOpacity style={styles.button} onPress={toggleEditable}>
@@ -127,14 +135,14 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     button: {
-        backgroundColor: primaryColor,
-        padding: 10,
+        backgroundColor: secondaryColor,
+        padding: 30,
         alignItems: 'center',
         borderRadius: 5,
     },
     buttonText: {
-        color: '#fff',
-        fontSize: 16,
+        color: 'white',
+        fontSize: 16
     },
 });
 
