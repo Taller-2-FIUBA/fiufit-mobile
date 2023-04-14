@@ -49,7 +49,7 @@ const UserDataScreen = ({route}) => {
     const [user, setUser] = useState(  {
         email: route.params.email,
         password: route.params.password,
-        isAthlete: true,
+        is_athlete: true,
         username: '',
         name: '',
         surname: '',
@@ -86,7 +86,7 @@ const UserDataScreen = ({route}) => {
 
     const trimUserData = (user) => {
         for (const key in user) {
-            if (user.hasOwnProperty(key) && key !== 'isAthlete') {
+            if (user.hasOwnProperty(key) && key !== 'is_athlete') {
                 user[key] = user[key].trim();
             }
         }
@@ -186,9 +186,9 @@ const UserDataScreen = ({route}) => {
                     <View style={{ flex: 1, borderRadius: 10, overflow: 'hidden', height: 50, marginTop: 5, marginLeft: 5 }}>
                         <Picker
                             ref={pickerRef}
-                            selectedValue={user.isAthlete}
+                            selectedValue={user.is_athlete}
                             onValueChange={(itemValue, itemIndex) =>
-                                handleInputChange("isAthlete", itemValue)
+                                handleInputChange("is_athlete", itemValue)
                             }
                             style={{
                                 backgroundColor: buttonTextColor,
