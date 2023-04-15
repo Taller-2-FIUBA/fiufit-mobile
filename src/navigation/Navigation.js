@@ -4,9 +4,10 @@ import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import LoginScreen from "../screens/LoginScreen";
 import SignUpScreen from "../screens/SignUpScreen";
-import {secondaryColor, tertiaryColor} from "../consts/colors";
+import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
 import {Octicons} from "@expo/vector-icons";
 import UserDataScreen from "../screens/UserDataScreen";
+import {TabBarButton} from "./Animations";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -22,6 +23,7 @@ const MainTabNavigator = () => {
                     borderTopWidth: 0,
                     elevation: 0,
                 },
+                tabBarButton: (props) => <TabBarButton {...props} />,
                 tabBarIcon: ({ focused}) => {
                     let iconName;
 
