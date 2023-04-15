@@ -6,7 +6,7 @@ import {useNavigation} from "@react-navigation/native"
 import { Image } from 'react-native'
 import {baseURL, loginURI} from "../consts/requests";
 
-let userId = "test user id";
+let userId = null;
 export {userId};
 
 const LoginScreen = () => {

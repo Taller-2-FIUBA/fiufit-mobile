@@ -4,7 +4,7 @@ import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import LoginScreen from "../screens/LoginScreen";
 import SignUpScreen from "../screens/SignUpScreen";
-import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
+import {secondaryColor, tertiaryColor} from "../consts/colors";
 import {Octicons} from "@expo/vector-icons";
 import UserDataScreen from "../screens/UserDataScreen";
 import {TabBarButton} from "./Animations";
