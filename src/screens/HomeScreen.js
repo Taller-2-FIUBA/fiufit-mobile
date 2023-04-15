@@ -2,19 +2,14 @@ import { useNavigation } from '@react-navigation/native'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import {primaryColor, secondaryColor} from "../consts/colors";
+import {userId} from "./LoginScreen";
 
-const HomeScreen = ({route}) => {
+const HomeScreen = () => {
     const navigation = useNavigation()
-
-    const { userId } = route.params;
 
     const handleSignOut = () => {
         navigation.navigate("Login")
         // TODO: Pegarle al back.
-    }
-
-    const handleProfile = () => {
-        navigation.navigate("Profile", {userId: userId})
     }
 
     return (
@@ -23,12 +18,6 @@ const HomeScreen = ({route}) => {
                 userId: {userId}
             </Text>
             <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                    onPress={handleProfile}
-                    style={styles.button}
-                >
-                    <Text style={styles.buttonText}>Profile</Text>
-                </TouchableOpacity>
                 <TouchableOpacity
                     onPress={handleSignOut}
                     style={styles.button}

@@ -16,7 +16,7 @@ import {
     validateWeight
 } from "../utils/validations";
 import {useNavigation} from "@react-navigation/native";
-import {buttonTextColor, primaryColor, secondaryColor, textBoxColor, textColor} from "../consts/colors";
+import {primaryColor, secondaryColor, tertiaryColor, whiteColor} from "../consts/colors";
 import {useRef, useState} from "react";
 import {baseURL, signUpURI} from "../consts/requests";
 import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
@@ -191,7 +191,7 @@ const UserDataScreen = ({route}) => {
                                 handleInputChange("is_athlete", itemValue)
                             }
                             style={{
-                                backgroundColor: buttonTextColor,
+                                backgroundColor: whiteColor,
                             }}
                         >
                             <Picker.Item label="Athlete" value={true} />
@@ -237,20 +237,20 @@ const styles = StyleSheet.create({
         width: '80%',
     },
     input: {
-        backgroundColor: textBoxColor,
+        backgroundColor: whiteColor,
         paddingHorizontal: 15,
         paddingVertical: 10,
         borderRadius: 10,
         marginTop: 5,
-        color: textColor,
+        color: tertiaryColor,
     },
     inputHorizontal: {
-        backgroundColor: textBoxColor,
+        backgroundColor: whiteColor,
         paddingHorizontal: 15,
         paddingVertical: 10,
         borderRadius: 10,
         marginTop: 5,
-        color: textColor,
+        color: tertiaryColor,
         flex: 1,
     },
     buttonContainer: {
@@ -267,14 +267,14 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     buttonDate: {
-        backgroundColor: buttonTextColor,
+        backgroundColor: whiteColor,
         width: '49%',
         padding: 15,
         marginTop: 5,
         borderRadius: 10,
     },
     buttonText: {
-        color: buttonTextColor,
+        color: whiteColor,
         fontWeight: '700',
         fontSize: 16,
     },

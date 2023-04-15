@@ -1,10 +1,13 @@
 import {Alert, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import React, {useState} from 'react'
-import {buttonTextColor, outlineColor, primaryColor, secondaryColor, textBoxColor, textColor} from '../consts/colors'
+import {primaryColor, secondaryColor, tertiaryColor, whiteColor} from '../consts/colors'
 import {validateEmail} from "../utils/validations"
 import {useNavigation} from "@react-navigation/native"
 import { Image } from 'react-native'
 import {baseURL, loginURI} from "../consts/requests";
+
+let userId = "test user id";
+export {userId};
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('')
@@ -40,7 +43,8 @@ const LoginScreen = () => {
                 if (data.error) {
                     Alert.alert(data.error);
                 } else {
-                    navigation.navigate('Home', {userId: data.id});
+                    userId = data.id;
+                    navigation.navigate('Home');
                 }
             })
             .catch(error => {
@@ -110,12 +114,12 @@ const styles = StyleSheet.create({
         width: '80%',
     },
     input: {
-        backgroundColor: textBoxColor,
+        backgroundColor: whiteColor,
         paddingHorizontal: 15,
         paddingVertical: 10,
         borderRadius: 10,
         marginTop: 5,
-        color: textColor,
+        color: primaryColor,
     },
     buttonContainer: {
         width: '60%',
@@ -133,16 +137,16 @@ const styles = StyleSheet.create({
     buttonOutline: {
         backgroundColor: primaryColor,
         marginTop: 5,
-        borderColor: outlineColor,
+        borderColor: tertiaryColor,
         borderWidth: 2,
     },
     buttonText: {
-        color: buttonTextColor,
+        color: whiteColor,
         fontWeight: '700',
         fontSize: 16,
     },
     buttonOutlineText: {
-        color: outlineColor,
+        color: tertiaryColor,
         fontWeight: '700',
         fontSize: 16,
     }

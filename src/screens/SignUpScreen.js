@@ -11,7 +11,7 @@ import {
 import React, {useState} from 'react'
 import {validateEmail, validatePassword} from "../utils/validations";
 import {useNavigation} from "@react-navigation/native";
-import {buttonTextColor, primaryColor, secondaryColor, textBoxColor, textColor} from "../consts/colors";
+import {primaryColor, secondaryColor, tertiaryColor, whiteColor} from "../consts/colors";
 
 const SignUpScreen = () => {
     const navigation = useNavigation();
@@ -99,12 +99,12 @@ const styles = StyleSheet.create({
         width: '80%',
     },
     input: {
-        backgroundColor: textBoxColor,
+        backgroundColor: whiteColor,
         paddingHorizontal: 15,
         paddingVertical: 10,
         borderRadius: 10,
         marginTop: 5,
-        color: textColor,
+        color: tertiaryColor,
     },
     buttonContainer: {
         width: '60%',
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     buttonText: {
-        color: buttonTextColor,
+        color: whiteColor,
         fontWeight: '700',
         fontSize: 16,
     },

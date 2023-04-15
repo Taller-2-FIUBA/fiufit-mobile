@@ -1,53 +1,10 @@
-import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import LoginScreen from "./src/screens/LoginScreen";
-import HomeScreen from "./src/screens/HomeScreen";
-import SignUpScreen from "./src/screens/SignUpScreen";
-import {primaryColor, secondaryColor} from "./src/consts/colors";
-import ProfileScreen from "./src/screens/ProfileScreen";
-import UserDataScreen from "./src/screens/UserDataScreen";
-
-const Stack = createNativeStackNavigator();
+import MainStackNavigator from "./src/navigation/Navigation";
 
 export default function App() {
   return (
       <NavigationContainer>
-        <Stack.Navigator>
-            <Stack.Screen options={{
-                headerShown: false,
-                statusBarColor: secondaryColor
-            }} name="Login" component={LoginScreen} />
-            <Stack.Screen options={{
-                headerShown: false,
-                statusBarColor: secondaryColor
-            }} name="SignUp" component={SignUpScreen} />
-            <Stack.Screen options={{
-                headerShown: false,
-                statusBarColor: secondaryColor
-            }} name="UserData" component={UserDataScreen} />
-            <Stack.Screen options={{
-                statusBarColor: secondaryColor,
-                headerStyle: {
-                    backgroundColor: secondaryColor
-                }
-            }} name="Home" component={HomeScreen} />
-            <Stack.Screen options={{
-                statusBarColor: secondaryColor,
-                headerStyle: {
-                    backgroundColor: secondaryColor
-                }
-            }} name="Profile" component={ProfileScreen} />
-        </Stack.Navigator>
+            <MainStackNavigator/>
       </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: primaryColor,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
