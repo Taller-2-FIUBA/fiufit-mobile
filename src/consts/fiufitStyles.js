@@ -1,5 +1,5 @@
 import {StyleSheet} from "react-native";
-import {primaryColor, secondaryColor, tertiaryColor, whiteColor} from "./colors";
+import {greyColor, primaryColor, secondaryColor, tertiaryColor, whiteColor} from "./colors";
 
 export const fiufitStyles = StyleSheet.create({
     logo: {
@@ -103,4 +103,10 @@ export const fiufitStyles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 10,
     },
+    haveAccount: {
+        color: greyColor,
+        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: 'bold',
+    }
 })

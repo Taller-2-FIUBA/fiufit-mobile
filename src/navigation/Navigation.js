@@ -98,12 +98,12 @@ const BottomTabNavigator = () => {
 const MainStackNavigator = () => {
     return (
         <Stack.Navigator>
-            <Stack.Screen name={"SignUp"} component={SignUpScreen}
+            <Stack.Screen name="Login" component={LoginScreen}
                           options={{
                               headerShown: false,
                               statusBarColor: secondaryColor
                           }}/>
-            <Stack.Screen name="Login" component={LoginScreen}
+            <Stack.Screen name={"SignUp"} component={SignUpScreen}
                           options={{
                               headerShown: false,
                               statusBarColor: secondaryColor

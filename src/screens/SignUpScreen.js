@@ -1,10 +1,11 @@
-import {SafeAreaView, ScrollView, Text, View} from 'react-native';
+import {Keyboard, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {greyColor, primaryColor, tertiaryColor} from "../consts/colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import {useNavigation} from "@react-navigation/native";
 import {useState} from "react";
 import {validateEmail, validatePassword} from "../utils/validations";
+import {fiufitStyles} from "../consts/fiufitStyles";
 
 const SignUpScreen = () => {
     const navigation = useNavigation();
@@ -25,6 +26,7 @@ const SignUpScreen = () => {
     };
 
     const handleSignUp = () => {
+        Keyboard.dismiss();
         let valid = true;
 
         if (!validateEmail(inputs.email)) {
@@ -102,12 +104,7 @@ const SignUpScreen = () => {
                     <Button onPress={handleSignUp} title="Register"/>
                     <Text
                         onPress={() => navigation.navigate('Login')}
-                        style={{
-                            color: greyColor,
-                            textAlign: 'center',
-                            fontSize: 16,
-                            fontWeight: 'bold',
-                        }}>Already have an account? Login</Text>
+                        style={fiufitStyles.haveAccount}>Already have an account? Login</Text>
                 </View>
             </ScrollView>
         </SafeAreaView>

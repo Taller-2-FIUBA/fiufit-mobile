@@ -1,42 +1,59 @@
-import {Alert, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
-import React, {useState} from 'react'
-import {validateEmail} from "../utils/validations"
-import {useNavigation} from "@react-navigation/native"
-import { Image } from 'react-native'
-import {baseURL, loginURI} from "../consts/requests";
+import {Alert, Image, Keyboard, SafeAreaView, ScrollView, Text, View} from "react-native";
+import {greyColor, primaryColor, tertiaryColor} from "../consts/colors";
+import {useNavigation} from "@react-navigation/native";
+import React, {useState} from "react";
+import {validateEmail} from "../utils/validations";
+import Input from "../components/Input";
+import Button from "../components/Button";
 import {fiufitStyles} from "../consts/fiufitStyles";
+import {baseURL, loginURI} from "../consts/requests";
 
 let userId = null;
 export {userId};
 
 const LoginScreen = () => {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-
     const navigation = useNavigation();
 
-    const handleSignUpPress = () => {
-        navigation.navigate('SignUp');
-    }
+    const [inputs, setInputs] = useState({
+        email: '',
+        password: '',
+    });
+    const [errors, setErrors] = useState({});
+
+    const handleInputChange = (key, value) => {
+        setInputs({ ...inputs, [key]: value });
+    };
+
+    const handleError = (error, input) => {
+        setErrors(prevState => ({...prevState, [input]: error}));
+    };
 
     const handleLogin = () => {
-        if (!validateEmail(email)) {
-            Alert.alert('Please enter a valid email address');
-            return;
+        Keyboard.dismiss();
+        let valid = true;
+        if (!validateEmail(inputs.email)) {
+            handleError('Invalid email', 'email');
+            valid = false;
         }
 
-        if (!password) {
-            Alert.alert('Please enter your password');
-            return;
+        if (!inputs.password) {
+            handleError('Invalid password', 'password');
+            valid = false;
         }
 
+        if (valid) {
+            login(inputs);
+        }
+    }
+
+    const login = (inputs) => {
         console.log("Logging in");
         fetch(baseURL + loginURI, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({email, password})
+            body: JSON.stringify(inputs)
         })
             .then(response => response.json())
             .then(data => {
@@ -54,46 +71,57 @@ const LoginScreen = () => {
     }
 
     return (
-        <KeyboardAvoidingView
-            style={fiufitStyles.container}
-            behavior="padding"
-            keyboardVerticalOffset={-200}>
-            <Image
-                source={require('../../resources/logo.png')}
-                style={fiufitStyles.logo}
-            />
-            <View style={fiufitStyles.inputContainer}>
-                <TextInput
-                    placeholder={"Email"}
-                    value={email}
-                    onChangeText={text => setEmail(text)}
-                    style={fiufitStyles.input}
+        <SafeAreaView style={{
+            backgroundColor: primaryColor,
+            flex: 1,
+        }}>
+            <ScrollView contentContainerStyle={{
+                paddingTop: 50, paddingHorizontal: 20,
+            }}>
+                <Image
+                    source={require('../../resources/logo.png')}
+                    style={[fiufitStyles.logo, {alignSelf: 'center', marginBottom: 20}]}
                 />
-                <TextInput
-                    placeholder={"Password"}
-                    value={password}
-                    onChangeText={text => setPassword(text)}
-                    style={fiufitStyles.input}
-                    secureTextEntry
-                />
-            </View>
-
-            <View style={fiufitStyles.buttonContainer}>
-                <TouchableOpacity
-                    onPress={handleLogin}
-                    style={fiufitStyles.button}
-                >
-                    <Text style={fiufitStyles.buttonText}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={handleSignUpPress}
-                    style={[fiufitStyles.button, fiufitStyles.buttonOutline]}
-                >
-                    <Text style={fiufitStyles.buttonOutlineText}>Register</Text>
-                </TouchableOpacity>
-            </View>
-        </KeyboardAvoidingView>
+                <Text style={{
+                    color: tertiaryColor,
+                    fontSize: 20,
+                    fontWeight: 'bold',
+                }}>
+                    Login
+                </Text>
+                <Text style={{
+                    color: greyColor,
+                    fontSize: 18,
+                    marginVertical: 10
+                }}>
+                    Enter your details to login
+                </Text>
+                <View style={{marginVertical: 20}}>
+                    <Input
+                        label="Email"
+                        iconName="email-outline"
+                        placeholder="Email address"
+                        onChangeText={text => handleInputChange('email', text)}
+                        error={errors.email}
+                        onFocus={() => handleError(null, 'email')}
+                    />
+                    <Input
+                        label="Password"
+                        iconName="lock-outline"
+                        placeholder="Password"
+                        password
+                        onChangeText={text => handleInputChange('password', text)}
+                        error={errors.password}
+                        onFocus={() => handleError(null, 'password')}
+                    />
+                    <Button onPress={handleLogin} title="Login"/>
+                    <Text
+                        onPress={() => navigation.navigate('SignUp')}
+                        style={fiufitStyles.haveAccount}>Do not have an account? Sign up</Text>
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     )
 }
 
-export default LoginScreen
+export default LoginScreen;

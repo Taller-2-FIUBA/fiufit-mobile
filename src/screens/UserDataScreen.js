@@ -136,10 +136,8 @@ const UserDataScreen = ({route}) => {
             .then(data => {
                 if (data.error) {
                     Alert.alert(data.error);
-                    navigation.navigate('Login');
-                } else {
-                    navigation.navigate('Trainings');
                 }
+                navigation.navigate('Login');
             })
             .catch(error => {
                 console.log(error);
