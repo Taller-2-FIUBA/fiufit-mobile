@@ -1,85 +1,117 @@
-import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    StyleSheet,
-    Text,
-    TextInput,
-    ToastAndroid,
-    TouchableOpacity,
-    View
-} from 'react-native'
-import React, {useState} from 'react'
-import {validateEmail, validatePassword} from "../utils/validations";
+import {SafeAreaView, ScrollView, Text, View} from 'react-native';
+import {greyColor, primaryColor, tertiaryColor} from "../consts/colors";
+import Input from "../components/Input";
+import Button from "../components/Button";
 import {useNavigation} from "@react-navigation/native";
-import {fiufitStyles} from "../consts/fiufitStyles";
+import {useState} from "react";
+import {validateEmail, validatePassword} from "../utils/validations";
 
 const SignUpScreen = () => {
     const navigation = useNavigation();
 
-    const [email, setEmail] = useState('');
-    const [password1, setPassword1] = useState('');
-    const [password2, setPassword2] = useState('');
+    const [inputs, setInputs] = useState({
+        email: '',
+        password1: '',
+        password2: '',
+    });
+    const [errors, setErrors] = useState({});
+
+    const handleInputChange = (key, value) => {
+        setInputs({ ...inputs, [key]: value });
+    };
+
+    const handleError = (error, input) => {
+        setErrors(prevState => ({...prevState, [input]: error}));
+    };
 
     const handleSignUp = () => {
-        if (!validateEmail(email)) {
-            Alert.alert('Please enter a valid email address');
-            return;
+        let valid = true;
+
+        if (!validateEmail(inputs.email)) {
+            handleError('Invalid email', 'email');
+            valid = false;
         }
 
-        if (!validatePassword(password1) || !validatePassword(password2)) {
-            Alert.alert('Password must be at least 6 characters long');
-            return;
+        if (!validatePassword(inputs.password1)) {
+            handleError('Invalid password', 'password1');
+            valid = false;
         }
 
-        if (password1 !== password2) {
-            Alert.alert('Passwords do not match');
-            return;
+        if (!validatePassword(inputs.password2)) {
+            handleError('Invalid password', 'password2');
+            valid = false;
+        } else if (inputs.password1 !== inputs.password2) {
+            handleError('Passwords do not match', 'password2');
+            valid = false;
         }
 
-        navigation.navigate('UserData', {email: email, password: password1});
+        if (valid) {
+            navigation.navigate('UserData', {email: inputs.email, password: inputs.password1});
+        }
     }
 
     return (
-        <KeyboardAvoidingView style={fiufitStyles.container}
-                              behavior="padding"
-                              keyboardVerticalOffset={-200}>
-            <Image
-                source={require('../../resources/logo.png')}
-                style={fiufitStyles.logo}
-            />
-            <View style={fiufitStyles.inputContainer}>
-                <TextInput
-                    placeholder={"Email"}
-                    value={email}
-                    onChangeText={text => setEmail(text)}
-                    style={fiufitStyles.input}
-                />
-                <TextInput
-                    placeholder={"Password"}
-                    value={password1}
-                    onChangeText={text => setPassword1(text)}
-                    style={fiufitStyles.input}
-                    secureTextEntry
-                />
-                <TextInput
-                    placeholder={"Repeat password"}
-                    value={password2}
-                    onChangeText={text => setPassword2(text)}
-                    style={fiufitStyles.input}
-                    secureTextEntry
-                />
-            </View>
-            <View style={fiufitStyles.buttonContainer}>
-                <TouchableOpacity
-                    onPress={handleSignUp}
-                    style={fiufitStyles.button}
-                >
-                    <Text style={fiufitStyles.buttonText}>Register</Text>
-                </TouchableOpacity>
-            </View>
-        </KeyboardAvoidingView>
+        <SafeAreaView style={{
+            backgroundColor: primaryColor,
+            flex: 1,
+        }}>
+            <ScrollView contentContainerStyle={{
+                paddingTop: 50, paddingHorizontal: 20,
+            }}>
+                <Text style={{
+                    color: tertiaryColor,
+                    fontSize: 40,
+                    fontWeight: 'bold',
+                }}>
+                    Register
+                </Text>
+                <Text style={{
+                    color: greyColor,
+                    fontSize: 18,
+                    marginVertical: 10
+                }}>
+                    Enter your details to register
+                </Text>
+                <View style={{marginVertical: 20}}>
+                    <Input
+                        label="Email"
+                        iconName="email-outline"
+                        placeholder="Email address"
+                        onChangeText={text => handleInputChange('email', text)}
+                        error={errors.email}
+                        onFocus={() => handleError(null, 'email')}
+                    />
+                    <Input
+                        label="Password"
+                        iconName="lock-outline"
+                        placeholder="Password"
+                        password
+                        onChangeText={text => handleInputChange('password1', text)}
+                        error={errors.password1}
+                        onFocus={() => handleError(null, 'password1')}
+                    />
+                    <Input
+                        label="Password"
+                        iconName="lock-outline"
+                        placeholder="Confirm password"
+                        password
+                        onChangeText={text => handleInputChange('password2', text)}
+                        error={errors.password2}
+                        onFocus={() => handleError(null, 'password2')}
+                    />
+                    <Button onPress={handleSignUp} title="Register"/>
+                    <Text
+                        onPress={() => navigation.navigate('Login')}
+                        style={{
+                            color: greyColor,
+                            textAlign: 'center',
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                        }}>Already have an account? Login</Text>
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     )
 }
 
-export default SignUpScreen
+export default SignUpScreen;

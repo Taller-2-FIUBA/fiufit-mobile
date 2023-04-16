@@ -78,5 +78,29 @@ export const fiufitStyles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
         marginTop: 5
-    }
+    },
+    registerInput: {
+        height: 55,
+        backgroundColor: secondaryColor,
+        flexDirection: 'row',
+        borderWidth: 0.5,
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        borderRadius: 10,
+    },
+    iconStyle: {
+        fontSize: 22,
+        color: tertiaryColor,
+        marginRight: 10,
+    },
+    registerButton: {
+        backgroundColor: primaryColor,
+        marginVertical: 10,
+        borderColor: tertiaryColor,
+        borderWidth: 2,
+        height: 55,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+    },
 })
