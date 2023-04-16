@@ -2,9 +2,7 @@ export const parseHeight = (value) => {
     let newValue = value.toString();
     let arr = newValue.replace(" cm", "").split("");
     arr.splice(1, 0, ".");
-    let ret = parseFloat(arr.join(""));
-    console.log(ret);
-    return ret;
+    return parseFloat(arr.join(""));
 }
 
 export const parseWeight = (value) => {

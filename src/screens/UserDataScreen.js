@@ -19,7 +19,7 @@ import {baseURL, signUpURI} from "../consts/requests";
 import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import {Picker} from "@react-native-picker/picker";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {primaryColor, secondaryColor, tertiaryColor, whiteColor} from "../consts/colors";
+import {whiteColor} from "../consts/colors";
 import WheelPickerExpo from 'react-native-wheel-picker-expo';
 import {parseHeight, parseWeight} from "../utils/utils";
 
@@ -77,6 +77,9 @@ const UserDataScreen = ({route}) => {
     });
 
     const handleInputChange = (key, value) => {
+        if (key === 'weight') {
+            value = parseWeight(value);
+        }
         setUser({ ...user, [key]: value });
     };
 
@@ -119,7 +122,6 @@ const UserDataScreen = ({route}) => {
         }
 
         signUpUser(user);
-        // navigation.navigate('Trainings', {user: user});
     }
 
     const signUpUser = (user) => {
