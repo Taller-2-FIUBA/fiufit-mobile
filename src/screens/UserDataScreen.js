@@ -4,15 +4,14 @@ import {
     KeyboardAvoidingView,
     Text,
     TextInput,
-    ToastAndroid,
     TouchableOpacity,
     View
 } from 'react-native'
 import {
-    validateHeight, validateLocation,
-    validateName,
-    validateUsername,
-    validateWeight
+    validateBirthDate, validateHeight,
+    validateLocation,
+    validateName, validateNameLength,
+    validateUsername, validateUsernameLength, validateWeight
 } from "../utils/validations";
 import {useNavigation} from "@react-navigation/native";
 import {useRef, useState} from "react";
@@ -20,25 +19,42 @@ import {baseURL, signUpURI} from "../consts/requests";
 import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import {Picker} from "@react-native-picker/picker";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {whiteColor} from "../consts/colors";
+import {primaryColor, secondaryColor, tertiaryColor, whiteColor} from "../consts/colors";
+import WheelPickerExpo from 'react-native-wheel-picker-expo';
+import {parseHeight, parseWeight} from "../utils/utils";
 
 const UserDataScreen = ({route}) => {
     const navigation = useNavigation();
-    const pickerRef = useRef();
-
+    const datePickerRef = useRef();
+    const [isPickerVisible, setPickerVisibility] = useState(false);
     const [date, setDate] = useState(null);
+    const [height, setHeight] = useState('');
+
+    const togglePicker = () => {
+        handleInputChange('height', parseHeight(height));
+        setPickerVisibility(!isPickerVisible);
+    };
 
     const onChange = (event, selectedDate) => {
         setDate(selectedDate);
         handleInputChange('birth_date', selectedDate.toISOString().split('T')[0]);
     };
 
+    const heightOptions = [];
+    for (let i = 30; i <= 250; i++) {
+        heightOptions.push(i + ' cm');
+    }
+
     const showMode = (currentMode) => {
+        const maxDate = new Date();
+        maxDate.setFullYear(maxDate.getFullYear() - 13);
         DateTimePickerAndroid.open({
             value: date || new Date(),
             onChange,
             mode: currentMode,
             is24Hour: true,
+            minimumDate: new Date(1940, 0, 1),
+            maximumDate: maxDate,
         });
     };
 
@@ -66,17 +82,21 @@ const UserDataScreen = ({route}) => {
 
     const validateForm = (user) => {
         const validationData = [
+            {value: user.name, validator: validateNameLength, errorMessage: 'Name must be at least 2 characters long'},
             {value: user.name, validator: validateName, errorMessage: 'Invalid name'},
+            {value: user.surname, validator: validateNameLength, errorMessage: 'Surname must be at least 2 characters long'},
             {value: user.surname, validator: validateName, errorMessage: 'Invalid surname'},
+            {value: user.username, validator: validateUsernameLength, errorMessage: 'Username must be at least 4 characters long'},
             {value: user.username, validator: validateUsername, errorMessage: 'Invalid username'},
-            {value: user.height, validator: validateHeight, errorMessage: 'Invalid height'},
-            {value: user.weight, validator: validateWeight, errorMessage: 'Invalid weight'},
+            {value: user.height, validator: validateHeight, errorMessage: 'Please select a height'},
+            {value: user.weight, validator: validateWeight, errorMessage: 'Weight must be a number between 20 and 400'},
+            {value: user.birth_date, validator: validateBirthDate, errorMessage: 'Invalid birth date'},
             {value: user.location, validator: validateLocation, errorMessage: 'Invalid location'},
         ];
 
         for (const {value, validator, errorMessage} of validationData) {
             if (!validator(value)) {
-                ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+                Alert.alert(errorMessage);
                 return false;
             }
         }
@@ -86,7 +106,7 @@ const UserDataScreen = ({route}) => {
 
     const trimUserData = (user) => {
         for (const key in user) {
-            if (user.hasOwnProperty(key) && key !== 'is_athlete') {
+            if (user.hasOwnProperty(key) && key !== 'is_athlete' && key !== 'height' && key !== 'weight') {
                 user[key] = user[key].trim();
             }
         }
@@ -94,13 +114,12 @@ const UserDataScreen = ({route}) => {
 
     const handleSignUp = () => {
         trimUserData(user);
-
         if (!validateForm(user)) {
             return;
         }
 
         signUpUser(user);
-        navigation.navigate('Trainings', {user: user});
+        // navigation.navigate('Trainings', {user: user});
     }
 
     const signUpUser = (user) => {
@@ -117,7 +136,7 @@ const UserDataScreen = ({route}) => {
                     Alert.alert(data.error);
                     navigation.navigate('Login');
                 } else {
-                    navigation.navigate('Trainings', {userId: data.id});
+                    navigation.navigate('Trainings');
                 }
             })
             .catch(error => {
@@ -155,15 +174,14 @@ const UserDataScreen = ({route}) => {
                     style={fiufitStyles.input}
                 />
                 <View style={{flexDirection: "row", alignItems: "center"}}>
-                    <TextInput
-                        placeholder={"Height"}
-                        value={user.height === 0 ? "" : user.height.toString()}
-                        onChangeText={(text) => handleInputChange('height', text)}
-                        style={{
-                            ...fiufitStyles.inputHorizontal,
-                            marginRight: 2.5
-                        }}
-                    />
+                    <TouchableOpacity
+                        style={fiufitStyles.buttonDate}
+                        onPress={togglePicker}
+                    >
+                        <Text style={{opacity: height ? 1 : 0.6}}>
+                            {height ? height: 'Height'}
+                        </Text>
+                    </TouchableOpacity>
                     <TextInput
                         placeholder={"Weight"}
                         value={user.weight === 0 ? "" : user.weight.toString()}
@@ -172,49 +190,70 @@ const UserDataScreen = ({route}) => {
                             ...fiufitStyles.inputHorizontal,
                             marginLeft: 2.5
                         }}
+                        keyboardType={"numeric"}
                     />
                 </View>
-                <View style={{ flexDirection: "row" }}>
-                    <TouchableOpacity
-                        style={fiufitStyles.buttonDate}
-                        onPress={showDatepicker}
-                    >
-                        <Text style={{ opacity: date ? 1 : 0.6 }}>
-                            {date ? date.toISOString().split("T")[0] : "Birthdate"}
-                        </Text>
-                    </TouchableOpacity>
-                    <View style={{ flex: 1, borderRadius: 10, overflow: 'hidden', height: 50, marginTop: 5, marginLeft: 5 }}>
-                        <Picker
-                            ref={pickerRef}
-                            selectedValue={user.is_athlete}
-                            onValueChange={(itemValue, itemIndex) =>
-                                handleInputChange("is_athlete", itemValue)
-                            }
-                            style={{
-                                backgroundColor: whiteColor,
-                            }}
+                {!isPickerVisible && (
+                    <View style={{ flexDirection: "row" }}>
+                        <TouchableOpacity
+                            style={fiufitStyles.buttonDate}
+                            onPress={showDatepicker}
                         >
-                            <Picker.Item label="Athlete" value={true} />
-                            <Picker.Item label="Trainer" value={false} />
-                        </Picker>
-                    </View>
+                            <Text style={{ opacity: date ? 1 : 0.6 }}>
+                                {date ? date.toISOString().split("T")[0] : "Birthdate"}
+                            </Text>
+                        </TouchableOpacity>
+                        <View style={{ flex: 1, borderRadius: 10, overflow: 'hidden', height: 50, marginTop: 5, marginLeft: 5 }}>
+                            <Picker
+                                ref={datePickerRef}
+                                selectedValue={user.is_athlete}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    handleInputChange("is_athlete", itemValue)
+                                }
+                                style={{
+                                    backgroundColor: whiteColor,
+                                }}
+                            >
+                                <Picker.Item label="Athlete" value={true} />
+                                <Picker.Item label="Trainer" value={false} />
+                            </Picker>
+                        </View>
+                    </View>)}
+                {!isPickerVisible && (
+                    <TextInput
+                        placeholder={"Location"}
+                        value={user.location}
+                        onChangeText={(text) => handleInputChange('location', text)}
+                        style={fiufitStyles.input}
+                    />
+                )}
+            </View>
+            {isPickerVisible && (
+                <View
+                    style={{marginTop: 5}}>
+                    <WheelPickerExpo
+                        initialSelectedIndex={140}
+                        items={heightOptions.map(name => ({ label: name, value: '' }))}
+                        onChange={({ item }) => setHeight(item.label)}
+                    />
+                    <TouchableOpacity
+                        style={fiufitStyles.heightInputConfirmButton}
+                        onPress={togglePicker}
+                    >
+                        <Text style={fiufitStyles.buttonOutlineText}>Confirm</Text>
+                    </TouchableOpacity>
                 </View>
-                <TextInput
-                    placeholder={"Location"}
-                    value={user.location}
-                    onChangeText={(text) => handleInputChange('location', text)}
-                    style={fiufitStyles.input}
-                />
-            </View>
-
-            <View style={fiufitStyles.buttonContainer}>
-                <TouchableOpacity
-                    onPress={handleSignUp}
-                    style={fiufitStyles.button}
-                >
-                    <Text style={fiufitStyles.buttonText}>Register</Text>
-                </TouchableOpacity>
-            </View>
+            )}
+            {!isPickerVisible && (
+                <View style={fiufitStyles.buttonContainer}>
+                    <TouchableOpacity
+                        onPress={handleSignUp}
+                        style={fiufitStyles.button}
+                    >
+                        <Text style={fiufitStyles.buttonText}>Register</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </KeyboardAvoidingView>
     )
 }

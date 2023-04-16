@@ -70,4 +70,13 @@ export const fiufitStyles = StyleSheet.create({
         color: primaryColor,
         flex: 1,
     },
+    heightInputConfirmButton: {
+        backgroundColor: primaryColor,
+        borderColor: tertiaryColor,
+        borderWidth: 2,
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginTop: 5
+    }
 })

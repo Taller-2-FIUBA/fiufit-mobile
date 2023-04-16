@@ -1,4 +1,5 @@
 import {
+    Alert,
     Image,
     KeyboardAvoidingView,
     StyleSheet,
@@ -22,17 +23,17 @@ const SignUpScreen = () => {
 
     const handleSignUp = () => {
         if (!validateEmail(email)) {
-            ToastAndroid.show('Invalid email', ToastAndroid.SHORT);
+            Alert.alert('Please enter a valid email address');
             return;
         }
 
         if (!validatePassword(password1) || !validatePassword(password2)) {
-            ToastAndroid.show('Password must be at least 6 digits long', ToastAndroid.SHORT);
+            Alert.alert('Password must be at least 6 characters long');
             return;
         }
 
         if (password1 !== password2) {
-            ToastAndroid.show('Passwords don\'t match', ToastAndroid.SHORT);
+            Alert.alert('Passwords do not match');
             return;
         }
 
