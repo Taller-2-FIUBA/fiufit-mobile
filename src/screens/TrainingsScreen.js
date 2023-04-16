@@ -2,34 +2,20 @@ import { useNavigation } from '@react-navigation/native'
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import {primaryColor, secondaryColor} from "../consts/colors";
-import {userId} from "./LoginScreen";
 
-const HomeScreen = () => {
+const TrainingsScreen = () => {
     const navigation = useNavigation()
-
-    const handleSignOut = () => {
-        navigation.navigate("Login")
-        // TODO: Pegarle al back.
-    }
 
     return (
         <View style={styles.container}>
             <Text style={styles.buttonText}>
-                userId: {userId}
+                Trainings Screen
             </Text>
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                    onPress={handleSignOut}
-                    style={styles.button}
-                >
-                    <Text style={styles.buttonText}>Sign out</Text>
-                </TouchableOpacity>
-            </View>
         </View>
     )
 }
 
-export default HomeScreen
+export default TrainingsScreen
 
 const styles = StyleSheet.create({
     container: {

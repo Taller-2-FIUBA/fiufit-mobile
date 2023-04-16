@@ -2,7 +2,6 @@ import {
     Alert,
     Image,
     KeyboardAvoidingView,
-    StyleSheet,
     Text,
     TextInput,
     ToastAndroid,
@@ -16,11 +15,12 @@ import {
     validateWeight
 } from "../utils/validations";
 import {useNavigation} from "@react-navigation/native";
-import {primaryColor, secondaryColor, tertiaryColor, whiteColor} from "../consts/colors";
 import {useRef, useState} from "react";
 import {baseURL, signUpURI} from "../consts/requests";
 import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import {Picker} from "@react-native-picker/picker";
+import {styles} from "../consts/styles";
+import {whiteColor} from "../consts/colors";
 
 const UserDataScreen = ({route}) => {
     const navigation = useNavigation();
@@ -100,7 +100,7 @@ const UserDataScreen = ({route}) => {
         }
 
         signUpUser(user);
-        navigation.navigate('Home', {user: user});
+        navigation.navigate('Trainings', {user: user});
     }
 
     const signUpUser = (user) => {
@@ -117,7 +117,7 @@ const UserDataScreen = ({route}) => {
                     Alert.alert(data.error);
                     navigation.navigate('Login');
                 } else {
-                    navigation.navigate('Home', {userId: data.id});
+                    navigation.navigate('Trainings', {userId: data.id});
                 }
             })
             .catch(error => {
@@ -220,62 +220,3 @@ const UserDataScreen = ({route}) => {
 }
 
 export default UserDataScreen
-const styles = StyleSheet.create({
-    logo: {
-        height: 150,
-        width: 150,
-        paddingVertical: 100,
-        marginBottom: 40,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: primaryColor,
-    },
-    inputContainer: {
-        width: '80%',
-    },
-    input: {
-        backgroundColor: whiteColor,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        borderRadius: 10,
-        marginTop: 5,
-        color: tertiaryColor,
-    },
-    inputHorizontal: {
-        backgroundColor: whiteColor,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        borderRadius: 10,
-        marginTop: 5,
-        color: tertiaryColor,
-        flex: 1,
-    },
-    buttonContainer: {
-        width: '60%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 40,
-    },
-    button: {
-        backgroundColor: secondaryColor,
-        width: '100%',
-        padding: 15,
-        borderRadius: 10,
-        alignItems: 'center'
-    },
-    buttonDate: {
-        backgroundColor: whiteColor,
-        width: '49%',
-        padding: 15,
-        marginTop: 5,
-        borderRadius: 10,
-    },
-    buttonText: {
-        color: whiteColor,
-        fontWeight: '700',
-        fontSize: 16,
-    },
-})

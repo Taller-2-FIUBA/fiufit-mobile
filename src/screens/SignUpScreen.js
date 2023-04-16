@@ -11,7 +11,7 @@ import {
 import React, {useState} from 'react'
 import {validateEmail, validatePassword} from "../utils/validations";
 import {useNavigation} from "@react-navigation/native";
-import {primaryColor, secondaryColor, tertiaryColor, whiteColor} from "../consts/colors";
+import {styles} from "../consts/styles";
 
 const SignUpScreen = () => {
     const navigation = useNavigation();
@@ -82,46 +82,3 @@ const SignUpScreen = () => {
 }
 
 export default SignUpScreen
-const styles = StyleSheet.create({
-    logo: {
-        height: 150,
-        width: 150,
-        paddingVertical: 100,
-        marginBottom: 40,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: primaryColor,
-    },
-    inputContainer: {
-        width: '80%',
-    },
-    input: {
-        backgroundColor: whiteColor,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        borderRadius: 10,
-        marginTop: 5,
-        color: tertiaryColor,
-    },
-    buttonContainer: {
-        width: '60%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 40,
-    },
-    button: {
-        backgroundColor: secondaryColor,
-        width: '100%',
-        padding: 15,
-        borderRadius: 10,
-        alignItems: 'center'
-    },
-    buttonText: {
-        color: whiteColor,
-        fontWeight: '700',
-        fontSize: 16,
-    },
-})
