@@ -1,7 +1,7 @@
 import {StyleSheet} from "react-native";
 import {primaryColor, secondaryColor, tertiaryColor, whiteColor} from "./colors";
 
-export const styles = StyleSheet.create({
+export const fiufitStyles = StyleSheet.create({
     logo: {
         height: 150,
         width: 150,

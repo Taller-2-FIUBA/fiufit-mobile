@@ -11,7 +11,7 @@ import {
 import React, {useState} from 'react'
 import {validateEmail, validatePassword} from "../utils/validations";
 import {useNavigation} from "@react-navigation/native";
-import {styles} from "../consts/styles";
+import {fiufitStyles} from "../consts/fiufitStyles";
 
 const SignUpScreen = () => {
     const navigation = useNavigation();
@@ -40,41 +40,41 @@ const SignUpScreen = () => {
     }
 
     return (
-        <KeyboardAvoidingView style={styles.container}
+        <KeyboardAvoidingView style={fiufitStyles.container}
                               behavior="padding"
                               keyboardVerticalOffset={-200}>
             <Image
                 source={require('../../resources/logo.png')}
-                style={styles.logo}
+                style={fiufitStyles.logo}
             />
-            <View style={styles.inputContainer}>
+            <View style={fiufitStyles.inputContainer}>
                 <TextInput
                     placeholder={"Email"}
                     value={email}
                     onChangeText={text => setEmail(text)}
-                    style={styles.input}
+                    style={fiufitStyles.input}
                 />
                 <TextInput
                     placeholder={"Password"}
                     value={password1}
                     onChangeText={text => setPassword1(text)}
-                    style={styles.input}
+                    style={fiufitStyles.input}
                     secureTextEntry
                 />
                 <TextInput
                     placeholder={"Repeat password"}
                     value={password2}
                     onChangeText={text => setPassword2(text)}
-                    style={styles.input}
+                    style={fiufitStyles.input}
                     secureTextEntry
                 />
             </View>
-            <View style={styles.buttonContainer}>
+            <View style={fiufitStyles.buttonContainer}>
                 <TouchableOpacity
                     onPress={handleSignUp}
-                    style={styles.button}
+                    style={fiufitStyles.button}
                 >
-                    <Text style={styles.buttonText}>Register</Text>
+                    <Text style={fiufitStyles.buttonText}>Register</Text>
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>

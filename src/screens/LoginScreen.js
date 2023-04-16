@@ -4,7 +4,7 @@ import {validateEmail} from "../utils/validations"
 import {useNavigation} from "@react-navigation/native"
 import { Image } from 'react-native'
 import {baseURL, loginURI} from "../consts/requests";
-import {styles} from "../consts/styles";
+import {fiufitStyles} from "../consts/fiufitStyles";
 
 let userId = null;
 export {userId};
@@ -55,41 +55,41 @@ const LoginScreen = () => {
 
     return (
         <KeyboardAvoidingView
-            style={styles.container}
+            style={fiufitStyles.container}
             behavior="padding"
             keyboardVerticalOffset={-200}>
             <Image
                 source={require('../../resources/logo.png')}
-                style={styles.logo}
+                style={fiufitStyles.logo}
             />
-            <View style={styles.inputContainer}>
+            <View style={fiufitStyles.inputContainer}>
                 <TextInput
                     placeholder={"Email"}
                     value={email}
                     onChangeText={text => setEmail(text)}
-                    style={styles.input}
+                    style={fiufitStyles.input}
                 />
                 <TextInput
                     placeholder={"Password"}
                     value={password}
                     onChangeText={text => setPassword(text)}
-                    style={styles.input}
+                    style={fiufitStyles.input}
                     secureTextEntry
                 />
             </View>
 
-            <View style={styles.buttonContainer}>
+            <View style={fiufitStyles.buttonContainer}>
                 <TouchableOpacity
                     onPress={handleLogin}
-                    style={styles.button}
+                    style={fiufitStyles.button}
                 >
-                    <Text style={styles.buttonText}>Login</Text>
+                    <Text style={fiufitStyles.buttonText}>Login</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={handleSignUpPress}
-                    style={[styles.button, styles.buttonOutline]}
+                    style={[fiufitStyles.button, fiufitStyles.buttonOutline]}
                 >
-                    <Text style={styles.buttonOutlineText}>Register</Text>
+                    <Text style={fiufitStyles.buttonOutlineText}>Register</Text>
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>

@@ -19,7 +19,7 @@ import {useRef, useState} from "react";
 import {baseURL, signUpURI} from "../consts/requests";
 import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import {Picker} from "@react-native-picker/picker";
-import {styles} from "../consts/styles";
+import {fiufitStyles} from "../consts/fiufitStyles";
 import {whiteColor} from "../consts/colors";
 
 const UserDataScreen = ({route}) => {
@@ -128,31 +128,31 @@ const UserDataScreen = ({route}) => {
     }
 
     return (
-        <KeyboardAvoidingView style={styles.container}
+        <KeyboardAvoidingView style={fiufitStyles.container}
                               behavior="padding"
                               keyboardVerticalOffset={-200}>
             <Image
                 source={require('../../resources/logo.png')}
-                style={styles.logo}
+                style={fiufitStyles.logo}
             />
-            <View style={styles.inputContainer}>
+            <View style={fiufitStyles.inputContainer}>
                 <TextInput
                     placeholder={"Name"}
                     value={user.name}
                     onChangeText={(text) => handleInputChange('name', text)}
-                    style={styles.input}
+                    style={fiufitStyles.input}
                 />
                 <TextInput
                     placeholder={"Surname"}
                     value={user.surname}
                     onChangeText={(text) => handleInputChange('surname', text)}
-                    style={styles.input}
+                    style={fiufitStyles.input}
                 />
                 <TextInput
                     placeholder={"Username"}
                     value={user.username}
                     onChangeText={(text) => handleInputChange('username', text)}
-                    style={styles.input}
+                    style={fiufitStyles.input}
                 />
                 <View style={{flexDirection: "row", alignItems: "center"}}>
                     <TextInput
@@ -160,7 +160,7 @@ const UserDataScreen = ({route}) => {
                         value={user.height === 0 ? "" : user.height.toString()}
                         onChangeText={(text) => handleInputChange('height', text)}
                         style={{
-                            ...styles.inputHorizontal,
+                            ...fiufitStyles.inputHorizontal,
                             marginRight: 2.5
                         }}
                     />
@@ -169,14 +169,14 @@ const UserDataScreen = ({route}) => {
                         value={user.weight === 0 ? "" : user.weight.toString()}
                         onChangeText={(text) => handleInputChange('weight', text)}
                         style={{
-                            ...styles.inputHorizontal,
+                            ...fiufitStyles.inputHorizontal,
                             marginLeft: 2.5
                         }}
                     />
                 </View>
                 <View style={{ flexDirection: "row" }}>
                     <TouchableOpacity
-                        style={styles.buttonDate}
+                        style={fiufitStyles.buttonDate}
                         onPress={showDatepicker}
                     >
                         <Text style={{ opacity: date ? 1 : 0.6 }}>
@@ -203,16 +203,16 @@ const UserDataScreen = ({route}) => {
                     placeholder={"Location"}
                     value={user.location}
                     onChangeText={(text) => handleInputChange('location', text)}
-                    style={styles.input}
+                    style={fiufitStyles.input}
                 />
             </View>
 
-            <View style={styles.buttonContainer}>
+            <View style={fiufitStyles.buttonContainer}>
                 <TouchableOpacity
                     onPress={handleSignUp}
-                    style={styles.button}
+                    style={fiufitStyles.button}
                 >
-                    <Text style={styles.buttonText}>Register</Text>
+                    <Text style={fiufitStyles.buttonText}>Register</Text>
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>

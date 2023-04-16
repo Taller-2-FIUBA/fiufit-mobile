@@ -1,11 +1,11 @@
 import {View, Text} from "react-native";
 import React from "react";
-import {styles} from "../consts/styles";
+import {fiufitStyles} from "../consts/fiufitStyles";
 
 const GoalsScreen = () => {
     return (
-        <View style={styles.container}>
-            <Text style={styles.buttonText}>
+        <View style={fiufitStyles.container}>
+            <Text style={fiufitStyles.buttonText}>
                 Goals Screen
             </Text>
         </View>
