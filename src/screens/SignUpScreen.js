@@ -1,5 +1,5 @@
 import {Keyboard, SafeAreaView, ScrollView, Text, View} from 'react-native';
-import {greyColor, primaryColor, tertiaryColor} from "../consts/colors";
+import {primaryColor} from "../consts/colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import {useNavigation} from "@react-navigation/native";
@@ -25,8 +25,13 @@ const SignUpScreen = () => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
 
-    const handleSignUp = () => {
+    const handleNext = () => {
         Keyboard.dismiss();
+
+        handleError(null, 'email')
+        handleError(null, 'password1')
+        handleError(null, 'password2')
+
         let valid = true;
 
         if (!validateEmail(inputs.email)) {
@@ -60,19 +65,11 @@ const SignUpScreen = () => {
             <ScrollView contentContainerStyle={{
                 paddingTop: 50, paddingHorizontal: 20,
             }}>
-                <Text style={{
-                    color: tertiaryColor,
-                    fontSize: 40,
-                    fontWeight: 'bold',
-                }}>
+                <Text style={fiufitStyles.titleText}>
                     Register
                 </Text>
-                <Text style={{
-                    color: greyColor,
-                    fontSize: 18,
-                    marginVertical: 10
-                }}>
-                    Enter your details to register
+                <Text style={fiufitStyles.detailsText}>
+                    Enter your email and a password
                 </Text>
                 <View style={{marginVertical: 20}}>
                     <Input
@@ -81,7 +78,6 @@ const SignUpScreen = () => {
                         placeholder="Email address"
                         onChangeText={text => handleInputChange('email', text)}
                         error={errors.email}
-                        onFocus={() => handleError(null, 'email')}
                     />
                     <Input
                         label="Password"
@@ -90,18 +86,16 @@ const SignUpScreen = () => {
                         password
                         onChangeText={text => handleInputChange('password1', text)}
                         error={errors.password1}
-                        onFocus={() => handleError(null, 'password1')}
                     />
                     <Input
-                        label="Password"
+                        label="Confirm password"
                         iconName="lock-outline"
-                        placeholder="Confirm password"
+                        placeholder="Password"
                         password
                         onChangeText={text => handleInputChange('password2', text)}
                         error={errors.password2}
-                        onFocus={() => handleError(null, 'password2')}
                     />
-                    <Button onPress={handleSignUp} title="Register"/>
+                    <Button onPress={handleNext} title="Next"/>
                     <Text
                         onPress={() => navigation.navigate('Login')}
                         style={fiufitStyles.haveAccount}>Already have an account? Login</Text>

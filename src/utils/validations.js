@@ -4,7 +4,7 @@ export const validateNameLength = (name) => {
 
 export const validateName = (name) => {
     const trimmedName = name.trim();
-    return /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/.test(trimmedName);
+    return name === "" || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/.test(trimmedName);
 }
 
 export const validateEmail = (email) => {

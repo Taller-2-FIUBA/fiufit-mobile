@@ -1,5 +1,5 @@
 import {Alert, Image, Keyboard, SafeAreaView, ScrollView, Text, View} from "react-native";
-import {greyColor, primaryColor, tertiaryColor} from "../consts/colors";
+import {primaryColor, tertiaryColor} from "../consts/colors";
 import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
 import {validateEmail} from "../utils/validations";
@@ -59,9 +59,12 @@ const LoginScreen = () => {
             .then(data => {
                 if (data.error) {
                     Alert.alert(data.error);
-                } else {
+                } else if (data.id) {
                     userId = data.id;
+                    console.log("Login successful");
                     navigation.navigate('Trainings');
+                } else {
+                    Alert.alert(data.detail);
                 }
             })
             .catch(error => {
@@ -89,11 +92,7 @@ const LoginScreen = () => {
                 }}>
                     Login
                 </Text>
-                <Text style={{
-                    color: greyColor,
-                    fontSize: 18,
-                    marginVertical: 10
-                }}>
+                <Text style={fiufitStyles.detailsText}>
                     Enter your details to login
                 </Text>
                 <View style={{marginVertical: 20}}>

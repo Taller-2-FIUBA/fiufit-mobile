@@ -12,6 +12,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import GoalsScreen from "../screens/GoalsScreen";
 import ChatScreen from "../screens/ChatScreen";
 import SearchScreen from "../screens/SearchScreen";
+import UserBiologicsScreen from "../screens/UserBiologicsScreen";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -62,7 +63,7 @@ const BottomTabNavigator = () => {
                             iconName = 'person';
                             break;
                         case 'ChatTab':
-                            iconName = 'mail';
+                            iconName = 'comment-discussion';
                             break;
                         default:
                             iconName = 'home';
@@ -110,7 +111,20 @@ const MainStackNavigator = () => {
                           }}/>
             <Stack.Screen name={"UserData"} component={UserDataScreen}
                           options={{
-                              headerShown: false,
+                              headerStyle: {
+                                    backgroundColor: secondaryColor
+                              },
+                              headerTitle: "Personal data",
+                              headerTintColor: tertiaryColor,
+                              statusBarColor: secondaryColor
+                          }}/>
+            <Stack.Screen name={"UserBiologics"} component={UserBiologicsScreen}
+                          options={{
+                              headerStyle: {
+                                  backgroundColor: secondaryColor,
+                              },
+                              headerTitle: "Physiological data",
+                              headerTintColor: tertiaryColor,
                               statusBarColor: secondaryColor
                           }}/>
             <Stack.Screen name="Trainings" component={BottomTabNavigator}

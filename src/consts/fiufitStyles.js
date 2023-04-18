@@ -1,5 +1,5 @@
 import {StyleSheet} from "react-native";
-import {greyColor, primaryColor, secondaryColor, tertiaryColor, whiteColor} from "./colors";
+import {greyColor, primaryColor, redColor, secondaryColor, tertiaryColor, whiteColor} from "./colors";
 
 export const fiufitStyles = StyleSheet.create({
     logo: {
@@ -54,21 +54,38 @@ export const fiufitStyles = StyleSheet.create({
         fontWeight: '700',
         fontSize: 16,
     },
-    buttonDate: {
-        backgroundColor: whiteColor,
+    buttonHeight: {
+        backgroundColor: secondaryColor,
         width: '49%',
         padding: 15,
-        marginTop: 5,
+        marginTop: 15,
         borderRadius: 10,
     },
-    inputHorizontal: {
-        backgroundColor: whiteColor,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
+    buttonDate: {
+        backgroundColor: secondaryColor,
+        padding: 15,
+        marginTop: 15,
         borderRadius: 10,
-        marginTop: 5,
-        color: primaryColor,
-        flex: 1,
+        marginBottom: 15,
+        height: 51,
+    },
+    buttonDateError: {
+        backgroundColor: secondaryColor,
+        borderColor: redColor,
+        borderWidth: 0.5,
+        padding: 15,
+        marginTop: 15,
+        borderRadius: 10,
+        marginBottom: 15
+    },
+    inputWeight: {
+        backgroundColor: secondaryColor,
+        paddingHorizontal: 15,
+        paddingVertical: 11,
+        borderRadius: 10,
+        marginTop: 15,
+        color: tertiaryColor,
+        marginLeft: 5,
     },
     heightInputConfirmButton: {
         backgroundColor: primaryColor,
@@ -107,6 +124,16 @@ export const fiufitStyles = StyleSheet.create({
         color: greyColor,
         textAlign: 'center',
         fontSize: 16,
+        fontWeight: 'bold',
+    },
+    detailsText: {
+        color: greyColor,
+        fontSize: 18,
+        marginVertical: 10,
+    },
+    titleText: {
+        color: tertiaryColor,
+        fontSize: 40,
         fontWeight: 'bold',
     }
 })
