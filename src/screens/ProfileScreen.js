@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import {View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator} from 'react-native';
 import {secondaryColor } from "../consts/colors";
 import {baseURL, userURI} from "../consts/requests";
+import {userId} from "./LoginScreen";
 
 
-const ProfileScreen = ({route}) => {
+const ProfileScreen = () => {
     const [userProfile, setUserProfile] = useState({
         name: '',
         surname: '',
@@ -19,7 +20,6 @@ const ProfileScreen = ({route}) => {
 
     useEffect(() => {
         console.log("Fetching user profile...");
-        const { userId } = route.params;
 
         fetch(baseURL + userURI + '/' + userId)
             .then((response) => response.json())
@@ -37,7 +37,6 @@ const ProfileScreen = ({route}) => {
 
 
     const updateProfile = () => {
-        const { userId } = route.params;
         console.log("Update profile: ", userProfile);
         let copyProfile = {...userProfile};
         delete copyProfile.email

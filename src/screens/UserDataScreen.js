@@ -1,281 +1,140 @@
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    StyleSheet,
+    SafeAreaView, ScrollView,
     Text,
-    TextInput,
-    ToastAndroid,
-    TouchableOpacity,
     View
 } from 'react-native'
 import {
-    validateHeight, validateLocation,
-    validateName,
-    validateUsername,
-    validateWeight
+    validateLocation,
+    validateName, validateNameLength,
+    validateUsername, validateUsernameLength
 } from "../utils/validations";
 import {useNavigation} from "@react-navigation/native";
-import {buttonTextColor, primaryColor, secondaryColor, textBoxColor, textColor} from "../consts/colors";
-import {useRef, useState} from "react";
-import {baseURL, signUpURI} from "../consts/requests";
-import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
-import {Picker} from "@react-native-picker/picker";
+import React, {useState} from "react";
+import {fiufitStyles} from "../consts/fiufitStyles";
+import {primaryColor} from "../consts/colors";
+import Input from "../components/Input";
+import Button from "../components/Button";
 
 const UserDataScreen = ({route}) => {
     const navigation = useNavigation();
-    const pickerRef = useRef();
 
-    const [date, setDate] = useState(null);
+    const [errors, setErrors] = useState({});
 
-    const onChange = (event, selectedDate) => {
-        setDate(selectedDate);
-        handleInputChange('birth_date', selectedDate.toISOString().split('T')[0]);
+    const handleError = (error, input) => {
+        setErrors(prevState => ({...prevState, [input]: error}));
     };
 
-    const showMode = (currentMode) => {
-        DateTimePickerAndroid.open({
-            value: date || new Date(),
-            onChange,
-            mode: currentMode,
-            is24Hour: true,
-        });
-    };
-
-    const showDatepicker = () => {
-        showMode('date');
-    };
-
-    const [user, setUser] = useState(  {
+    const [user, setUser] = useState({
         email: route.params.email,
         password: route.params.password,
-        is_athlete: true,
-        username: '',
         name: '',
         surname: '',
-        height: 0.0,
-        weight: 0,
-        birth_date: '',
+        username: '',
         location: '',
-        registration_date: new Date().toISOString().split('T')[0],
     });
 
     const handleInputChange = (key, value) => {
-        setUser({ ...user, [key]: value });
+        setUser({...user, [key]: value});
     };
 
     const validateForm = (user) => {
+        let valid = true;
         const validationData = [
-            {value: user.name, validator: validateName, errorMessage: 'Invalid name'},
-            {value: user.surname, validator: validateName, errorMessage: 'Invalid surname'},
-            {value: user.username, validator: validateUsername, errorMessage: 'Invalid username'},
-            {value: user.height, validator: validateHeight, errorMessage: 'Invalid height'},
-            {value: user.weight, validator: validateWeight, errorMessage: 'Invalid weight'},
-            {value: user.location, validator: validateLocation, errorMessage: 'Invalid location'},
+            {value: user.name, validator: validateName, errorMessage: 'Invalid name', field: 'name'},
+            {value: user.name, validator: validateNameLength, errorMessage: 'Name must be at least 2 characters long', field: 'name'},
+            {value: user.surname, validator: validateName, errorMessage: 'Invalid surname', field: 'surname'},
+            {
+                value: user.surname,
+                validator: validateNameLength,
+                errorMessage: 'Surname must be at least 2 characters long',
+                field: 'surname'
+            },
+            {
+                value: user.username,
+                validator: validateUsernameLength,
+                errorMessage: 'Username must be at least 4 characters long',
+                field: 'username'
+            },
+            {value: user.username, validator: validateUsername, errorMessage: 'Invalid username', field: 'username'},
+            {value: user.location, validator: validateLocation, errorMessage: 'Invalid location', field: 'location'},
         ];
 
-        for (const {value, validator, errorMessage} of validationData) {
+        for (const {value, validator, errorMessage, field} of validationData) {
             if (!validator(value)) {
-                ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
-                return false;
+                handleError(errorMessage, field);
+                valid = false;
             }
         }
 
-        return true;
+        return valid;
     }
 
     const trimUserData = (user) => {
         for (const key in user) {
-            if (user.hasOwnProperty(key) && key !== 'is_athlete') {
-                user[key] = user[key].trim();
-            }
+            user[key] = user[key].trim();
         }
     }
 
-    const handleSignUp = () => {
-        trimUserData(user);
+    const handleNext = () => {
+        handleError(null, 'name')
+        handleError(null, 'surname')
+        handleError(null, 'username')
+        handleError(null, 'location')
 
+        trimUserData(user);
         if (!validateForm(user)) {
             return;
         }
 
-        signUpUser(user);
-        navigation.navigate('Home', {user: user});
-    }
-
-    const signUpUser = (user) => {
-        fetch(baseURL + signUpURI, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(user)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    Alert.alert(data.error);
-                    navigation.navigate('Login');
-                } else {
-                    navigation.navigate('Home', {userId: data.id});
-                }
-            })
-            .catch(error => {
-                console.log(error);
-                Alert.alert(error.message);
-                navigation.navigate('Login');
-            });
+        navigation.navigate('UserBiologics', {user: user});
     }
 
     return (
-        <KeyboardAvoidingView style={styles.container}
-                              behavior="padding"
-                              keyboardVerticalOffset={-200}>
-            <Image
-                source={require('../../resources/logo.png')}
-                style={styles.logo}
-            />
-            <View style={styles.inputContainer}>
-                <TextInput
-                    placeholder={"Name"}
-                    value={user.name}
-                    onChangeText={(text) => handleInputChange('name', text)}
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder={"Surname"}
-                    value={user.surname}
-                    onChangeText={(text) => handleInputChange('surname', text)}
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder={"Username"}
-                    value={user.username}
-                    onChangeText={(text) => handleInputChange('username', text)}
-                    style={styles.input}
-                />
-                <View style={{flexDirection: "row", alignItems: "center"}}>
-                    <TextInput
-                        placeholder={"Height"}
-                        value={user.height === 0 ? "" : user.height.toString()}
-                        onChangeText={(text) => handleInputChange('height', text)}
-                        style={{
-                            ...styles.inputHorizontal,
-                            marginRight: 2.5
-                        }}
+        <SafeAreaView style={{
+            backgroundColor: primaryColor,
+            flex: 1,
+        }}>
+            <ScrollView contentContainerStyle={{
+                paddingTop: 50, paddingHorizontal: 20,
+            }}>
+                <Text style={[fiufitStyles.titleText, {marginTop: -25}]}>
+                    Register
+                </Text>
+                <Text style={fiufitStyles.detailsText}>
+                    Enter your details to register
+                </Text>
+                <View style={{marginVertical: 20}}>
+                    <Input
+                        label="Name"
+                        placeholder="Enter your name"
+                        onChangeText={text => handleInputChange('name', text)}
+                        error={errors.name}
                     />
-                    <TextInput
-                        placeholder={"Weight"}
-                        value={user.weight === 0 ? "" : user.weight.toString()}
-                        onChangeText={(text) => handleInputChange('weight', text)}
-                        style={{
-                            ...styles.inputHorizontal,
-                            marginLeft: 2.5
-                        }}
+                    <Input
+                        label="Surname"
+                        placeholder="Enter your surname"
+                        onChangeText={text => handleInputChange('surname', text)}
+                        error={errors.surname}
                     />
-                </View>
-                <View style={{ flexDirection: "row" }}>
-                    <TouchableOpacity
-                        style={styles.buttonDate}
-                        onPress={showDatepicker}
-                    >
-                        <Text style={{ opacity: date ? 1 : 0.6 }}>
-                            {date ? date.toISOString().split("T")[0] : "Birthdate"}
-                        </Text>
-                    </TouchableOpacity>
-                    <View style={{ flex: 1, borderRadius: 10, overflow: 'hidden', height: 50, marginTop: 5, marginLeft: 5 }}>
-                        <Picker
-                            ref={pickerRef}
-                            selectedValue={user.is_athlete}
-                            onValueChange={(itemValue, itemIndex) =>
-                                handleInputChange("is_athlete", itemValue)
-                            }
-                            style={{
-                                backgroundColor: buttonTextColor,
-                            }}
-                        >
-                            <Picker.Item label="Athlete" value={true} />
-                            <Picker.Item label="Trainer" value={false} />
-                        </Picker>
-                    </View>
-                </View>
-                <TextInput
-                    placeholder={"Location"}
-                    value={user.location}
-                    onChangeText={(text) => handleInputChange('location', text)}
-                    style={styles.input}
-                />
-            </View>
+                    <Input
+                        label="Username"
+                        placeholder="Enter your username"
+                        onChangeText={text => handleInputChange('username', text)}
+                        error={errors.username}
+                    />
 
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                    onPress={handleSignUp}
-                    style={styles.button}
-                >
-                    <Text style={styles.buttonText}>Register</Text>
-                </TouchableOpacity>
-            </View>
-        </KeyboardAvoidingView>
+                    <Input
+                        label="Location (optional)"
+                        iconName={"map-marker"}
+                        placeholder="Enter your location"
+                        onChangeText={text => handleInputChange('location', text)}
+                        error={errors.location}
+                    />
+                    <Button onPress={handleNext} title="Next"/>
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     )
 }
 
 export default UserDataScreen
-const styles = StyleSheet.create({
-    logo: {
-        height: 150,
-        width: 150,
-        paddingVertical: 100,
-        marginBottom: 40,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: primaryColor,
-    },
-    inputContainer: {
-        width: '80%',
-    },
-    input: {
-        backgroundColor: textBoxColor,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        borderRadius: 10,
-        marginTop: 5,
-        color: textColor,
-    },
-    inputHorizontal: {
-        backgroundColor: textBoxColor,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        borderRadius: 10,
-        marginTop: 5,
-        color: textColor,
-        flex: 1,
-    },
-    buttonContainer: {
-        width: '60%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 40,
-    },
-    button: {
-        backgroundColor: secondaryColor,
-        width: '100%',
-        padding: 15,
-        borderRadius: 10,
-        alignItems: 'center'
-    },
-    buttonDate: {
-        backgroundColor: buttonTextColor,
-        width: '49%',
-        padding: 15,
-        marginTop: 5,
-        borderRadius: 10,
-    },
-    buttonText: {
-        color: buttonTextColor,
-        fontWeight: '700',
-        fontSize: 16,
-    },
-})

@@ -1,46 +1,70 @@
-import {Alert, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
-import React, {useState} from 'react'
-import {buttonTextColor, outlineColor, primaryColor, secondaryColor, textBoxColor, textColor} from '../consts/colors'
-import {validateEmail} from "../utils/validations"
-import {useNavigation} from "@react-navigation/native"
-import { Image } from 'react-native'
+import {Alert, Image, Keyboard, SafeAreaView, ScrollView, Text, View} from "react-native";
+import {primaryColor, tertiaryColor} from "../consts/colors";
+import {useNavigation} from "@react-navigation/native";
+import React, {useState} from "react";
+import {validateEmail} from "../utils/validations";
+import Input from "../components/Input";
+import Button from "../components/Button";
+import {fiufitStyles} from "../consts/fiufitStyles";
 import {baseURL, loginURI} from "../consts/requests";
 
-const LoginScreen = () => {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+let userId = null;
+export {userId};
 
+const LoginScreen = () => {
     const navigation = useNavigation();
 
-    const handleSignUpPress = () => {
-        navigation.navigate('SignUp');
-    }
+    const [inputs, setInputs] = useState({
+        email: '',
+        password: '',
+    });
+    const [errors, setErrors] = useState({});
+
+    const handleInputChange = (key, value) => {
+        setInputs({ ...inputs, [key]: value });
+    };
+
+    const handleError = (error, input) => {
+        setErrors(prevState => ({...prevState, [input]: error}));
+    };
 
     const handleLogin = () => {
-        if (!validateEmail(email)) {
-            Alert.alert('Please enter a valid email address');
-            return;
+        Keyboard.dismiss();
+        let valid = true;
+        if (!validateEmail(inputs.email)) {
+            handleError('Invalid email', 'email');
+            valid = false;
         }
 
-        if (!password) {
-            Alert.alert('Please enter your password');
-            return;
+        if (!inputs.password) {
+            handleError('Invalid password', 'password');
+            valid = false;
         }
 
+        if (valid) {
+            login(inputs);
+        }
+    }
+
+    const login = (inputs) => {
         console.log("Logging in");
         fetch(baseURL + loginURI, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({email, password})
+            body: JSON.stringify(inputs)
         })
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     Alert.alert(data.error);
+                } else if (data.id) {
+                    userId = data.id;
+                    console.log("Login successful");
+                    navigation.navigate('Trainings');
                 } else {
-                    navigation.navigate('Home', {userId: data.id});
+                    Alert.alert(data.detail);
                 }
             })
             .catch(error => {
@@ -50,100 +74,53 @@ const LoginScreen = () => {
     }
 
     return (
-        <KeyboardAvoidingView
-            style={styles.container}
-            behavior="padding"
-            keyboardVerticalOffset={-200}>
-            <Image
-                source={require('../../resources/logo.png')}
-                style={styles.logo}
-            />
-            <View style={styles.inputContainer}>
-                <TextInput
-                    placeholder={"Email"}
-                    value={email}
-                    onChangeText={text => setEmail(text)}
-                    style={styles.input}
+        <SafeAreaView style={{
+            backgroundColor: primaryColor,
+            flex: 1,
+        }}>
+            <ScrollView contentContainerStyle={{
+                paddingTop: 50, paddingHorizontal: 20,
+            }}>
+                <Image
+                    source={require('../../resources/logo.png')}
+                    style={[fiufitStyles.logo, {alignSelf: 'center', marginBottom: 20}]}
                 />
-                <TextInput
-                    placeholder={"Password"}
-                    value={password}
-                    onChangeText={text => setPassword(text)}
-                    style={styles.input}
-                    secureTextEntry
-                />
-            </View>
-
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                    onPress={handleLogin}
-                    style={styles.button}
-                >
-                    <Text style={styles.buttonText}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={handleSignUpPress}
-                    style={[styles.button, styles.buttonOutline]}
-                >
-                    <Text style={styles.buttonOutlineText}>Register</Text>
-                </TouchableOpacity>
-            </View>
-        </KeyboardAvoidingView>
+                <Text style={{
+                    color: tertiaryColor,
+                    fontSize: 20,
+                    fontWeight: 'bold',
+                }}>
+                    Login
+                </Text>
+                <Text style={fiufitStyles.detailsText}>
+                    Enter your details to login
+                </Text>
+                <View style={{marginVertical: 20}}>
+                    <Input
+                        label="Email"
+                        iconName="email-outline"
+                        placeholder="Email address"
+                        onChangeText={text => handleInputChange('email', text)}
+                        error={errors.email}
+                        onFocus={() => handleError(null, 'email')}
+                    />
+                    <Input
+                        label="Password"
+                        iconName="lock-outline"
+                        placeholder="Password"
+                        password
+                        onChangeText={text => handleInputChange('password', text)}
+                        error={errors.password}
+                        onFocus={() => handleError(null, 'password')}
+                    />
+                    <Button onPress={handleLogin} title="Login"/>
+                    <Text
+                        onPress={() => navigation.navigate('SignUp')}
+                        style={fiufitStyles.haveAccount}>Do not have an account? Sign up</Text>
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     )
 }
 
-export default LoginScreen
-const styles = StyleSheet.create({
-    logo: {
-        height: 150,
-        width: 150,
-        paddingVertical: 100,
-        marginBottom: 40,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: primaryColor,
-    },
-    inputContainer: {
-        width: '80%',
-    },
-    input: {
-        backgroundColor: textBoxColor,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        borderRadius: 10,
-        marginTop: 5,
-        color: textColor,
-    },
-    buttonContainer: {
-        width: '60%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 40,
-    },
-    button: {
-        backgroundColor: secondaryColor,
-        width: '100%',
-        padding: 15,
-        borderRadius: 10,
-        alignItems: 'center'
-    },
-    buttonOutline: {
-        backgroundColor: primaryColor,
-        marginTop: 5,
-        borderColor: outlineColor,
-        borderWidth: 2,
-    },
-    buttonText: {
-        color: buttonTextColor,
-        fontWeight: '700',
-        fontSize: 16,
-    },
-    buttonOutlineText: {
-        color: outlineColor,
-        fontWeight: '700',
-        fontSize: 16,
-    }
-})
+export default LoginScreen;

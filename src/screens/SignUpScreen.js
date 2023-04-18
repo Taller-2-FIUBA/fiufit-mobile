@@ -1,127 +1,108 @@
-import {
-    Image,
-    KeyboardAvoidingView,
-    StyleSheet,
-    Text,
-    TextInput,
-    ToastAndroid,
-    TouchableOpacity,
-    View
-} from 'react-native'
-import React, {useState} from 'react'
-import {validateEmail, validatePassword} from "../utils/validations";
+import {Keyboard, SafeAreaView, ScrollView, Text, View} from 'react-native';
+import {primaryColor} from "../consts/colors";
+import Input from "../components/Input";
+import Button from "../components/Button";
 import {useNavigation} from "@react-navigation/native";
-import {buttonTextColor, primaryColor, secondaryColor, textBoxColor, textColor} from "../consts/colors";
+import {useState} from "react";
+import {validateEmail, validatePassword} from "../utils/validations";
+import {fiufitStyles} from "../consts/fiufitStyles";
 
 const SignUpScreen = () => {
     const navigation = useNavigation();
 
-    const [email, setEmail] = useState('');
-    const [password1, setPassword1] = useState('');
-    const [password2, setPassword2] = useState('');
+    const [inputs, setInputs] = useState({
+        email: '',
+        password1: '',
+        password2: '',
+    });
+    const [errors, setErrors] = useState({});
 
-    const handleSignUp = () => {
-        if (!validateEmail(email)) {
-            ToastAndroid.show('Invalid email', ToastAndroid.SHORT);
-            return;
+    const handleInputChange = (key, value) => {
+        setInputs({ ...inputs, [key]: value });
+    };
+
+    const handleError = (error, input) => {
+        setErrors(prevState => ({...prevState, [input]: error}));
+    };
+
+    const handleNext = () => {
+        Keyboard.dismiss();
+
+        handleError(null, 'email')
+        handleError(null, 'password1')
+        handleError(null, 'password2')
+
+        let valid = true;
+
+        if (!validateEmail(inputs.email)) {
+            handleError('Invalid email', 'email');
+            valid = false;
         }
 
-        if (!validatePassword(password1) || !validatePassword(password2)) {
-            ToastAndroid.show('Password must be at least 6 digits long', ToastAndroid.SHORT);
-            return;
+        if (!validatePassword(inputs.password1)) {
+            handleError('Invalid password', 'password1');
+            valid = false;
         }
 
-        if (password1 !== password2) {
-            ToastAndroid.show('Passwords don\'t match', ToastAndroid.SHORT);
-            return;
+        if (!validatePassword(inputs.password2)) {
+            handleError('Invalid password', 'password2');
+            valid = false;
+        } else if (inputs.password1 !== inputs.password2) {
+            handleError('Passwords do not match', 'password2');
+            valid = false;
         }
 
-        navigation.navigate('UserData', {email: email, password: password1});
+        if (valid) {
+            navigation.navigate('UserData', {email: inputs.email, password: inputs.password1});
+        }
     }
 
     return (
-        <KeyboardAvoidingView style={styles.container}
-                              behavior="padding"
-                              keyboardVerticalOffset={-200}>
-            <Image
-                source={require('../../resources/logo.png')}
-                style={styles.logo}
-            />
-            <View style={styles.inputContainer}>
-                <TextInput
-                    placeholder={"Email"}
-                    value={email}
-                    onChangeText={text => setEmail(text)}
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder={"Password"}
-                    value={password1}
-                    onChangeText={text => setPassword1(text)}
-                    style={styles.input}
-                    secureTextEntry
-                />
-                <TextInput
-                    placeholder={"Repeat password"}
-                    value={password2}
-                    onChangeText={text => setPassword2(text)}
-                    style={styles.input}
-                    secureTextEntry
-                />
-            </View>
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                    onPress={handleSignUp}
-                    style={styles.button}
-                >
-                    <Text style={styles.buttonText}>Register</Text>
-                </TouchableOpacity>
-            </View>
-        </KeyboardAvoidingView>
+        <SafeAreaView style={{
+            backgroundColor: primaryColor,
+            flex: 1,
+        }}>
+            <ScrollView contentContainerStyle={{
+                paddingTop: 50, paddingHorizontal: 20,
+            }}>
+                <Text style={fiufitStyles.titleText}>
+                    Register
+                </Text>
+                <Text style={fiufitStyles.detailsText}>
+                    Enter your email and a password
+                </Text>
+                <View style={{marginVertical: 20}}>
+                    <Input
+                        label="Email"
+                        iconName="email-outline"
+                        placeholder="Email address"
+                        onChangeText={text => handleInputChange('email', text)}
+                        error={errors.email}
+                    />
+                    <Input
+                        label="Password"
+                        iconName="lock-outline"
+                        placeholder="Password"
+                        password
+                        onChangeText={text => handleInputChange('password1', text)}
+                        error={errors.password1}
+                    />
+                    <Input
+                        label="Confirm password"
+                        iconName="lock-outline"
+                        placeholder="Password"
+                        password
+                        onChangeText={text => handleInputChange('password2', text)}
+                        error={errors.password2}
+                    />
+                    <Button onPress={handleNext} title="Next"/>
+                    <Text
+                        onPress={() => navigation.navigate('Login')}
+                        style={fiufitStyles.haveAccount}>Already have an account? Login</Text>
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     )
 }
 
-export default SignUpScreen
-const styles = StyleSheet.create({
-    logo: {
-        height: 150,
-        width: 150,
-        paddingVertical: 100,
-        marginBottom: 40,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: primaryColor,
-    },
-    inputContainer: {
-        width: '80%',
-    },
-    input: {
-        backgroundColor: textBoxColor,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        borderRadius: 10,
-        marginTop: 5,
-        color: textColor,
-    },
-    buttonContainer: {
-        width: '60%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 40,
-    },
-    button: {
-        backgroundColor: secondaryColor,
-        width: '100%',
-        padding: 15,
-        borderRadius: 10,
-        alignItems: 'center'
-    },
-    buttonText: {
-        color: buttonTextColor,
-        fontWeight: '700',
-        fontSize: 16,
-    },
-})
+export default SignUpScreen;
