@@ -1,8 +1,41 @@
 import React, { useEffect, useState } from 'react';
-import {View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator} from 'react-native';
-import {secondaryColor } from "../consts/colors";
+import {View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator} from 'react-native';
+import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor } from "../consts/colors";
 import {baseURL, userURI} from "../consts/requests";
 import {userId} from "./LoginScreen";
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {fiufitStyles} from "../consts/fiufitStyles";
+
+
+
+const ProfileItem = ({iconName, value, editable, onChange}) => {
+    return (
+        <View style={styles.profileItemContainer}>
+            <Icon name={iconName} style={{
+                fontSize: 22,
+                color: iconName == "email" ? greyColor : tertiaryColor,
+                marginRight: 10,
+            }}/>
+            <TextInput
+                style={editable ? styles.input : styles.notEditableInpunt}
+                value={value}
+                onChangeText={onChange}
+                editable={editable}
+            />
+        </View>
+    )
+}
+
+const ProfileAvatar = ({userName, onChange}) => {
+    return (
+        <View style={styles.profileAvatarContainer}>
+            <Image
+                style={styles.profileAvatar}
+                source={require('../profile.jpg')}
+            />
+        </View>
+    )
+}
 
 
 const ProfileScreen = () => {
@@ -24,7 +57,6 @@ const ProfileScreen = () => {
         fetch(baseURL + userURI + '/' + userId)
             .then((response) => response.json())
             .then((profile) => {
-                //const profileAux = {"birth_date": "2023-04-14", "email": "valeria@gmail.com", "height": "1.70", "isAthlete": true, "location": "Bs. As.", "name": "Val", "password": "123412", "registration_date": "2023-04-14", "surname": "fiuba", "username": "valfiuba", "weight": "65"};
                 setLoading(false);
                 setUserProfile(profile);
             })
@@ -58,12 +90,17 @@ const ProfileScreen = () => {
         });
     };
 
-    toggleEditable = () => {
-        if (editable) {
-            updateProfile();
-        } else {
-            setEditable(true);
-        }
+    const handleEditAction = () => {
+        setEditable(true);
+    }
+
+    const handleSaveAction = () => {
+        updateProfile();
+        setEditable(false);
+    };
+
+    const handleCancelAction = () => {
+        setEditable(false);
     };
 
     const handleInputChange = (key, value) => {
@@ -71,78 +108,123 @@ const ProfileScreen = () => {
     };
 
     return (
-        <View>
-            {loading && <ActivityIndicator />}
-            {!loading && error && <Text>{error.message}</Text>}
-            {!loading && !error && 
-                <View style={styles.profile_container}>
-                    <TextInput
-                        style={styles.input}
-                        value={userProfile.name}
-                        editable={editable}
-                        onChangeText={(text) => handleInputChange("name", text)}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        value={userProfile.surname}
-                        editable={editable}
-                        onChangeText={(text) => handleInputChange("surname", text)}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        value={userProfile.email}
-                        editable={false}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        value={userProfile.location}
-                        editable={editable}
-                        onChangeText={(text) => handleInputChange("location", text)}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        value={userProfile.height?.toString()}
-                        editable={editable}
-                        onChangeText={(text) => handleInputChange("height", text)}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        value={userProfile.weight?.toString()}
-                        editable={editable}
-                        onChangeText={(text) => handleInputChange("weight", text)}
-                    />
-            
-                    <TouchableOpacity style={styles.button} onPress={toggleEditable}>
-                        <Text style={styles.buttonText}>{editable ? 'Save' : 'Edit'}</Text>
+        <ScrollView style={styles.profileContainer}>
+            <ProfileAvatar
+                userName={userProfile.name}
+            /> 
+            <ProfileItem
+                iconName="account"
+                value={userProfile.name}
+                editable={editable}
+                onChange={(text) => handleInputChange("name", text)}
+            />
+            <ProfileItem
+                iconName="account"
+                value={userProfile.surname}
+                editable={editable}
+                onChange={(text) => handleInputChange("surname", text)}
+            />
+            <ProfileItem
+                iconName="email"
+                value={userProfile.email}
+                editable={false}
+                onChange={(text) => handleInputChange("email", text)}
+            />
+            <ProfileItem
+                iconName="map-marker"
+                value={userProfile.location}
+                editable={editable}
+                onChange={(text) => handleInputChange("location", text)}
+            />
+             <ProfileItem
+                iconName="human-male-height"
+                value={userProfile.height?.toString()}
+                editable={editable}
+                onChange={(text) => handleInputChange("height", text)}
+            />
+            <ProfileItem
+                iconName="weight-kilogram"
+                value={userProfile.weight?.toString()}
+                editable={editable}
+                onChange={(text) => handleInputChange("weight", text)}
+            />
+    
+            {!editable && 
+                <TouchableOpacity style={{...styles.button, width: '100%'}} onPress={handleEditAction}>
+                    <Text style={styles.buttonText}>{'Edit profile'}</Text>
+                </TouchableOpacity>
+            }   
+            {editable && 
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={{...styles.button, marginRight: 5}} onPress={handleSaveAction}>
+                        <Text style={styles.buttonText}>{'Save'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.button} onPress={handleCancelAction}>
+                        <Text style={styles.buttonText}>{'Cancel'}</Text>
                     </TouchableOpacity>
                 </View>
-            }   
-        </View>
+            }
+        </ScrollView>   
     );
 }
       
 const styles = StyleSheet.create({
-    profile_container: {
+    profileContainer: {
         flex: 1,
         padding: 20,
+        backgroundColor: primaryColor
+    },
+    profileItemContainer: {
+        height: 55,
+        backgroundColor: secondaryColor,
+        flexDirection: 'row',
+        borderWidth: 0.5,
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        borderRadius: 10,
+        marginBottom: 5
+    },
+    profileAvatarContainer: { 
+        width: '100%',
+        alignItems: 'center',
+        marginBottom: 20
+    },
+    profileAvatar: {
+        height: 50,
+        width: 50
     },
     input: {
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        padding: 10,
-        marginBottom: 20,
+        fontSize: 12,
+        borderColor: secondaryColor,
+        borderWidth: 0.8,
+        color: tertiaryColor,
+        paddingHorizontal: 5
+    },
+    notEditableInpunt: {
+        fontSize: 12,
+        borderColor: secondaryColor,
+        borderWidth: 0.8,
+        color: "#888",
+        paddingHorizontal: 10
     },
     button: {
         backgroundColor: secondaryColor,
-        padding: 30,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
         alignItems: 'center',
         borderRadius: 5,
+        marginVertical: 10,
+        width: '50%'
     },
     buttonText: {
-        color: 'white',
+        color: whiteColor,
         fontSize: 16
     },
+    buttonContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    }
 });
 
 export default ProfileScreen;
