@@ -94,12 +94,12 @@ const ProfileScreen = () => {
         setEditable(true);
     }
 
-    handleSaveAction = () => {
+    const handleSaveAction = () => {
         updateProfile();
         setEditable(false);
     };
 
-    handleCancelAction = () => {
+    const handleCancelAction = () => {
         setEditable(false);
     };
 
