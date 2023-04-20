@@ -28,3 +28,6 @@ In order to test the app with jest, run the following command on your terminal:
 npm run test
 ```
 This will run all the tests in the app and provide you with a coverage report.
+
+If you want to add more tests keep in mind that the tests file should be named
+`<name>.test.js`.

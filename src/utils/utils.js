@@ -1,21 +1,8 @@
-export const parseHeight = (value) => {
-    let newValue = value.toString();
-    let arr = newValue.replace(" cm", "").split("");
-    arr.splice(1, 0, ".");
-    return parseFloat(arr.join(""));
-}
-
 export const parseWeight = (value) => {
-    if (value > 400) {
-        return 400;
-    }
-
-    if (value !== 0) {
-        let newValue = value.toString();
+    if (value.length > 0) {
         const regex = /^[0-9]*$/;
-        if (!regex.test(newValue)) {
-            newValue = newValue.substring(0, newValue.length - 1);
-            return newValue;
+        if (!regex.test(value)) {
+            return value.substring(0, value.length - 1);
         }
     }
 
