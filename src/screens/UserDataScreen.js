@@ -106,18 +106,21 @@ const UserDataScreen = ({route}) => {
                 <View style={{marginVertical: 20}}>
                     <Input
                         label="Name"
+                        iconName={"account-outline"}
                         placeholder="Enter your name"
                         onChangeText={text => handleInputChange('name', text)}
                         error={errors.name}
                     />
                     <Input
                         label="Surname"
+                        iconName={"account-outline"}
                         placeholder="Enter your surname"
                         onChangeText={text => handleInputChange('surname', text)}
                         error={errors.surname}
                     />
                     <Input
                         label="Username"
+                        iconName={"account-tie"}
                         placeholder="Enter your username"
                         onChangeText={text => handleInputChange('username', text)}
                         error={errors.username}

@@ -25,12 +25,24 @@ export const validateUsername = (username) => {
     return regex.test(username);
 }
 
+export const validateHeightMeters = (meters) => {
+    const regex = /^(0|[1-2])$/;
+    return regex.test(meters);
+}
+
+export const validateHeightCentimeters = (centimeters) => {
+    const regex = /^(0|[1-9]\d?)$/;
+    return regex.test(centimeters);
+}
+
 export const validateHeight = (height) => {
-    return height > 0 && height <= 2.5;
+    const parsedHeight = parseFloat(height);
+    return parsedHeight > 0.5 && parsedHeight <= 2.5;
 }
 
 export const validateWeight = (weight) => {
-    return weight > 20 && weight <= 400;
+    const regex = /^([2-9][0-9]|[1-3][0-9]{2}|400)$/;
+    return regex.test(weight);
 }
 
 export const validateBirthDate = (birthDate) => {
@@ -42,6 +54,7 @@ export const validateBirthDate = (birthDate) => {
 }
 
 export const validateLocation = (location) => {
-    const regex = /^[a-zA-Z0-9\s,'-]*$/;
-    return location === '' || regex.test(location);
+    const containsOnlyNumbersAndSpaces = /^\d[\d\s]*$/.test(location);
+    const containsOnlyLettersAndSpecialChars = /^[a-zA-Z0-9\s,'\p{L}]*$/u.test(location);
+    return !containsOnlyNumbersAndSpaces && (location === '' || containsOnlyLettersAndSpecialChars);
 }

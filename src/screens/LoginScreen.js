@@ -30,6 +30,9 @@ const LoginScreen = () => {
 
     const handleLogin = () => {
         Keyboard.dismiss();
+        handleError(null, 'email');
+        handleError(null, 'password');
+
         let valid = true;
         if (!validateEmail(inputs.email)) {
             handleError('Invalid email', 'email');
@@ -102,7 +105,7 @@ const LoginScreen = () => {
                         placeholder="Email address"
                         onChangeText={text => handleInputChange('email', text)}
                         error={errors.email}
-                        onFocus={() => handleError(null, 'email')}
+                        keyboardType="email-address"
                     />
                     <Input
                         label="Password"
@@ -111,7 +114,6 @@ const LoginScreen = () => {
                         password
                         onChangeText={text => handleInputChange('password', text)}
                         error={errors.password}
-                        onFocus={() => handleError(null, 'password')}
                     />
                     <Button onPress={handleLogin} title="Login"/>
                     <Text

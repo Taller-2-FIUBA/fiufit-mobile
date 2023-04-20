@@ -4,7 +4,6 @@ import {
     SafeAreaView,
     ScrollView,
     Text,
-    TextInput,
     ToastAndroid,
     TouchableOpacity,
     View
@@ -14,34 +13,30 @@ import {useNavigation} from "@react-navigation/native";
 import React, {useRef, useState} from "react";
 import {Picker} from "@react-native-picker/picker";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {parseHeight, parseWeight} from "../utils/utils";
-import WheelPickerExpo from "react-native-wheel-picker-expo";
+import {parseWeight} from "../utils/utils";
 import Button from "../components/Button";
-import {validateBirthDate, validateHeight, validateWeight} from "../utils/validations";
+import {
+    validateBirthDate,
+    validateHeight,
+    validateHeightCentimeters,
+    validateHeightMeters,
+    validateWeight
+} from "../utils/validations";
 import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {baseURL, signUpURI} from "../consts/requests";
+import Input from "../components/Input";
 
 const UserBiologicsScreen = ({route}) => {
     const navigation = useNavigation();
     const rolePickerRef = useRef();
 
-    const [weightError, setWeightError] = useState(false);
-
-    const [height, setHeight] = useState('');
-    const [heightError, setHeightError] = useState(false);
-    const [isPickerVisible, setPickerVisibility] = useState(false);
-
-    const togglePicker = () => {
-        handleInputChange('height', parseHeight(height));
-        setPickerVisibility(!isPickerVisible);
-    };
-
-    const heightOptions = [];
-    for (let i = 30; i <= 250; i++) {
-        heightOptions.push(i + ' cm');
-    }
-
+    const [meters, setMeters] = useState('');
+    const [centimeters, setCentimeters] = useState('');
+    const [weight, setWeight] = useState('');
+    const [date, setDate] = useState(null);
+    const [errorDate, setErrorDate] = useState(false);
+    const [errors, setErrors] = useState({});
     const [user, setUser] = useState({
         email: route.params.user.email,
         password: route.params.user.password,
@@ -56,8 +51,9 @@ const UserBiologicsScreen = ({route}) => {
         registration_date: new Date().toISOString().split('T')[0],
     });
 
-    const [date, setDate] = useState(null);
-    const [errorDate, setErrorDate] = useState(false);
+    const handleInputChange = (key, value) => {
+        setUser({ ...user, [key]: value });
+    }
 
     const showDatepicker = () => {
         showMode('date');
@@ -66,6 +62,10 @@ const UserBiologicsScreen = ({route}) => {
     const onChange = (event, selectedDate) => {
         setDate(selectedDate);
         handleInputChange('birth_date', selectedDate.toISOString().split('T')[0]);
+    };
+
+    const handleError = (error, input) => {
+        setErrors(prevState => ({...prevState, [input]: error}));
     };
 
     const showMode = (currentMode) => {
@@ -81,31 +81,22 @@ const UserBiologicsScreen = ({route}) => {
         });
     };
 
-    const handleInputChange = (key, value) => {
-        if (key === 'weight') {
-            value = parseWeight(value);
-        }
-
-        setUser({...user, [key]: value});
-    };
+    const handleWeight = (value) => {
+        setWeight(parseWeight(value));
+    }
 
     const handleSignUp = () => {
         Keyboard.dismiss();
-        if (weightError) {
-            setWeightError(false);
-        }
-
-        if (heightError) {
-            setHeightError(false);
-        }
 
         if (errorDate) {
             setErrorDate(false);
         }
 
         if (validateForm()) {
-            signUpUser(user);
-            navigation.navigate('Login');
+            const updatedUser
+                = { ...user, height: parseFloat(meters + '.' + centimeters), weight: parseInt(weight) };
+
+            signUpUser(updatedUser);
         }
     }
 
@@ -134,15 +125,30 @@ const UserBiologicsScreen = ({route}) => {
     }
 
     const validateForm = () => {
+        handleError(null, 'weight');
+        handleError(null, 'heightMeters');
+        handleError(null, 'heightCentimeters');
         let valid = true;
 
-        if (!validateWeight(user.weight)) {
-            setWeightError(true);
+        if (!validateHeightMeters(meters)) {
+            handleError('Meters should be a number between 0 and 2', 'heightMeters');
             valid = false;
         }
 
-        if (!validateHeight(user.height)) {
-            setHeightError(true);
+        if (!validateHeightCentimeters(centimeters)) {
+            handleError('Centimeters should be a number between 0 and 99', 'heightCentimeters');
+            valid = false;
+        }
+
+        if (valid) {
+            if (!validateHeight(meters + '.' + centimeters)) {
+                handleError('Height should be a number between 0.5 and 2.5', 'heightMeters');
+                valid = false;
+            }
+        }
+
+        if (!validateWeight(weight)) {
+            handleError('Weight should be a number between 20 and 400', 'weight');
             valid = false;
         }
 
@@ -168,13 +174,15 @@ const UserBiologicsScreen = ({route}) => {
                 <Text style={fiufitStyles.detailsText}>
                     Last step! Please enter your data
                 </Text>
-                <Text style={{marginVertical: 20, fontSize: 14, color: greyColor, marginLeft: 5}}>Pick a Role</Text>
+                <Text style={{marginTop: 20, marginBottom: 5, fontSize: 14, color: greyColor, marginLeft: 5}}>
+                    Pick a Role
+                </Text>
                 <View style={{
                     borderRadius: 10,
                     overflow: 'hidden',
                     height: 50,
                     marginLeft: 5,
-                    marginTop: -5
+                    marginBottom: 20,
                 }}>
                     <Picker
                         ref={rolePickerRef}
@@ -200,140 +208,84 @@ const UserBiologicsScreen = ({route}) => {
                         }} label="Trainer" value={false}/>
                     </Picker>
                 </View>
-                <Text style={{fontSize: 14, color: greyColor, marginLeft: 5, marginTop: 15}}>
-                    Enter your weight in kg
-                </Text>
-                {!weightError ?
-                    <TextInput
-                        placeholder={"Weight"}
-                        placeholderTextColor={greyColor}
-                        value={user.weight === 0 ? "" : user.weight.toString()}
-                        onChangeText={(text) => handleInputChange('weight', text)}
-                        style={fiufitStyles.inputWeight}
-                        keyboardType={"numeric"}
-                    />
-                    :
-                    <View>
-                        <TextInput
-                            placeholder={"Weight"}
-                            placeholderTextColor={greyColor}
-                            value={user.weight === 0 ? "" : user.weight.toString()}
-                            onChangeText={(text) => handleInputChange('weight', text)}
-                            style={[fiufitStyles.inputWeight, {borderColor: 'red', borderWidth: 1}]}
-                            keyboardType={"numeric"}
-                        />
-                        <Text style={{color: 'red', fontSize: 12, marginLeft: 5, marginTop: 5}}>Invalid weight</Text>
-                    </View>
-                }
-                <Text style={{fontSize: 14, color: greyColor, marginLeft: 5, marginTop: 15}}>Enter your
-                    height</Text>
-                {!heightError ?
-                    <View style={{marginBottom: 10}}>
-                        <TouchableOpacity
-                            style={{
-                                backgroundColor: secondaryColor,
-                                borderRadius: 10,
-                                height: 51,
-                                marginTop: 15,
-                                marginLeft: 5,
-                                marginBottom: 15,
-                                justifyContent: 'center',
-                                paddingHorizontal: 10,
-                            }}
-                            onPress={togglePicker}
-                        >
-                            <Text style={{color: height ? tertiaryColor : greyColor, marginLeft: 5}}>
-                                {height ? height: 'Height'}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                    :
-                    <View style={{marginBottom: 10}}>
-                        <TouchableOpacity
-                            style={{
-                                backgroundColor: secondaryColor,
-                                borderRadius: 10,
-                                height: 51,
-                                marginTop: 15,
-                                marginLeft: 5,
-                                justifyContent: 'center',
-                                paddingHorizontal: 10,
-                                borderColor: 'red',
-                                borderWidth: 1
-                            }}
-                            onPress={togglePicker}
-                        >
-                            <Text style={{color: height ? tertiaryColor : greyColor, marginLeft: 5}}>
-                                {height ? height: 'Height'}
-                            </Text>
-                        </TouchableOpacity>
-                        <Text style={{color: 'red', fontSize: 12, marginLeft: 5, marginBottom: 15, marginTop: 5}}>Invalid height</Text>
-                    </View>
-                }
-                {!isPickerVisible && (
-                    <View style={{marginTop: -10, marginBottom: 5}}>
-                        <Text style={{color: greyColor, flex: 1, marginLeft: 5}}>
-                            Enter your birthdate
-                        </Text>
-                        {!errorDate ?
-                            <View style={{marginLeft: 5}}>
-                                <TouchableOpacity
-                                    style={fiufitStyles.buttonDate}
-                                    onPress={showDatepicker}
-                                >
-                                    <Icon name={"calendar-range"} style={fiufitStyles.iconStyle}/>
-                                    <Text style={{color: date ? tertiaryColor : greyColor, marginLeft: 33, marginTop: -20}}>
-                                        {date ? date.toISOString().split("T")[0] : "Birthdate"}
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                            :
-                            <View>
-                                <TouchableOpacity
-                                    style={fiufitStyles.buttonDateError}
-                                    onPress={showDatepicker}
-                                >
-                                    <Icon name={"calendar-range"} style={fiufitStyles.iconStyle}/>
-                                    <Text style={{color: date ? tertiaryColor : greyColor, marginLeft: 33, marginTop: -20}}>
-                                        {date ? date.toISOString().split("T")[0] : "Birthdate"}
-                                    </Text>
-                                </TouchableOpacity>
-                                <Text style={{color: 'red', marginTop: -10, fontSize: 12, marginLeft: 5, marginBottom: 15}}>
-                                    Invalid birthdate
-                                </Text>
-                            </View>
-                        }
-                    </View>
-                )}
-                {!isPickerVisible && (
-                    <Button onPress={handleSignUp} title="Register"/>
-                )}
-            </ScrollView>
-            {isPickerVisible && (
-                <View
-                    style={{
-                        marginLeft: 100,
-                    }}>
-                    <WheelPickerExpo
-                        initialSelectedIndex={140}
-                        items={heightOptions.map(name => ({ label: name, value: '' }))}
-                        onChange={({ item }) => setHeight(item.label)}
-                        backgroundColor={secondaryColor}
-                        selectedStyle={{
-                            borderColor: tertiaryColor,
-                            borderWidth: 1
-                        }}
+
+                <View style={{
+                    marginLeft: 5,
+                }}>
+                    <Input
+                        placeholder="Weight"
+                        label={'Enter your weight'}
+                        onChangeText={text => handleWeight(text)}
+                        value={weight}
+                        keyboardType={'numeric'}
+                        iconName={'weight-kilogram'}
+                        error={errors.weight}
                     />
                 </View>
-            )}
-            {isPickerVisible && (
-                <TouchableOpacity
-                    style={fiufitStyles.heightInputConfirmButton}
-                    onPress={togglePicker}
-                >
-                    <Text style={fiufitStyles.buttonOutlineText}>Confirm</Text>
-                </TouchableOpacity>
-            )}
+
+
+                <View style={{
+                    flexDirection: 'row',
+                    width: '100%',
+                    justifyContent: 'center',
+                }}>
+                    <View style={{flex: 1, marginLeft: 5, marginBottom: 5}}>
+                        <Input
+                            label={'Enter your height'}
+                            placeholder="Meters"
+                            onChangeText={text => setMeters(text)}
+                            iconName={'human-male-height'}
+                            keyboardType={'numeric'}
+                            error={errors.heightMeters}
+                        />
+                    </View>
+                    <View style={{flex: 1, marginLeft: 5}}>
+                        <Input
+                            placeholder="Centimeters"
+                            onChangeText={text => setCentimeters(text)}
+                            iconName={'human-male-height'}
+                            keyboardType={'numeric'}
+                            error={errors.heightCentimeters}
+                        />
+                    </View>
+                </View>
+
+                <View style={{marginBottom: 5}}>
+                    <Text style={{color: greyColor, flex: 1, marginLeft: 5, marginBottom: -10}}>
+                        Enter your birthdate
+                    </Text>
+                    {!errorDate ?
+                        <View style={{marginLeft: 5}}>
+                            <TouchableOpacity
+                                style={fiufitStyles.buttonDate}
+                                onPress={showDatepicker}
+                            >
+                                <Icon name={"calendar-range"} style={fiufitStyles.iconStyle}/>
+                                <Text style={{color: date ? tertiaryColor : greyColor, marginLeft: 33, marginTop: -20}}>
+                                    {date ? date.toISOString().split("T")[0] : "Birthdate"}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                        :
+                        <View>
+                            <TouchableOpacity
+                                style={fiufitStyles.buttonDateError}
+                                onPress={showDatepicker}
+                            >
+                                <Icon name={"calendar-range"} style={fiufitStyles.iconStyle}/>
+                                <Text style={{color: date ? tertiaryColor : greyColor, marginLeft: 33, marginTop: -20}}>
+                                    {date ? date.toISOString().split("T")[0] : "Birthdate"}
+                                </Text>
+                            </TouchableOpacity>
+                            <Text style={{color: 'red', marginTop: -10, fontSize: 12, marginLeft: 5, marginBottom: 15}}>
+                                Invalid birthdate
+                            </Text>
+                        </View>
+                    }
+                </View>
+
+                <Button onPress={handleSignUp} title="Register"/>
+            </ScrollView>
         </SafeAreaView>
     )
 }

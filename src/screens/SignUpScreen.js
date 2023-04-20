@@ -77,6 +77,7 @@ const SignUpScreen = () => {
                         iconName="email-outline"
                         placeholder="Email address"
                         onChangeText={text => handleInputChange('email', text)}
+                        keyboardType="email-address"
                         error={errors.email}
                     />
                     <Input
