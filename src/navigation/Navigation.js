@@ -13,6 +13,7 @@ import GoalsScreen from "../screens/GoalsScreen";
 import ChatScreen from "../screens/ChatScreen";
 import SearchScreen from "../screens/SearchScreen";
 import UserBiologicsScreen from "../screens/UserBiologicsScreen";
+import {NavigationContainer} from "@react-navigation/native";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -98,45 +99,47 @@ const BottomTabNavigator = () => {
 
 const MainStackNavigator = () => {
     return (
-        <Stack.Navigator>
-            <Stack.Screen name="Login" component={LoginScreen}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: secondaryColor
-                          }}/>
-            <Stack.Screen name={"SignUp"} component={SignUpScreen}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: secondaryColor
-                          }}/>
-            <Stack.Screen name={"UserData"} component={UserDataScreen}
-                          options={{
-                              headerStyle: {
-                                    backgroundColor: secondaryColor
-                              },
-                              headerTitle: "Personal data",
-                              headerTintColor: tertiaryColor,
-                              statusBarColor: secondaryColor
-                          }}/>
-            <Stack.Screen name={"UserBiologics"} component={UserBiologicsScreen}
-                          options={{
-                              headerStyle: {
-                                  backgroundColor: secondaryColor,
-                              },
-                              headerTitle: "Physiological data",
-                              headerTintColor: tertiaryColor,
-                              statusBarColor: secondaryColor
-                          }}/>
-            <Stack.Screen name="Trainings" component={BottomTabNavigator}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: secondaryColor,
-                              headerTintColor: whiteColor,
-                              headerStyle: {
-                                  backgroundColor: secondaryColor
-                              }
-                          }}/>
-        </Stack.Navigator>
+        <NavigationContainer>
+            <Stack.Navigator>
+                <Stack.Screen name="Login" component={LoginScreen}
+                              options={{
+                                  headerShown: false,
+                                  statusBarColor: secondaryColor
+                              }}/>
+                <Stack.Screen name={"SignUp"} component={SignUpScreen}
+                              options={{
+                                  headerShown: false,
+                                  statusBarColor: secondaryColor
+                              }}/>
+                <Stack.Screen name={"UserData"} component={UserDataScreen}
+                              options={{
+                                  headerStyle: {
+                                        backgroundColor: secondaryColor
+                                  },
+                                  headerTitle: "Personal data",
+                                  headerTintColor: tertiaryColor,
+                                  statusBarColor: secondaryColor
+                              }}/>
+                <Stack.Screen name={"UserBiologics"} component={UserBiologicsScreen}
+                              options={{
+                                  headerStyle: {
+                                      backgroundColor: secondaryColor,
+                                  },
+                                  headerTitle: "Physiological data",
+                                  headerTintColor: tertiaryColor,
+                                  statusBarColor: secondaryColor
+                              }}/>
+                <Stack.Screen name="Trainings" component={BottomTabNavigator}
+                              options={{
+                                  headerShown: false,
+                                  statusBarColor: secondaryColor,
+                                  headerTintColor: whiteColor,
+                                  headerStyle: {
+                                      backgroundColor: secondaryColor
+                                  }
+                              }}/>
+            </Stack.Navigator>
+        </NavigationContainer>
     );
 }
 
