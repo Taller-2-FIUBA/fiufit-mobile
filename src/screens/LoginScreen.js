@@ -117,7 +117,7 @@ const LoginScreen = () => {
                     />
                     <Button onPress={handleLogin} title="Login"/>
                     <Text
-                        onPress={() => navigation.navigate('SignUp')}
+                        onPress={() => navigation.navigate('Trainings')}
                         style={fiufitStyles.haveAccount}>Do not have an account? Sign up</Text>
                 </View>
             </ScrollView>
