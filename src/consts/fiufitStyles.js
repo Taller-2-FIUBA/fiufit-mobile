@@ -135,5 +135,10 @@ export const fiufitStyles = StyleSheet.create({
         color: tertiaryColor,
         fontSize: 40,
         fontWeight: 'bold',
+    },
+    pickerSelect: {
+        flex: 1,
+        paddingTop: 40,
+        alignItems: "center",
     }
 })

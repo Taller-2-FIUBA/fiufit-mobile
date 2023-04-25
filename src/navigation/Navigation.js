@@ -10,6 +10,7 @@ import UserBiologicsScreen from "../screens/UserBiologicsScreen";
 import {BottomNavigation, useTheme} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {CommonActions} from "@react-navigation/native";
+import CreateTrainingScreen from '../screens/CreateTrainingScreen';
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -138,6 +139,11 @@ const MainStackNavigator = () => {
                               headerShown: false,
                               statusBarColor: theme.colors.background,
                           }}/>
+            <Stack.Screen name="CreateTraining" component={CreateTrainingScreen}
+                        options={{
+                            headerShown: false,
+                            statusBarColor: theme.colors.background,
+                        }}/>
         </Stack.Navigator>
     );
 }
