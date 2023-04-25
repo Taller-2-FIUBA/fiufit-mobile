@@ -34,7 +34,7 @@ const AuthStack = () => {
                         <Image source={require('../../resources/profile.jpg')} style={{
                             height: 30,
                             width: 30,
-                            marginLeft: 10,
+                            marginLeft: 15,
                             borderRadius: 40,
                         }}/>
                     </TouchableOpacity>
@@ -43,7 +43,7 @@ const AuthStack = () => {
                     <Icon name="magnify"
                             size={30}
                             color={theme.colors.tertiary}
-                            style={{marginRight: 10}}
+                            style={{marginRight: 15}}
                             onPress={() => navigation.navigate('Search')} />
                 ),
                 drawerLabel: 'Trainings',
