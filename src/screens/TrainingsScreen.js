@@ -4,20 +4,10 @@ import {
     View
 } from 'react-native'
 import {useNavigation} from "@react-navigation/native";
-
-import {Picker} from '@react-native-picker/picker';
-import {
-    validateLocation,
-    validateName, validateNameLength,
-    validateUsername, validateUsernameLength
-} from "../utils/validations";
-import {TextInput} from 'react-native-paper';
 import React, {useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
-import Input from "../components/Input";
-import Button from "../components/Button";
-import { IconButton, MD3Colors, List } from 'react-native-paper';
+import { IconButton, List } from 'react-native-paper';
 
 
 const TrainingsScreen = () => {

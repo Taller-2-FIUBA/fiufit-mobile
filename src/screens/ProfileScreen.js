@@ -31,7 +31,7 @@ const ProfileAvatar = ({userName, onChange}) => {
         <View style={styles.profileAvatarContainer}>
             <Image
                 style={styles.profileAvatar}
-                source={require('../profile.jpg')}
+                source={require('../../resources/profile.jpg')}
             />
         </View>
     )

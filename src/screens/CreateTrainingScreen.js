@@ -4,17 +4,11 @@ import {
     View
 } from 'react-native'
 import {Picker} from '@react-native-picker/picker';
-import {
-    validateLocation,
-    validateName, validateNameLength,
-    validateUsername, validateUsernameLength
-} from "../utils/validations";
 import {TextInput} from 'react-native-paper';
 import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
-import Input from "../components/Input";
 import Button from "../components/Button";
 
 const CreateTrainingScreen = () => {
