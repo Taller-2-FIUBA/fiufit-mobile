@@ -9,12 +9,14 @@ export const redColor = '#FF0000'
 
 export const fiufitTheme = {
     ...DefaultTheme,
+    dark: false,
+    roundness: 2,
     colors: {
         ...DefaultTheme.colors,
         primary: '#13678A',
         secondary: '#45C4B0',
+        secondaryContainer: '#13678A',
         tertiary: '#ADA7A7',
-        background: '#012030'
+        background: '#012030',
     }
 }
-
