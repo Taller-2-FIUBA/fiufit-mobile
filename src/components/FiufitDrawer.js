@@ -1,8 +1,9 @@
 import {DrawerContentScrollView, DrawerItemList} from "@react-navigation/drawer";
-import {Image, Text, View} from "react-native";
+import {Image, Text, TouchableOpacity, View} from "react-native";
 import {useTheme} from "react-native-paper";
-import Button from "./Button";
 import {useNavigation} from "@react-navigation/native";
+import React from "react";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const FiufitDrawer = (props) => {
     const theme = useTheme();
@@ -20,13 +21,15 @@ const FiufitDrawer = (props) => {
                 borderBottomWidth: 1,
                 borderBottomColor: theme.colors.primary,
             }}>
-                <Image source={require('../../resources/profile.jpg')} style={{
-                    height: 50,
-                    width: 50,
-                    marginBottom: 15,
-                    marginTop: 20,
-                    borderRadius: 40,
-                }}/>
+                <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+                    <Image source={require('../../resources/profile.jpg')} style={{
+                        height: 50,
+                        width: 50,
+                        marginBottom: 15,
+                        marginTop: 20,
+                        borderRadius: 40,
+                    }}/>
+                </TouchableOpacity>
                 <Text
                     style={{
                         marginBottom: 20,
@@ -49,8 +52,21 @@ const FiufitDrawer = (props) => {
                 borderTopColor: theme.colors.primary,
                 marginLeft: 20,
                 marginRight: 20,
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
             }}>
-                <Button title="Logout" onPress={() => navigation.navigate('Login')}/>
+                <TouchableOpacity onPress={() => navigation.navigate("Login")} style={{
+                    marginTop: 10,
+                    marginBottom: 10,
+                    alignContent: 'flex-end',
+                    justifyContent: 'flex-start',
+                    width: '40%',
+                }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={{ marginRight: 10, color: theme.colors.secondary }}>Logout</Text>
+                        <Icon name="logout" size={30} color={theme.colors.secondary} />
+                    </View>
+                </TouchableOpacity>
             </View>
         </View>
     );

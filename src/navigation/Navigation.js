@@ -8,11 +8,13 @@ import SearchScreen from "../screens/SearchScreen";
 import UserBiologicsScreen from "../screens/UserBiologicsScreen";
 import {BottomNavigation, useTheme} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {CommonActions, useNavigation} from "@react-navigation/native";
+import {CommonActions, DrawerActions, useNavigation} from "@react-navigation/native";
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import FiufitDrawer from "../components/FiufitDrawer";
 import ProfileScreen from "../screens/ProfileScreen";
 import GoalsScreen from "../screens/GoalsScreen";
+import {Image, TouchableOpacity} from "react-native";
+import ChatScreen from "../screens/ChatScreen";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -27,6 +29,16 @@ const AuthStack = () => {
             <Drawer.Screen name="MainScreen" component={BottomTabNavigator} options={{
                 title: 'Fiufit',
                 headerTitleAlign: 'center',
+                headerLeft: () => (
+                    <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer)}>
+                        <Image source={require('../../resources/profile.jpg')} style={{
+                            height: 30,
+                            width: 30,
+                            marginLeft: 10,
+                            borderRadius: 40,
+                        }}/>
+                    </TouchableOpacity>
+                ),
                 headerRight: () => (
                     <Icon name="magnify"
                             size={30}
@@ -46,8 +58,34 @@ const AuthStack = () => {
                 drawerInactiveTintColor: theme.colors.tertiary,
 
             }}/>
+            <Drawer.Screen name="Chat" component={ChatScreen} options={{
+                title: 'Chat',
+                headerStyle: {
+                    backgroundColor: theme.colors.background,
+                },
+                headerTintColor: theme.colors.tertiary,
+                headerLeft: () => (
+                    <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}} />
+                    </TouchableOpacity>
+                ),
+                drawerIcon: ({ focused, color, size }) => {
+                    return <Icon name="forum" size={size} color={color} />;
+                },
+                drawerActiveTintColor: theme.colors.secondary,
+                drawerInactiveTintColor: theme.colors.tertiary,
+            }}/>
             <Drawer.Screen name="Profile" component={ProfileScreen} options={{
                 title: 'Profile',
+                headerStyle: {
+                    backgroundColor: theme.colors.background,
+                },
+                headerTintColor: theme.colors.tertiary,
+                headerLeft: () => (
+                    <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}} />
+                    </TouchableOpacity>
+                ),
                 drawerIcon: ({ focused, color, size }) => {
                     return <Icon name="account" size={size} color={color} />;
                 },
@@ -169,6 +207,10 @@ const MainStackNavigator = () => {
                           }}/>
             <Stack.Screen name="Search" component={SearchScreen}
                           options={{
+                                headerStyle: {
+                                    backgroundColor: theme.colors.background,
+                                },
+                              headerTintColor: theme.colors.tertiary,
                               statusBarColor: theme.colors.background,
                           }}/>
             <Stack.Screen name="Trainings" component={AuthStack}
