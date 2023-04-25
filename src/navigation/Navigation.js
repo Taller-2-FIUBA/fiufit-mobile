@@ -4,15 +4,59 @@ import TrainingsScreen from "../screens/TrainingsScreen";
 import LoginScreen from "../screens/LoginScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import UserDataScreen from "../screens/UserDataScreen";
-import ChatScreen from "../screens/ChatScreen";
 import SearchScreen from "../screens/SearchScreen";
 import UserBiologicsScreen from "../screens/UserBiologicsScreen";
 import {BottomNavigation, useTheme} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {CommonActions} from "@react-navigation/native";
+import {CommonActions, useNavigation} from "@react-navigation/native";
+import {createDrawerNavigator} from "@react-navigation/drawer";
+import FiufitDrawer from "../components/FiufitDrawer";
+import ProfileScreen from "../screens/ProfileScreen";
+import GoalsScreen from "../screens/GoalsScreen";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
+
+const AuthStack = () => {
+    const theme = useTheme();
+    const navigation = useNavigation();
+
+    return (
+        <Drawer.Navigator drawerContent={props => <FiufitDrawer {...props} />}>
+            <Drawer.Screen name="MainScreen" component={BottomTabNavigator} options={{
+                title: 'Fiufit',
+                headerTitleAlign: 'center',
+                headerRight: () => (
+                    <Icon name="magnify"
+                            size={30}
+                            color={theme.colors.tertiary}
+                            style={{marginRight: 10}}
+                            onPress={() => navigation.navigate('Search')} />
+                ),
+                drawerLabel: 'Trainings',
+                headerTintColor: theme.colors.tertiary,
+                headerStyle: {
+                    backgroundColor: theme.colors.background,
+                },
+                drawerIcon: ({ focused, color, size }) => {
+                    return <Icon name="weight-lifter" size={size} color={color} />;
+                },
+                drawerActiveTintColor: theme.colors.secondary,
+                drawerInactiveTintColor: theme.colors.tertiary,
+
+            }}/>
+            <Drawer.Screen name="Profile" component={ProfileScreen} options={{
+                title: 'Profile',
+                drawerIcon: ({ focused, color, size }) => {
+                    return <Icon name="account" size={size} color={color} />;
+                },
+                drawerActiveTintColor: theme.colors.secondary,
+                drawerInactiveTintColor: theme.colors.tertiary,
+            }}/>
+        </Drawer.Navigator>
+    );
+}
 
 const BottomTabNavigator = () => {
     const theme = useTheme();
@@ -77,22 +121,12 @@ const BottomTabNavigator = () => {
                 }}
             />
             <BottomTab.Screen
-                name="Search"
-                component={SearchScreen}
+                name="Goals"
+                component={GoalsScreen}
                 options={{
-                    tabBarLabel: 'Search',
+                    tabBarLabel: 'Goals',
                     tabBarIcon: ({ color, size }) => {
-                        return <Icon name="magnify" size={size} color={color} />;
-                    },
-                }}
-            />
-            <BottomTab.Screen
-                name="Chat"
-                component={ChatScreen}
-                options={{
-                    tabBarLabel: 'Chat',
-                    tabBarIcon: ({ color, size }) => {
-                        return <Icon name="forum" size={size} color={color} />;
+                        return <Icon name="flag-checkered" size={size} color={color} />;
                     },
                 }}
             />
@@ -133,7 +167,11 @@ const MainStackNavigator = () => {
                               headerTintColor: theme.colors.secondary,
                               statusBarColor: theme.colors.primary
                           }}/>
-            <Stack.Screen name="Trainings" component={BottomTabNavigator}
+            <Stack.Screen name="Search" component={SearchScreen}
+                          options={{
+                              statusBarColor: theme.colors.background,
+                          }}/>
+            <Stack.Screen name="Trainings" component={AuthStack}
                           options={{
                               headerShown: false,
                               statusBarColor: theme.colors.background,
