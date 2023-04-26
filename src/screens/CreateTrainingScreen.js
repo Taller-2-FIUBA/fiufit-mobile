@@ -123,6 +123,12 @@ const CreateTrainingScreen = () => {
                             value={training.media}
                             onChangeText={text => handleInputChange('media', text)}
                         />
+                        <TextInput
+                            label="Goals"
+                            mode='flat'
+                            value={training.media}
+                            onChangeText={text => handleInputChange('goal', text)}
+                        />
                         <Button onPress={handleCreate} title="Register"/>
                     </View>
                 </ScrollView>

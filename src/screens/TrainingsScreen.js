@@ -9,62 +9,105 @@ import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
 import { IconButton, List } from 'react-native-paper';
 
-
 const TrainingsScreen = () => {
     const navigation = useNavigation();
 
-    const [training, setTraining] = useState({
-        title: '',
-        description: '',
-        type: '',
-        difficulty: 'easy',
-        media: '',
-        goal: '',
-    });
+    const trainings = [
+        {
+            title: 'Training 1',
+            description: 'Description 1',
+            type: 'Type 1',
+            difficulty: 'easy',
+            media: 'Media 1',
+            goal: 'Goal 1',
+        },
+        {
+            title: 'Training 2',
+            description: 'Description 2',
+            type: 'Type 2',
+            difficulty: 'medium',
+            media: 'Media 2',
+            goal: 'Goal 2',
+        },
+        {
+            title: 'Training 3',
+            description: 'Description 3',
+            type: 'Type 3',
+            difficulty: 'hard',
+            media: 'Media 3',
+            goal: 'Goal 3',
+        }
+    ];
 
-    const [expanded, setExpanded] = React.useState(true);
+    const [expandedList, setExpandedList] = useState(trainings.map(() => false));
 
-    const handlePress = () => setExpanded(!expanded);
+    const handlePress = (index) => {
+        const newList = [...expandedList];
+        newList[index] = !newList[index];
+        setExpandedList(newList);
+    }
 
     const handleNext = () => {
         navigation.navigate('CreateTraining');
     }
 
     return (
-        <View style={fiufitStyles.container}>
-            <Text style={[fiufitStyles.titleText, {marginTop: -25}]}>
+        <SafeAreaView style={{ flex: 1 }}>
+            <ScrollView contentContainerStyle={fiufitStyles.container}>
+            <Text style={[fiufitStyles.titleText, { marginTop: -25 }]}>
                 Trainings
             </Text>
-            <List.Accordion
-                style={{ height: 50, width: 350 }}
-                left={props => <List.Icon {...props} icon="bike" />}>
-                <List.Item title="First item" />
-                <List.Item title="Second item" />
-            </List.Accordion>
+    
+            {trainings.map((training, index) => (
+                <List.Accordion
+                key={index}
+                style={{ height: 50, width: 350, backgroundColor: tertiaryColor }}
+                left={(props) => <List.Icon {...props} icon="bike" />}
+                title={training.title}
+                titleStyle={{ color: primaryColor }}
+                expanded={expandedList[index]}
+                onPress={() => handlePress(index)}
+                >
+                <List.Item
+                    title={`Description: ${training.description}`}
+                    titleStyle={{ color: tertiaryColor }}
+                />
+                <List.Item
+                    title={`Type: ${training.type}`}
+                    titleStyle={{ color: tertiaryColor }}
 
-            <List.Accordion
-                style={{ height: 50, width: 350 }}
-                left={props => <List.Icon {...props} icon="bike" />}
-                expanded={expanded}
-                onPress={handlePress}>
-                <List.Item style={{color: tertiaryColor}} title="First item" />
-                <List.Item title="Second item" />
-            </List.Accordion>
+                />
+                <List.Item
+                    title={`Difficulty: ${training.difficulty}`}
+                    titleStyle={{ color: tertiaryColor }}
+                />
+                <List.Item
+                    title={`Media: ${training.media}`}
+                    titleStyle={{ color: tertiaryColor }}
+                />
+                <List.Item
+                    title={`Goal: ${training.goal}`}
+                    titleStyle={{ color: tertiaryColor }}
+                />
+                </List.Accordion>
+            ))}
+    
             <IconButton
                 icon="plus"
-                type='contained-tonal'
+                type="contained-tonal"
                 iconColor={tertiaryColor}
                 containerColor={secondaryColor}
                 style={{
-                    position: 'absolute',
-                    bottom: 20,  // ajusta la posición vertical del botón
-                    right: 20,
+                position: 'absolute',
+                bottom: 20,
+                right: 20,
                 }}
                 size={45}
                 onPress={handleNext}
             />
-        </View>
-    )
-}
-
-export default TrainingsScreen
+        </ScrollView>
+      </SafeAreaView>
+    );
+  };
+  
+  export default TrainingsScreen;
