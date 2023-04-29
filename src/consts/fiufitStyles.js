@@ -120,6 +120,16 @@ export const fiufitStyles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 10,
     },
+    trainingButton: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+    },
+    editButton: {
+        position: 'absolute',
+        bottom: 10,
+        right: 5,
+    },
     haveAccount: {
         color: greyColor,
         textAlign: 'center',

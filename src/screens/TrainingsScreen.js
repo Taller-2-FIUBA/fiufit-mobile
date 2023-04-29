@@ -1,7 +1,7 @@
 import {
     SafeAreaView, ScrollView,
     Text,
-    View
+    TouchableOpacity,
 } from 'react-native'
 import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
@@ -89,6 +89,17 @@ const TrainingsScreen = () => {
                     title={`Goal: ${training.goal}`}
                     titleStyle={{ color: tertiaryColor }}
                 />
+                <TouchableOpacity
+                    style={fiufitStyles.editButton}
+                    onPress={handleNext}
+                >
+                    <IconButton
+                        icon="pencil"
+                        iconColor={tertiaryColor}
+                        style={{backgroundColor: secondaryColor}}
+                        size={30}
+                    />
+                </TouchableOpacity>
                 </List.Accordion>
             ))}
     
@@ -97,11 +108,7 @@ const TrainingsScreen = () => {
                 type="contained-tonal"
                 iconColor={tertiaryColor}
                 containerColor={secondaryColor}
-                style={{
-                position: 'absolute',
-                bottom: 20,
-                right: 20,
-                }}
+                style={fiufitStyles.trainingButton}
                 size={45}
                 onPress={handleNext}
             />
