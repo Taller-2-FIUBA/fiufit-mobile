@@ -57,9 +57,6 @@ const CreateTrainingScreen = () => {
 
     return (
         <View style={fiufitStyles.container}>
-            <Text style={fiufitStyles.buttonText}>
-                Trainings Screen
-            </Text>
             <SafeAreaView style={{
             backgroundColor: primaryColor,
             flex: 1,
@@ -71,48 +68,45 @@ const CreateTrainingScreen = () => {
                         Training
                     </Text>
                     <Text style={fiufitStyles.detailsText}>
-                        Enter your details to register a Training
+                        Enter your details to register a training
                     </Text>
                     <View style={{marginVertical: 20}}>
                         <TextInput
+                            style={fiufitStyles.createTrainingInput}
                             label="Title"
-                            mode='flat'
                             value={training.title}
                             onChangeText={text => handleInputChange('title', text)}
                         />
                         <TextInput
+                            style={fiufitStyles.createTrainingInput}
                             label="Description"
-                            mode='flat'
                             value={training.description}
                             onChangeText={text => handleInputChange('description', text)}
                         />
                         <TextInput
+                            style={fiufitStyles.createTrainingInput}
                             label="Type"
-                            mode='flat'
                             value={training.type}
                             onChangeText={text => handleInputChange('type', text)}
                         />
                         <Picker
                             selectedValue={training.difficulty}
-                            style={[{
-                                backgroundColor: secondaryColor,
-                                color: tertiaryColor
-                            },fiufitStyles.pickerSelect, { height: 50, width: 150 }]}
-                            onValueChange={(itemValue, itemIndex) => handleInputChange('difficulty', itemValue)}
+                            style={fiufitStyles.trainingPickerSelect}
+                            onValueChange={(itemValue) => handleInputChange('difficulty', itemValue)}
                         >
                             <Picker.Item label="easy" value="easy" />
                             <Picker.Item label="medium" value="medium" />
                             <Picker.Item label="hard" value="hard" />
                         </Picker>
                         <TextInput
+                            style={fiufitStyles.createTrainingInput}
                             label="Media"
-                            mode='flat'
                             value={training.media}
                             onChangeText={text => handleInputChange('media', text)}
                         />
                         <TextInput
+                            style={fiufitStyles.createTrainingInput}
                             label="Goals"
-                            mode='flat'
                             value={training.media}
                             onChangeText={text => handleInputChange('goal', text)}
                         />

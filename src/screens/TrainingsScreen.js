@@ -179,10 +179,10 @@ const TrainingsScreen = () => {
                     {editable && 
                         <View style={fiufitStyles.trainingButtonContainer}>
                             <TouchableOpacity style={{...fiufitStyles.trainingActionButton, marginRight: 5}} onPress={() => handleSaveAction(index)}>
-                                <Text style={fiufitStyles.trainingButtonText}>{'Save'}</Text>
+                                <Text style={fiufitStyles.trainingActionButtonText}>{'Save'}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={fiufitStyles.trainingActionButton} onPress={handleCancelAction}>
-                                <Text style={fiufitStyles.trainingButtonText}>{'Cancel'}</Text>
+                                <Text style={fiufitStyles.trainingActionButtonText}>{'Cancel'}</Text>
                             </TouchableOpacity>
                         </View>
                     }
