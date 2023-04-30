@@ -29,19 +29,6 @@ const CreateTrainingScreen = () => {
 
     const handleCreate = () => {
         navigation.navigate('Trainings');
-
-        /* Keyboard.dismiss();
-
-        if (errorDate) {
-            setErrorDate(false);
-        }
-
-        if (validateForm()) {
-            const updatedUser
-                = { ...user, height: parseFloat(meters + '.' + centimeters), weight: parseInt(weight) };
-
-            signUpUser(updatedUser);
-        } */
     }
 
     const createTraining = (training) => {
