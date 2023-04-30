@@ -60,8 +60,6 @@ const TrainingsScreen = () => {
     const [expandedList, setExpandedList] = useState(trainings.map(() => false));
 
     const handlePress = (index) => {
-        console.log(index);
-
         const newList = [...expandedList];
         newList[index] = !newList[index];
         setExpandedList(newList);
@@ -74,15 +72,11 @@ const TrainingsScreen = () => {
       };
 
     const handleEditAction = (index) => {
-        console.log(index);
-
-        console.log('first: ', editable);
-
         setEditable(true);
-        console.log(editable);
     }
 
     const handleSaveAction = (index) => {
+        //updateTraining();
         setEditable(false);
     };
 
@@ -117,7 +111,6 @@ const TrainingsScreen = () => {
     }; */
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
             <ScrollView contentContainerStyle={fiufitStyles.container}>
             <Text style={[fiufitStyles.titleText, { marginTop: -25 }]}>
                 Trainings
@@ -126,7 +119,7 @@ const TrainingsScreen = () => {
             {trainings.map((training, index) => (
                 <List.Accordion
                 key={index}
-                style={{ height: 50, width: 350, marginBottom: 3, backgroundColor: tertiaryColor }}
+                style={fiufitStyles.trainingsList}
                 left={(props) => <List.Icon {...props} icon="bike" />}
                 title={training.title}
                 titleStyle={{ color: primaryColor }}
@@ -134,7 +127,7 @@ const TrainingsScreen = () => {
                 onPress={() => handlePress(index)}
                 >
                     <TrainingItem
-                        value={trainings[index].description}
+                        value={training.description}
                         editable={editable}
                         onChange={(text) => handleInputChange(index, "description", text)}
                     />
@@ -147,7 +140,7 @@ const TrainingsScreen = () => {
                         <Picker
                             selectedValue={training.difficulty}
                             style={fiufitStyles.trainingPickerSelect}
-                            onValueChange={(itemValue, itemIndex) => handleInputChange(itemIndex, 'difficulty', itemValue)}
+                            onValueChange={(itemValue) => handleInputChange(index, 'difficulty', itemValue)}
                         >
                             <Picker.Item label="easy" value="easy" />
                             <Picker.Item label="medium" value="medium" />
@@ -185,11 +178,11 @@ const TrainingsScreen = () => {
                     }   
                     {editable && 
                         <View style={fiufitStyles.trainingButtonContainer}>
-                            <TouchableOpacity style={{...fiufitStyles.button, marginRight: 5}} onPress={() => handleSaveAction(index)}>
-                                <Text style={fiufitStyles.buttonText}>{'Save'}</Text>
+                            <TouchableOpacity style={{...fiufitStyles.trainingActionButton, marginRight: 5}} onPress={() => handleSaveAction(index)}>
+                                <Text style={fiufitStyles.trainingButtonText}>{'Save'}</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={fiufitStyles.button} onPress={handleCancelAction}>
-                                <Text style={fiufitStyles.buttonText}>{'Cancel'}</Text>
+                            <TouchableOpacity style={fiufitStyles.trainingActionButton} onPress={handleCancelAction}>
+                                <Text style={fiufitStyles.trainingButtonText}>{'Cancel'}</Text>
                             </TouchableOpacity>
                         </View>
                     }
@@ -201,12 +194,11 @@ const TrainingsScreen = () => {
                 type="contained-tonal"
                 iconColor={tertiaryColor}
                 containerColor={secondaryColor}
-                style={fiufitStyles.trainingButton}
+                style={fiufitStyles.addTrainingButton}
                 size={45}
                 onPress={handleNext}
             />
         </ScrollView>
-      </SafeAreaView>
     );
   };
   

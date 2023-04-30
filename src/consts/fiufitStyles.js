@@ -151,15 +151,15 @@ export const fiufitStyles = StyleSheet.create({
         borderRadius: 10,
         marginBottom: 5
     },
-    trainingButton: {
+    addTrainingButton: {
         position: 'absolute',
-        bottom: 20,
+        bottom: 5,
         right: 20,
     },
     editButton: {
         position: 'absolute',
-        bottom: 5,
-        right: 5,
+        bottom: 2,
+        right: 2,
     },
     trainingInput: {
         fontSize: 12,
@@ -177,12 +177,24 @@ export const fiufitStyles = StyleSheet.create({
     },
     trainingButtonContainer: {
         flexDirection: 'row',
-        width: '60%',
+        width: '55%',
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 2,
-        marginBottom: 10,
-        marginLeft: 20
+        marginBottom: 5,
+        marginLeft: 30
+    },
+    trainingActionButton: {
+        backgroundColor: secondaryColor,
+        width: '100%',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center'
+    },
+    trainingButtonText: {
+        color: tertiaryColor,
+        fontWeight: '700',
+        fontSize: 16,
     },
     trainingPickerSelect: {
         marginTop: 2,
@@ -191,5 +203,11 @@ export const fiufitStyles = StyleSheet.create({
         width: 150,
         backgroundColor: secondaryColor,
         color: tertiaryColor
+    },
+    trainingsList: { 
+        height: 50, 
+        width: 350, 
+        marginBottom: 3, 
+        backgroundColor: tertiaryColor 
     },
 })
