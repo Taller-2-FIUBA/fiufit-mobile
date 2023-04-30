@@ -1,18 +1,36 @@
 import {
     SafeAreaView, ScrollView,
     Text,
+    TextInput,
+    View,
     TouchableOpacity,
 } from 'react-native'
 import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
+import {primaryColor, secondaryColor, tertiaryColor, greyColor} from "../consts/colors";
 import { IconButton, List } from 'react-native-paper';
+import {Picker} from '@react-native-picker/picker';
+
+
+const TrainingItem = ({value, editable, onChange}) => {
+    return (
+        <View style={fiufitStyles.trainingItemContainer}>
+            <TextInput
+                style={editable ? fiufitStyles.trainingInput : fiufitStyles.trainingNotEditableInpunt}
+                value={value}
+                onChangeText={onChange}
+                editable={editable}
+            />
+        </View>
+    )
+}
 
 const TrainingsScreen = () => {
     const navigation = useNavigation();
+    const [editable, setEditable] = useState(false);
 
-    const trainings = [
+    const [trainings, setTrainings] = useState([
         {
             title: 'Training 1',
             description: 'Description 1',
@@ -37,19 +55,66 @@ const TrainingsScreen = () => {
             media: 'Media 3',
             goal: 'Goal 3',
         }
-    ];
+    ]);
 
     const [expandedList, setExpandedList] = useState(trainings.map(() => false));
 
     const handlePress = (index) => {
+        console.log(index);
+
         const newList = [...expandedList];
         newList[index] = !newList[index];
         setExpandedList(newList);
     }
 
+    const handleInputChange = (index, field, text) => {
+        const newTrainings = [...trainings];
+        newTrainings[index][field] = text;
+        setTrainings(newTrainings);
+      };
+
+    const handleEditAction = (index) => {
+        console.log(index);
+
+        console.log('first: ', editable);
+
+        setEditable(true);
+        console.log(editable);
+    }
+
+    const handleSaveAction = (index) => {
+        setEditable(false);
+    };
+
+    const handleCancelAction = () => {
+        setEditable(false);
+    };
+
     const handleNext = () => {
         navigation.navigate('CreateTraining');
     }
+
+    /*
+    const updateTraining = (index) => {
+         console.log("Update profile: ", expandedList[index]);
+        let copyTraining = {...userProfile};
+
+        fetch(baseURL + trainingURI + '/' + trainingId, {
+        method: 'PATCH',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(copyTraining)
+        })
+        .then((response) => response.json())
+        .then(() => {
+            setEditable(false);
+        })
+        .catch((error) => {
+            console.log("Error: ", error.message);
+        });
+    }; */
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -61,45 +126,73 @@ const TrainingsScreen = () => {
             {trainings.map((training, index) => (
                 <List.Accordion
                 key={index}
-                style={{ height: 50, width: 350, backgroundColor: tertiaryColor }}
+                style={{ height: 50, width: 350, marginBottom: 3, backgroundColor: tertiaryColor }}
                 left={(props) => <List.Icon {...props} icon="bike" />}
                 title={training.title}
                 titleStyle={{ color: primaryColor }}
                 expanded={expandedList[index]}
                 onPress={() => handlePress(index)}
                 >
-                <List.Item
-                    title={`Description: ${training.description}`}
-                    titleStyle={{ color: tertiaryColor }}
-                />
-                <List.Item
-                    title={`Type: ${training.type}`}
-                    titleStyle={{ color: tertiaryColor }}
-
-                />
-                <List.Item
-                    title={`Difficulty: ${training.difficulty}`}
-                    titleStyle={{ color: tertiaryColor }}
-                />
-                <List.Item
-                    title={`Media: ${training.media}`}
-                    titleStyle={{ color: tertiaryColor }}
-                />
-                <List.Item
-                    title={`Goal: ${training.goal}`}
-                    titleStyle={{ color: tertiaryColor }}
-                />
-                <TouchableOpacity
-                    style={fiufitStyles.editButton}
-                    onPress={handleNext}
-                >
-                    <IconButton
-                        icon="pencil"
-                        iconColor={tertiaryColor}
-                        style={{backgroundColor: secondaryColor}}
-                        size={30}
+                    <TrainingItem
+                        value={trainings[index].description}
+                        editable={editable}
+                        onChange={(text) => handleInputChange(index, "description", text)}
                     />
-                </TouchableOpacity>
+                    <TrainingItem
+                        value={trainings[index].type}
+                        editable={editable}
+                        onChange={(text) => handleInputChange(index, "type", text)}
+                    />
+                    {editable && 
+                        <Picker
+                            selectedValue={training.difficulty}
+                            style={fiufitStyles.trainingPickerSelect}
+                            onValueChange={(itemValue, itemIndex) => handleInputChange(itemIndex, 'difficulty', itemValue)}
+                        >
+                            <Picker.Item label="easy" value="easy" />
+                            <Picker.Item label="medium" value="medium" />
+                            <Picker.Item label="hard" value="hard" />
+                        </Picker>
+                    }
+                    {!editable && <TrainingItem
+                        value={trainings[index].difficulty}
+                        editable={editable}
+                        onChange={(text) => handleInputChange(index, "difficulty", text)}
+                    />
+                    }
+                    <TrainingItem
+                        value={trainings[index].media}
+                        editable={editable}
+                        onChange={(text) => handleInputChange(index, "media", text)}
+                    />
+                    <TrainingItem
+                        value={trainings[index].goal}
+                        editable={editable}
+                        onChange={(text) => handleInputChange(index, "goal", text)}
+                    />
+                    {!editable && 
+                        <TouchableOpacity
+                            style={fiufitStyles.editButton}
+                            onPress={handleEditAction}
+                        >
+                            <IconButton
+                                icon="pencil"
+                                iconColor={tertiaryColor}
+                                style={{backgroundColor: secondaryColor}}
+                                size={30}
+                            />
+                        </TouchableOpacity>
+                    }   
+                    {editable && 
+                        <View style={fiufitStyles.trainingButtonContainer}>
+                            <TouchableOpacity style={{...fiufitStyles.button, marginRight: 5}} onPress={() => handleSaveAction(index)}>
+                                <Text style={fiufitStyles.buttonText}>{'Save'}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={fiufitStyles.button} onPress={handleCancelAction}>
+                                <Text style={fiufitStyles.buttonText}>{'Cancel'}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    }
                 </List.Accordion>
             ))}
     

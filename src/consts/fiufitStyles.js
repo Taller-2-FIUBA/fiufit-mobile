@@ -120,16 +120,6 @@ export const fiufitStyles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 10,
     },
-    trainingButton: {
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
-    },
-    editButton: {
-        position: 'absolute',
-        bottom: 10,
-        right: 5,
-    },
     haveAccount: {
         color: greyColor,
         textAlign: 'center',
@@ -150,5 +140,56 @@ export const fiufitStyles = StyleSheet.create({
         flex: 1,
         paddingTop: 40,
         alignItems: "center",
-    }
+    },
+    trainingItemContainer: {
+        height: 50,
+        backgroundColor: whiteColor,
+        flexDirection: 'row',
+        borderWidth: 0.5,
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        borderRadius: 10,
+        marginBottom: 5
+    },
+    trainingButton: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+    },
+    editButton: {
+        position: 'absolute',
+        bottom: 5,
+        right: 5,
+    },
+    trainingInput: {
+        fontSize: 12,
+        borderColor: whiteColor,
+        borderWidth: 0.8,
+        color: tertiaryColor,
+        paddingHorizontal: 5
+    },
+    trainingNotEditableInpunt: {
+        fontSize: 12,
+        borderColor: whiteColor,
+        borderWidth: 0.8,
+        color: primaryColor,
+        paddingHorizontal: 10
+    },
+    trainingButtonContainer: {
+        flexDirection: 'row',
+        width: '60%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 2,
+        marginBottom: 10,
+        marginLeft: 20
+    },
+    trainingPickerSelect: {
+        marginTop: 2,
+        marginBottom: 5,
+        alignItems: "center",
+        width: 150,
+        backgroundColor: secondaryColor,
+        color: tertiaryColor
+    },
 })
