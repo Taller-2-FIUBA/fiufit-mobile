@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import {View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator} from 'react-native';
+import {View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor } from "../consts/colors";
 import {baseURL, userURI} from "../consts/requests";
 import {userId} from "./LoginScreen";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {fiufitStyles} from "../consts/fiufitStyles";
 
 
 

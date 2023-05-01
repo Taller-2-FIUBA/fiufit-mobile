@@ -135,5 +135,92 @@ export const fiufitStyles = StyleSheet.create({
         color: tertiaryColor,
         fontSize: 40,
         fontWeight: 'bold',
-    }
+    },
+    pickerSelect: {
+        flex: 1,
+        paddingTop: 40,
+        alignItems: "center",
+    },
+    createTrainingInput: {
+        height: 50,
+        backgroundColor: primaryColor,
+        borderColor: tertiaryColor,
+        color: tertiaryColor,
+        textColor: tertiaryColor,
+        borderWidth: 0.5,
+        borderRadius: 20,
+        marginBottom: 5
+    },
+    trainingItemContainer: {
+        height: 50,
+        backgroundColor: primaryColor,
+        borderColor: tertiaryColor,
+        flexDirection: 'row',
+        borderWidth: 0.5,
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        borderRadius: 10,
+        marginBottom: 5
+    },
+    addTrainingButton: {
+        position: 'absolute',
+        bottom: 5,
+        right: 20,
+    },
+    editButton: {
+        position: 'absolute',
+        bottom: 2,
+        right: 2,
+    },
+    trainingInput: {
+        fontSize: 14,
+        borderColor: primaryColor,
+        borderWidth: 0.8,
+        color: tertiaryColor,
+        paddingHorizontal: 5
+    },
+    trainingNotEditableInpunt: {
+        fontSize: 14,
+        borderColor: primaryColor,
+        borderWidth: 0.8,
+        color: secondaryColor,
+        paddingHorizontal: 10
+    },
+    trainingButtonContainer: {
+        flexDirection: 'row',
+        width: '55%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 2,
+        marginBottom: 5,
+        marginLeft: 30
+    },
+    trainingActionButton: {
+        backgroundColor: secondaryColor,
+        width: '100%',
+        padding: 15,
+        borderRadius: 20,
+        alignItems: 'center'
+    },
+    trainingActionButtonText: {
+        color: tertiaryColor,
+        fontWeight: '700',
+        fontSize: 16,
+    },
+    trainingPickerSelect: {
+        marginTop: 2,
+        marginBottom: 5,
+        alignItems: "center",
+        width: 150,
+        backgroundColor: secondaryColor,
+        color: tertiaryColor,
+        borderRadius: 10
+    },
+    trainingsList: { 
+        height: 50, 
+        width: 350, 
+        marginBottom: 3, 
+        backgroundColor: tertiaryColor,
+        borderRadius: 10
+    },
 })

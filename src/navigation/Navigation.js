@@ -8,6 +8,7 @@ import SearchScreen from "../screens/SearchScreen";
 import UserBiologicsScreen from "../screens/UserBiologicsScreen";
 import {BottomNavigation, useTheme} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import CreateTrainingScreen from '../screens/CreateTrainingScreen';
 import {CommonActions, DrawerActions, useNavigation} from "@react-navigation/native";
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import FiufitDrawer from "../components/FiufitDrawer";
@@ -218,6 +219,11 @@ const MainStackNavigator = () => {
                               headerShown: false,
                               statusBarColor: theme.colors.background,
                           }}/>
+            <Stack.Screen name="CreateTraining" component={CreateTrainingScreen}
+                        options={{
+                            headerShown: false,
+                            statusBarColor: theme.colors.background,
+                        }}/>
         </Stack.Navigator>
     );
 }
