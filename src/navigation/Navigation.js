@@ -59,23 +59,6 @@ const AuthStack = () => {
                 drawerInactiveTintColor: theme.colors.tertiary,
 
             }}/>
-            <Drawer.Screen name="Chat" component={ChatScreen} options={{
-                title: 'Chat',
-                headerStyle: {
-                    backgroundColor: theme.colors.background,
-                },
-                headerTintColor: theme.colors.tertiary,
-                headerLeft: () => (
-                    <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}} />
-                    </TouchableOpacity>
-                ),
-                drawerIcon: ({ focused, color, size }) => {
-                    return <Icon name="forum" size={size} color={color} />;
-                },
-                drawerActiveTintColor: theme.colors.secondary,
-                drawerInactiveTintColor: theme.colors.tertiary,
-            }}/>
             <Drawer.Screen name="Profile" component={ProfileScreen} options={{
                 title: 'Profile',
                 headerStyle: {
@@ -89,6 +72,23 @@ const AuthStack = () => {
                 ),
                 drawerIcon: ({ focused, color, size }) => {
                     return <Icon name="account" size={size} color={color} />;
+                },
+                drawerActiveTintColor: theme.colors.secondary,
+                drawerInactiveTintColor: theme.colors.tertiary,
+            }}/>
+            <Drawer.Screen name="Chat" component={ChatScreen} options={{
+                title: 'Chat',
+                headerStyle: {
+                    backgroundColor: theme.colors.background,
+                },
+                headerTintColor: theme.colors.tertiary,
+                headerLeft: () => (
+                    <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}} />
+                    </TouchableOpacity>
+                ),
+                drawerIcon: ({ focused, color, size }) => {
+                    return <Icon name="forum" size={size} color={color} />;
                 },
                 drawerActiveTintColor: theme.colors.secondary,
                 drawerInactiveTintColor: theme.colors.tertiary,

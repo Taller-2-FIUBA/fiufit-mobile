@@ -1,10 +1,19 @@
 import {
     validateBirthDate,
-    validateEmail, validateHeight, validateHeightCentimeters, validateHeightMeters, validateLocation,
+    validateEmail,
+    validateGoalTitle,
+    validateGoalDescription,
+    validateGoalObjective,
+    validateHeight,
+    validateHeightCentimeters,
+    validateHeightMeters,
+    validateLocation,
     validateName,
     validateNameLength,
-    validatePassword, validateUsername,
-    validateUsernameLength, validateWeight
+    validatePassword,
+    validateUsername,
+    validateUsernameLength,
+    validateWeight
 } from "../../src/utils/validations";
 
 describe('validateName', () => {
@@ -282,5 +291,86 @@ describe("validateLocation", () => {
 
     test("should return true for empty string", () => {
         expect(validateLocation("")).toBe(true);
+    });
+});
+
+describe("validateNewGoalTitle", () => {
+    test("returns true when title is between 1 and 15 characters", () => {
+        const result = validateGoalTitle("Learn React");
+        expect(result).toBe(true);
+    });
+
+    test("returns true when title is 1 character long", () => {
+        const result = validateGoalTitle("a");
+        expect(result).toBe(true);
+    });
+
+    test("returns true when title is 15 characters long", () => {
+        const result = validateGoalTitle("Learn HTML/CSS");
+        expect(result).toBe(true);
+    });
+
+    test("returns false when title is shorter than 1 character", () => {
+        const result = validateGoalTitle("");
+        expect(result).toBe(false);
+    });
+
+    test("returns false when title is longer than 15 characters", () => {
+        const result = validateGoalTitle("Learn React and Redux");
+        expect(result).toBe(false);
+    });
+});
+
+describe("validateNewGoalDescription", () => {
+    test("returns true when description is between 1 and 30 characters", () => {
+        const result = validateGoalDescription("Learn JavaScript");
+        expect(result).toBe(true);
+    });
+
+    test("returns true when description is 1 character long", () => {
+        const result = validateGoalDescription("a");
+        expect(result).toBe(true);
+    });
+
+    test("returns true when description is 30 characters long", () => {
+        const result = validateGoalDescription("Learn HTML/CSS/JavaScript");
+        expect(result).toBe(true);
+    });
+
+    test("returns false when description is shorter than 1 character", () => {
+        const result = validateGoalDescription("");
+        expect(result).toBe(false);
+    });
+
+    test("returns false when description is longer than 30 characters", () => {
+        const result = validateGoalDescription("Learn React, Redux, and Node.js");
+        expect(result).toBe(false);
+    });
+});
+
+describe("validateNewGoalObjective", () => {
+    test("returns true when objective is a positive integer", () => {
+        const result = validateGoalObjective("10");
+        expect(result).toBe(true);
+    });
+
+    test("returns true when objective is zero", () => {
+        const result = validateGoalObjective("0");
+        expect(result).toBe(true);
+    });
+
+    test("returns false when objective is a negative integer", () => {
+        const result = validateGoalObjective("-5");
+        expect(result).toBe(false);
+    });
+
+    test("returns false when objective is a non-integer string", () => {
+        const result = validateGoalObjective("1.5");
+        expect(result).toBe(false);
+    });
+
+    test("returns false when objective is an empty string", () => {
+        const result = validateGoalObjective("");
+        expect(result).toBe(false);
     });
 });
