@@ -1,3 +1,4 @@
+import {describe, test, expect} from '@jest/globals';
 import {parseWeight} from "../../src/utils/utils";
 
 describe('parseWeight', () => {
