@@ -58,3 +58,16 @@ export const validateLocation = (location) => {
     const containsOnlyLettersAndSpecialChars = /^[a-zA-Z0-9\s,'\p{L}]*$/u.test(location);
     return !containsOnlyNumbersAndSpaces && (location === '' || containsOnlyLettersAndSpecialChars);
 }
+
+export const validateGoalTitle = (title) => {
+    return title.length >= 1 && title.length <= 15;
+}
+
+export const validateGoalDescription = (description) => {
+    return description.length >= 1 && description.length <= 30;
+}
+
+export const validateGoalObjective = (objective) => {
+    const regex = /^[0-9]+$/;
+    return regex.test(objective);
+}

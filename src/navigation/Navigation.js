@@ -35,7 +35,7 @@ const AuthStack = () => {
                         <Image source={require('../../resources/profile.jpg')} style={{
                             height: 30,
                             width: 30,
-                            marginLeft: 10,
+                            marginLeft: 15,
                             borderRadius: 40,
                         }}/>
                     </TouchableOpacity>
@@ -44,7 +44,7 @@ const AuthStack = () => {
                     <Icon name="magnify"
                             size={30}
                             color={theme.colors.tertiary}
-                            style={{marginRight: 10}}
+                            style={{marginRight: 15}}
                             onPress={() => navigation.navigate('Search')} />
                 ),
                 drawerLabel: 'Trainings',
@@ -59,23 +59,6 @@ const AuthStack = () => {
                 drawerInactiveTintColor: theme.colors.tertiary,
 
             }}/>
-            <Drawer.Screen name="Chat" component={ChatScreen} options={{
-                title: 'Chat',
-                headerStyle: {
-                    backgroundColor: theme.colors.background,
-                },
-                headerTintColor: theme.colors.tertiary,
-                headerLeft: () => (
-                    <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}} />
-                    </TouchableOpacity>
-                ),
-                drawerIcon: ({ focused, color, size }) => {
-                    return <Icon name="forum" size={size} color={color} />;
-                },
-                drawerActiveTintColor: theme.colors.secondary,
-                drawerInactiveTintColor: theme.colors.tertiary,
-            }}/>
             <Drawer.Screen name="Profile" component={ProfileScreen} options={{
                 title: 'Profile',
                 headerStyle: {
@@ -89,6 +72,23 @@ const AuthStack = () => {
                 ),
                 drawerIcon: ({ focused, color, size }) => {
                     return <Icon name="account" size={size} color={color} />;
+                },
+                drawerActiveTintColor: theme.colors.secondary,
+                drawerInactiveTintColor: theme.colors.tertiary,
+            }}/>
+            <Drawer.Screen name="Chat" component={ChatScreen} options={{
+                title: 'Chat',
+                headerStyle: {
+                    backgroundColor: theme.colors.background,
+                },
+                headerTintColor: theme.colors.tertiary,
+                headerLeft: () => (
+                    <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}} />
+                    </TouchableOpacity>
+                ),
+                drawerIcon: ({ focused, color, size }) => {
+                    return <Icon name="forum" size={size} color={color} />;
                 },
                 drawerActiveTintColor: theme.colors.secondary,
                 drawerInactiveTintColor: theme.colors.tertiary,
