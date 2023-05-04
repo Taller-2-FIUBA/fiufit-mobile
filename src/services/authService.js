@@ -1,11 +1,12 @@
 import {axiosInstance} from "./config/axiosConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {StatusCodes} from "http-status-codes";
+import requests from "../consts/requests";
 
 const authService = {
     async login(user) {
         try {
-            const response = await axiosInstance.post("/users/login", user);
+            const response = await axiosInstance.post(requests.LOGIN, user);
             const token = response.data.token;
             const userId = response.data.id;
             await AsyncStorage.setItem('@fiufit_token', token);
@@ -18,7 +19,7 @@ const authService = {
 
     async register(user) {
         try {
-            const response = await axiosInstance.post("/users", user);
+            const response = await axiosInstance.post(requests.SIGNUP, user);
             return response.data;
         } catch (error) {
             throw new Error(StatusCodes[error.response.status] + " " + error.response.status);

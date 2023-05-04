@@ -1,6 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {StatusCodes} from "http-status-codes";
+import requests from "../../consts/requests";
 
 let navigation;
 
@@ -9,7 +10,7 @@ export const setNavigation = (nav) => {
 }
 
 export const axiosInstance = axios.create({
-    baseURL: 'https://users-ingress-taller2-marianocinalli.cloud.okteto.net',  // TODO: pasar a .env
+    baseURL: requests.BASE_URL,
     responseType: 'json',
 });
 
