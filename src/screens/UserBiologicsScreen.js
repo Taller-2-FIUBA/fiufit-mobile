@@ -9,7 +9,6 @@ import {
     View
 } from "react-native";
 import {greyColor, primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
-import {useNavigation} from "@react-navigation/native";
 import React, {useRef, useState} from "react";
 import {Picker} from "@react-native-picker/picker";
 import {fiufitStyles} from "../consts/fiufitStyles";
@@ -24,11 +23,10 @@ import {
 } from "../utils/validations";
 import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import {baseURL, signUpURI} from "../consts/requests";
 import Input from "../components/Input";
+import authService from "../services/authService";
 
-const UserBiologicsScreen = ({route}) => {
-    const navigation = useNavigation();
+const UserBiologicsScreen = ({navigation, route}) => {
     const rolePickerRef = useRef();
 
     const [meters, setMeters] = useState('');
@@ -87,11 +85,6 @@ const UserBiologicsScreen = ({route}) => {
 
     const handleSignUp = () => {
         Keyboard.dismiss();
-
-        if (errorDate) {
-            setErrorDate(false);
-        }
-
         if (validateForm()) {
             const updatedUser
                 = { ...user, height: parseFloat(meters + '.' + centimeters), weight: parseInt(weight) };
@@ -101,30 +94,22 @@ const UserBiologicsScreen = ({route}) => {
     }
 
     const signUpUser = (user) => {
-        fetch(baseURL + signUpURI, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(user)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    Alert.alert(data.error);
-                }
-
-                ToastAndroid.show("User created successfully", ToastAndroid.SHORT);
-                navigation.navigate('Login');
-            })
-            .catch(error => {
-                console.log(error);
-                Alert.alert(error.message);
-                navigation.navigate('Login');
-            });
+        authService.register(user).then(data => {
+            if (data.detail) {
+                throw new Error(`Error signing up: ${data.detail}`);
+            }
+            ToastAndroid.show("User created successfully", ToastAndroid.SHORT);
+            navigation.navigate('Login');
+        }).catch(error => {
+            console.log(error);
+            Alert.alert("Error", "Something went wrong. Please try again later.");
+        });
     }
 
     const validateForm = () => {
+        if (errorDate) {
+            setErrorDate(false);
+        }
         handleError(null, 'weight');
         handleError(null, 'heightMeters');
         handleError(null, 'heightCentimeters');

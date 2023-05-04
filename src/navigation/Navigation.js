@@ -6,7 +6,7 @@ import SignUpScreen from "../screens/SignUpScreen";
 import UserDataScreen from "../screens/UserDataScreen";
 import SearchScreen from "../screens/SearchScreen";
 import UserBiologicsScreen from "../screens/UserBiologicsScreen";
-import {BottomNavigation, useTheme} from 'react-native-paper';
+import {Avatar, BottomNavigation, useTheme} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CreateTrainingScreen from '../screens/CreateTrainingScreen';
 import {CommonActions, DrawerActions, useNavigation} from "@react-navigation/native";
@@ -14,8 +14,11 @@ import {createDrawerNavigator} from "@react-navigation/drawer";
 import FiufitDrawer from "../components/FiufitDrawer";
 import ProfileScreen from "../screens/ProfileScreen";
 import GoalsScreen from "../screens/GoalsScreen";
-import {Image, TouchableOpacity} from "react-native";
+import {Alert, Image, TouchableOpacity} from "react-native";
 import ChatScreen from "../screens/ChatScreen";
+import InitialScreen from "../screens/InitialScreen";
+import {useEffect, useState} from "react";
+import userService from "../services/userService";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -24,6 +27,19 @@ const Drawer = createDrawerNavigator();
 const AuthStack = () => {
     const theme = useTheme();
     const navigation = useNavigation();
+    const [userData, setUserData] = useState({
+        name: '',
+        surname: '',
+    });
+
+    useEffect(() => {
+        userService.getUser().then((profile) => {
+            setUserData(profile);
+        }).catch((error) => {
+            console.log(error);
+            Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
+        });
+    }, []);
 
     return (
         <Drawer.Navigator drawerContent={props => <FiufitDrawer {...props} />}>
@@ -32,28 +48,29 @@ const AuthStack = () => {
                 headerTitleAlign: 'center',
                 headerLeft: () => (
                     <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer)}>
-                        <Image source={require('../../resources/profile.jpg')} style={{
-                            height: 30,
-                            width: 30,
-                            marginLeft: 15,
-                            borderRadius: 40,
-                        }}/>
+                        <Avatar.Text size={30} color={theme.colors.secondary}
+                                     style={{
+                                         marginLeft: 10,
+                                         backgroundColor: theme.colors.primary
+                                     }}
+                                     label={userData.name.charAt(0) + userData.surname.charAt(0)}
+                        />
                     </TouchableOpacity>
                 ),
                 headerRight: () => (
                     <Icon name="magnify"
-                            size={30}
-                            color={theme.colors.tertiary}
-                            style={{marginRight: 15}}
-                            onPress={() => navigation.navigate('Search')} />
+                          size={30}
+                          color={theme.colors.tertiary}
+                          style={{marginRight: 15}}
+                          onPress={() => navigation.navigate('Search')}/>
                 ),
                 drawerLabel: 'Trainings',
                 headerTintColor: theme.colors.tertiary,
                 headerStyle: {
                     backgroundColor: theme.colors.background,
                 },
-                drawerIcon: ({ focused, color, size }) => {
-                    return <Icon name="weight-lifter" size={size} color={color} />;
+                drawerIcon: ({focused, color, size}) => {
+                    return <Icon name="weight-lifter" size={size} color={color}/>;
                 },
                 drawerActiveTintColor: theme.colors.secondary,
                 drawerInactiveTintColor: theme.colors.tertiary,
@@ -67,11 +84,11 @@ const AuthStack = () => {
                 headerTintColor: theme.colors.tertiary,
                 headerLeft: () => (
                     <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}} />
+                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}}/>
                     </TouchableOpacity>
                 ),
-                drawerIcon: ({ focused, color, size }) => {
-                    return <Icon name="account" size={size} color={color} />;
+                drawerIcon: ({focused, color, size}) => {
+                    return <Icon name="account" size={size} color={color}/>;
                 },
                 drawerActiveTintColor: theme.colors.secondary,
                 drawerInactiveTintColor: theme.colors.tertiary,
@@ -84,11 +101,11 @@ const AuthStack = () => {
                 headerTintColor: theme.colors.tertiary,
                 headerLeft: () => (
                     <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}} />
+                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}}/>
                     </TouchableOpacity>
                 ),
-                drawerIcon: ({ focused, color, size }) => {
-                    return <Icon name="forum" size={size} color={color} />;
+                drawerIcon: ({focused, color, size}) => {
+                    return <Icon name="forum" size={size} color={color}/>;
                 },
                 drawerActiveTintColor: theme.colors.secondary,
                 drawerInactiveTintColor: theme.colors.tertiary,
@@ -105,7 +122,7 @@ const BottomTabNavigator = () => {
             screenOptions={{
                 headerShown: false,
             }}
-            tabBar={({ navigation, state, descriptors, insets }) => (
+            tabBar={({navigation, state, descriptors, insets}) => (
                 <BottomNavigation.Bar
                     navigationState={state}
                     safeAreaInsets={insets}
@@ -114,7 +131,7 @@ const BottomTabNavigator = () => {
                     style={{
                         backgroundColor: theme.colors.background,
                     }}
-                    onTabPress={({ route, preventDefault }) => {
+                    onTabPress={({route, preventDefault}) => {
                         const event = navigation.emit({
                             type: 'tabPress',
                             target: route.key,
@@ -130,16 +147,16 @@ const BottomTabNavigator = () => {
                             });
                         }
                     }}
-                    renderIcon={({ route, focused, color }) => {
-                        const { options } = descriptors[route.key];
+                    renderIcon={({route, focused, color}) => {
+                        const {options} = descriptors[route.key];
                         if (options.tabBarIcon) {
-                            return options.tabBarIcon({ focused, color, size: 24 });
+                            return options.tabBarIcon({focused, color, size: 24});
                         }
 
                         return null;
                     }}
-                    getLabelText={({ route }) => {
-                        const { options } = descriptors[route.key];
+                    getLabelText={({route}) => {
+                        const {options} = descriptors[route.key];
                         return options.tabBarLabel !== undefined
                             ? options.tabBarLabel
                             : options.title !== undefined
@@ -154,8 +171,8 @@ const BottomTabNavigator = () => {
                 component={TrainingsScreen}
                 options={{
                     tabBarLabel: 'Trainings',
-                    tabBarIcon: ({ color, size }) => {
-                        return <Icon name="weight-lifter" size={size} color={color} />;
+                    tabBarIcon: ({color, size}) => {
+                        return <Icon name="weight-lifter" size={size} color={color}/>;
                     },
                 }}
             />
@@ -164,8 +181,8 @@ const BottomTabNavigator = () => {
                 component={GoalsScreen}
                 options={{
                     tabBarLabel: 'Goals',
-                    tabBarIcon: ({ color, size }) => {
-                        return <Icon name="flag-checkered" size={size} color={color} />;
+                    tabBarIcon: ({color, size}) => {
+                        return <Icon name="flag-checkered" size={size} color={color}/>;
                     },
                 }}
             />
@@ -178,6 +195,11 @@ const MainStackNavigator = () => {
 
     return (
         <Stack.Navigator>
+            <Stack.Screen name="Initial" component={InitialScreen}
+                          options={{
+                              headerShown: false,
+                              statusBarColor: theme.colors.primary
+                          }}/>
             <Stack.Screen name="Login" component={LoginScreen}
                           options={{
                               headerShown: false,
@@ -191,7 +213,7 @@ const MainStackNavigator = () => {
             <Stack.Screen name={"UserData"} component={UserDataScreen}
                           options={{
                               headerStyle: {
-                                    backgroundColor: theme.colors.primary
+                                  backgroundColor: theme.colors.primary
                               },
                               headerTitle: "Personal data",
                               headerTintColor: theme.colors.secondary,
@@ -208,9 +230,9 @@ const MainStackNavigator = () => {
                           }}/>
             <Stack.Screen name="Search" component={SearchScreen}
                           options={{
-                                headerStyle: {
-                                    backgroundColor: theme.colors.background,
-                                },
+                              headerStyle: {
+                                  backgroundColor: theme.colors.background,
+                              },
                               headerTintColor: theme.colors.tertiary,
                               statusBarColor: theme.colors.background,
                           }}/>
@@ -220,10 +242,10 @@ const MainStackNavigator = () => {
                               statusBarColor: theme.colors.background,
                           }}/>
             <Stack.Screen name="CreateTraining" component={CreateTrainingScreen}
-                        options={{
-                            headerShown: false,
-                            statusBarColor: theme.colors.background,
-                        }}/>
+                          options={{
+                              headerShown: false,
+                              statusBarColor: theme.colors.background,
+                          }}/>
         </Stack.Navigator>
     );
 }

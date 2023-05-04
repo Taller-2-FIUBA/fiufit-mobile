@@ -8,15 +8,13 @@ import {
     validateName, validateNameLength,
     validateUsername, validateUsernameLength
 } from "../utils/validations";
-import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor} from "../consts/colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
 
-const UserDataScreen = ({route}) => {
-    const navigation = useNavigation();
+const UserDataScreen = ({navigation, route}) => {
 
     const [errors, setErrors] = useState({});
 

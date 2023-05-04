@@ -1,13 +1,36 @@
 import {DrawerContentScrollView, DrawerItemList} from "@react-navigation/drawer";
-import {Image, Text, TouchableOpacity, View} from "react-native";
-import {useTheme} from "react-native-paper";
-import {useNavigation} from "@react-navigation/native";
-import React from "react";
+import {Alert, Text, TouchableOpacity, View} from "react-native";
+import {Avatar, useTheme} from "react-native-paper";
+import React, {useEffect, useState} from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import authService from "../services/authService";
+import userService from "../services/userService";
 
 const FiufitDrawer = (props) => {
     const theme = useTheme();
-    const navigation = useNavigation();
+    const [userData, setUserData] = useState({
+        name: '',
+        surname: '',
+        username: '',
+    });
+
+    useEffect(() => {
+        userService.getUser().then((profile) => {
+            setUserData(profile);
+        }).catch((error) => {
+            console.log(error);
+            Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
+        });
+    }, []);
+
+    const handleLogout = () => {
+        authService.logout().then(data => {
+            props.navigation.replace('Login');
+        }).catch(error => {
+            console.log(error);
+            Alert.alert("Error", "Something went wrong while logging out. Please try again later.");
+        });
+    }
 
     return (
         <View style={{
@@ -21,24 +44,24 @@ const FiufitDrawer = (props) => {
                 borderBottomWidth: 1,
                 borderBottomColor: theme.colors.primary,
             }}>
-                <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-                    <Image source={require('../../resources/profile.jpg')} style={{
-                        height: 50,
-                        width: 50,
-                        marginBottom: 15,
-                        marginTop: 20,
-                        borderRadius: 40,
-                    }}/>
+                <TouchableOpacity onPress={() => props.navigation.navigate("Profile")}>
+                    <Avatar.Text size={50} color={theme.colors.secondary}
+                                 label={userData.name.charAt(0) + userData.surname.charAt(0)}
+                                 style={{
+                                     backgroundColor: theme.colors.primary,
+                                     marginTop: 20,
+                                     marginBottom: 10,
+                                 }}/>
                 </TouchableOpacity>
                 <Text
                     style={{
-                        marginBottom: 20,
                         color: theme.colors.tertiary,
                         fontSize: 15,
                         fontFamily: 'Roboto',
                         fontWeight: 'bold',
-                }}>
-                    John Doe
+                        marginBottom: 20,
+                    }}>
+                    {userData.username}
                 </Text>
             </View>
             <DrawerContentScrollView {...props} contentContainerStyle={{
@@ -55,16 +78,16 @@ const FiufitDrawer = (props) => {
                 flexDirection: 'row',
                 justifyContent: 'flex-end',
             }}>
-                <TouchableOpacity onPress={() => navigation.navigate("Login")} style={{
+                <TouchableOpacity onPress={handleLogout} style={{
                     marginTop: 10,
                     marginBottom: 10,
                     alignContent: 'flex-end',
                     justifyContent: 'flex-start',
                     width: '40%',
                 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={{ marginRight: 10, color: theme.colors.secondary }}>Logout</Text>
-                        <Icon name="logout" size={30} color={theme.colors.secondary} />
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={{marginRight: 10, color: theme.colors.secondary}}>Logout</Text>
+                        <Icon name="logout" size={30} color={theme.colors.secondary}/>
                     </View>
                 </TouchableOpacity>
             </View>
