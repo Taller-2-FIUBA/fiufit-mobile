@@ -19,6 +19,7 @@ import ChatScreen from "../screens/ChatScreen";
 import InitialScreen from "../screens/InitialScreen";
 import {useEffect, useState} from "react";
 import userService from "../services/userService";
+import UserDataContext from "../contexts/userDataContext";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -190,11 +191,58 @@ const BottomTabNavigator = () => {
     );
 };
 
+const RegistrationStackNavigator = () => {
+    const theme = useTheme();
+    const [userData, setUserData] = useState({
+        email: '',
+        password: '',
+        name: '',
+        surname: '',
+        username: '',
+        location: '',
+        is_athlete: true,
+        height: 0.0,
+        weight: 0,
+        birth_date: '',
+        registration_date: new Date().toISOString().split('T')[0],
+    });
+
+    return (
+        <UserDataContext.Provider value={{userData: userData, setUserData: setUserData}}>
+            <Stack.Navigator>
+                <Stack.Screen name={"SignUp"} component={SignUpScreen}
+                              options={{
+                                  headerShown: false,
+                                  statusBarColor: theme.colors.primary
+                              }}/>
+                <Stack.Screen name={"UserData"} component={UserDataScreen}
+                              options={{
+                                  headerStyle: {
+                                      backgroundColor: theme.colors.primary
+                                  },
+                                  headerTitle: "Personal data",
+                                  headerTintColor: theme.colors.secondary,
+                                  statusBarColor: theme.colors.primary
+                              }}/>
+                <Stack.Screen name={"UserBiologics"} component={UserBiologicsScreen}
+                              options={{
+                                  headerStyle: {
+                                      backgroundColor: theme.colors.primary,
+                                  },
+                                  headerTitle: "Physiological data",
+                                  headerTintColor: theme.colors.secondary,
+                                  statusBarColor: theme.colors.primary
+                              }}/>
+            </Stack.Navigator>
+        </UserDataContext.Provider>
+    );
+}
+
 const MainStackNavigator = () => {
     const theme = useTheme();
 
     return (
-        <Stack.Navigator>
+        <Stack.Navigator initialRouteName={"Initial"}>
             <Stack.Screen name="Initial" component={InitialScreen}
                           options={{
                               headerShown: false,
@@ -205,27 +253,9 @@ const MainStackNavigator = () => {
                               headerShown: false,
                               statusBarColor: theme.colors.primary
                           }}/>
-            <Stack.Screen name={"SignUp"} component={SignUpScreen}
+            <Stack.Screen name="Registration" component={RegistrationStackNavigator}
                           options={{
                               headerShown: false,
-                              statusBarColor: theme.colors.primary
-                          }}/>
-            <Stack.Screen name={"UserData"} component={UserDataScreen}
-                          options={{
-                              headerStyle: {
-                                  backgroundColor: theme.colors.primary
-                              },
-                              headerTitle: "Personal data",
-                              headerTintColor: theme.colors.secondary,
-                              statusBarColor: theme.colors.primary
-                          }}/>
-            <Stack.Screen name={"UserBiologics"} component={UserBiologicsScreen}
-                          options={{
-                              headerStyle: {
-                                  backgroundColor: theme.colors.primary,
-                              },
-                              headerTitle: "Physiological data",
-                              headerTintColor: theme.colors.secondary,
                               statusBarColor: theme.colors.primary
                           }}/>
             <Stack.Screen name="Search" component={SearchScreen}

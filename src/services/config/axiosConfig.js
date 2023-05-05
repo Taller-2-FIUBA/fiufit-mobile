@@ -29,10 +29,13 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
     async (response) => {
-        if (response.status === StatusCodes.UNAUTHORIZED) {
+        return response;
+    },
+    async (error) => {
+        if (error.response.status === StatusCodes.UNAUTHORIZED) {
             await AsyncStorage.removeItem('@fiufit_token');
             await AsyncStorage.removeItem('@fiufit_userId');
         }
-        return response;
+        return Promise.reject(error);
     }
 );

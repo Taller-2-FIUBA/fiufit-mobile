@@ -9,7 +9,7 @@ import {
     View
 } from "react-native";
 import {greyColor, primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
-import React, {useRef, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import {Picker} from "@react-native-picker/picker";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {parseWeight} from "../utils/utils";
@@ -25,9 +25,11 @@ import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Input from "../components/Input";
 import authService from "../services/authService";
+import UserDataContext from "../contexts/userDataContext";
 
-const UserBiologicsScreen = ({navigation, route}) => {
+const UserBiologicsScreen = ({navigation}) => {
     const rolePickerRef = useRef();
+    const {userData, setUserData} = useContext(UserDataContext);
 
     const [meters, setMeters] = useState('');
     const [centimeters, setCentimeters] = useState('');
@@ -35,22 +37,9 @@ const UserBiologicsScreen = ({navigation, route}) => {
     const [date, setDate] = useState(null);
     const [errorDate, setErrorDate] = useState(false);
     const [errors, setErrors] = useState({});
-    const [user, setUser] = useState({
-        email: route.params.user.email,
-        password: route.params.user.password,
-        name: route.params.user.name,
-        surname: route.params.user.surname,
-        username: route.params.user.username,
-        location: route.params.user.location,
-        is_athlete: true,
-        height: 0.0,
-        weight: 0,
-        birth_date: '',
-        registration_date: new Date().toISOString().split('T')[0],
-    });
 
     const handleInputChange = (key, value) => {
-        setUser({ ...user, [key]: value });
+        setUserData({ ...userData, [key]: value });
     }
 
     const showDatepicker = () => {
@@ -87,22 +76,19 @@ const UserBiologicsScreen = ({navigation, route}) => {
         Keyboard.dismiss();
         if (validateForm()) {
             const updatedUser
-                = { ...user, height: parseFloat(meters + '.' + centimeters), weight: parseInt(weight) };
-
+                = { ...userData, height: parseFloat(meters + '.' + centimeters), weight: parseInt(weight) };
             signUpUser(updatedUser);
         }
     }
 
     const signUpUser = (user) => {
-        authService.register(user).then(data => {
-            if (data.detail) {
-                throw new Error(`Error signing up: ${data.detail}`);
-            }
+        authService.register(user).then(() => {
             ToastAndroid.show("User created successfully", ToastAndroid.SHORT);
             navigation.navigate('Login');
         }).catch(error => {
             console.log(error);
-            Alert.alert("Error", "Something went wrong. Please try again later.");
+            Alert.alert("Error signing up", "Something went wrong. Please try again later.");
+            navigation.replace('Login');
         });
     }
 
@@ -137,7 +123,7 @@ const UserBiologicsScreen = ({navigation, route}) => {
             valid = false;
         }
 
-        if (!validateBirthDate(user.birth_date)) {
+        if (!validateBirthDate(userData.birth_date)) {
             setErrorDate(true);
             valid = false;
         }
@@ -171,7 +157,7 @@ const UserBiologicsScreen = ({navigation, route}) => {
                 }}>
                     <Picker
                         ref={rolePickerRef}
-                        selectedValue={user.is_athlete}
+                        selectedValue={userData.is_athlete}
                         onValueChange={(itemValue) =>
                             handleInputChange("is_athlete", itemValue)
                         }
