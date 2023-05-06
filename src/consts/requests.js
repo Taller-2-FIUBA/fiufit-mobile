@@ -6,5 +6,5 @@ export const signUpURI = '/users';
 
 export const userURI = '/users';
 
-export const trainingURI = '/training';
+export const trainingsURI = '/trainings';
 

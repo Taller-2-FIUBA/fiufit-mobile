@@ -45,7 +45,8 @@ const LoginScreen = () => {
         }
 
         if (valid) {
-            login(inputs);
+            //login(inputs);
+            navigation.navigate('Trainings');
         }
     }
 
@@ -60,6 +61,7 @@ const LoginScreen = () => {
         })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 if (data.error) {
                     Alert.alert(data.error);
                 } else if (data.id) {

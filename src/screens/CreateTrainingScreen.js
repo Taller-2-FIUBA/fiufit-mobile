@@ -11,11 +11,9 @@ import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
 import Button from "../components/Button";
 import TrainingInput from "../components/TrainingInput";
 import {
-    validateLocation,
-    validateName, validateNameLength,
-    validateUsername, validateUsernameLength
+    validateName, validateTrainingNameLength,
+    validateMediaUrl
 } from "../utils/validations";
-import Input from "../components/Input";
 
 const CreateTrainingScreen = () => {
     const navigation = useNavigation();
@@ -38,12 +36,12 @@ const CreateTrainingScreen = () => {
         setTraining({...training, [key]: value});
     };
 
-    const validateForm = (user) => {
+    const validateForm = () => {
         let valid = true;
         const validationData = [
             {value: training.title, validator: validateName, errorMessage: 'Invalid title', field: 'title'},
-            {value: training.description, validator: validateNameLength, errorMessage: 'Description must be at least 2 characters long', field: 'description'},
-            {value: training.type, validator: validateName, errorMessage: 'Invalid type', field: 'type'},
+            {value: training.title, validator: validateTrainingNameLength, errorMessage: 'Title must be at least 3 characters long', field: 'title'},
+            {value: training.media, validator: validateMediaUrl, errorMessage: 'Invalid link', field: 'media'},
         ];
 
         for (const {value, validator, errorMessage, field} of validationData) {
@@ -62,41 +60,15 @@ const CreateTrainingScreen = () => {
         }
     }
 
-
     const handleCreate = () => {
         handleError(null, 'title')
-        handleError(null, 'description')
-        handleError(null, 'type')
+        handleError(null, 'media')
 
         trimUserData(training);
         if (!validateForm(training)) {
             return;
         }
         navigation.navigate('Trainings');
-    }
-
-    const createTraining = (training) => {
-        fetch(baseURL + trainings, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(user)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    Alert.alert(data.error);
-                }
-
-                ToastAndroid.show("Training created successfully", ToastAndroid.SHORT);
-                navigation.navigate('Trainings');
-            })
-            .catch(error => {
-                console.log(error);
-                Alert.alert(error.message);
-                navigation.navigate('Login');
-            });
     }
 
     return (
@@ -126,7 +98,6 @@ const CreateTrainingScreen = () => {
                             label="Description"
                             placeholder="Enter a description"
                             value={training.description}
-                            error={errors.description}
                             onChangeText={text => handleInputChange('description', text)}
                         />
 

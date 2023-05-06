@@ -71,3 +71,12 @@ export const validateGoalObjective = (objective) => {
     const regex = /^[0-9]+$/;
     return regex.test(objective);
 }
+
+export const validateTrainingNameLength = (name) => {
+    return name.length >= 3 && name.length <= 40;
+}
+
+export const validateMediaUrl = (url) => {
+    const regex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w.-]*)*\/?$/;
+    return regex.test(url);
+}
