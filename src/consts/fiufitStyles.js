@@ -143,13 +143,10 @@ export const fiufitStyles = StyleSheet.create({
     },
     createTrainingInput: {
         height: 50,
-        backgroundColor: primaryColor,
-        borderColor: tertiaryColor,
+        backgroundColor: secondaryColor,
         color: tertiaryColor,
-        textColor: tertiaryColor,
-        borderWidth: 0.5,
-        borderRadius: 20,
-        marginBottom: 5
+        borderWidth: 1,
+        borderRadius: 10,
     },
     trainingItemContainer: {
         height: 50,
@@ -164,8 +161,12 @@ export const fiufitStyles = StyleSheet.create({
     },
     addTrainingButton: {
         position: 'absolute',
-        bottom: 5,
-        right: 20,
+        margin: 16,
+        right: 0,
+        bottom: 0,
+        borderRadius: 30,
+        backgroundColor: secondaryColor,
+        color: tertiaryColor
     },
     editButton: {
         position: 'absolute',

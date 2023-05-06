@@ -9,7 +9,7 @@ import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor, greyColor} from "../consts/colors";
-import { IconButton, List } from 'react-native-paper';
+import { FAB, IconButton, List } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 
 
@@ -112,9 +112,23 @@ const TrainingsScreen = () => {
 
     return (
             <ScrollView contentContainerStyle={fiufitStyles.container}>
-            <Text style={[fiufitStyles.titleText, { marginTop: -25 }]}>
-                Trainings
-            </Text>
+            <Text style={{
+                        ...fiufitStyles.titleText,
+                        alignSelf: 'center',
+                        marginTop: 10,
+                    }}>
+                        Goals
+                    </Text>
+                    {trainings.length === 0 && (
+                        <Text style={{
+                            alignSelf: 'center',
+                            marginTop: 10,
+                            color: theme.colors.tertiary,
+                            fontSize: 20,
+                        }}>
+                            You have no goals yet, add one!
+                        </Text>
+                    )}
     
             {trainings.map((training, index) => (
                 <List.Accordion
@@ -189,14 +203,13 @@ const TrainingsScreen = () => {
                 </List.Accordion>
             ))}
     
-            <IconButton
+            <FAB
                 icon="plus"
                 type="contained-tonal"
-                iconColor={tertiaryColor}
-                containerColor={secondaryColor}
                 style={fiufitStyles.addTrainingButton}
                 size={45}
                 onPress={handleNext}
+                color={tertiaryColor}
             />
         </ScrollView>
     );
