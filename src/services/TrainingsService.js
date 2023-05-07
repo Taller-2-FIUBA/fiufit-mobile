@@ -16,6 +16,7 @@ const createTraining = async (training) => {
     }
 }
 
+
 const getTrainingsByUserId = async (userId) => {
     try {
         const response = await axios.get(`${baseURL}${userURI}/${userId}${trainingsURI}`);

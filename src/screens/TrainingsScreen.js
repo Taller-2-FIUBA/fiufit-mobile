@@ -8,10 +8,13 @@ import {
 import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {primaryColor, secondaryColor, tertiaryColor, greyColor} from "../consts/colors";
+import {primaryColor, secondaryColor, tertiaryColor, redColor} from "../consts/colors";
 import { FAB, IconButton, List } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
-
+import {
+    validateName, validateTrainingNameLength,
+    validateMediaUrl
+} from "../utils/validations";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -29,6 +32,11 @@ const TrainingItem = ({value, editable, onChange}) => {
 const TrainingsScreen = () => {
     const navigation = useNavigation();
     const [editable, setEditable] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const handleError = (error, input) => {
+        setErrors(prevState => ({...prevState, [input]: error}));
+    };
 
     const [trainings, setTrainings] = useState([
         {
@@ -77,6 +85,13 @@ const TrainingsScreen = () => {
 
     const handleSaveAction = (index) => {
         //updateTraining();
+        handleError(null, 'title')
+        handleError(null, 'media')
+
+        trimUserData(trainings[index]);
+        if (!validateForm(trainings[index])) {
+            return;
+        }        
         setEditable(false);
     };
 
@@ -86,6 +101,30 @@ const TrainingsScreen = () => {
 
     const handleNext = () => {
         navigation.navigate('CreateTraining');
+    }
+
+    const validateForm = (training) => {
+        let valid = true;
+        const validationData = [
+            {value: training.title, validator: validateName, errorMessage: 'Invalid title', field: 'title'},
+            {value: training.title, validator: validateTrainingNameLength, errorMessage: 'Title must be at least 3 characters long', field: 'title'},
+            {value: training.media, validator: validateMediaUrl, errorMessage: 'Invalid link', field: 'media'},
+        ];
+
+        for (const {value, validator, errorMessage, field} of validationData) {
+            if (!validator(value)) {
+                handleError(errorMessage, field);
+                valid = false;
+            }
+        }
+
+        return valid;
+    }
+
+    const trimUserData = (training) => {
+        for (const key in training) {
+            training[key] = training[key].trim();
+        }
     }
 
     /*
@@ -117,7 +156,7 @@ const TrainingsScreen = () => {
                         alignSelf: 'center',
                         marginTop: 10,
                     }}>
-                        Goals
+                        Trainings
                     </Text>
                     {trainings.length === 0 && (
                         <Text style={{
@@ -126,7 +165,7 @@ const TrainingsScreen = () => {
                             color: theme.colors.tertiary,
                             fontSize: 20,
                         }}>
-                            You have no goals yet, add one!
+                            You have no trainings yet, add one!
                         </Text>
                     )}
     
@@ -172,6 +211,9 @@ const TrainingsScreen = () => {
                         editable={editable}
                         onChange={(text) => handleInputChange(index, "media", text)}
                     />
+                    {errors.media &&
+                        <Text style={{color: redColor, fontSize: 14}}>{errors.media}</Text>
+                    }
                     <TrainingItem
                         value={trainings[index].goal}
                         editable={editable}
