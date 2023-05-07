@@ -14,7 +14,7 @@ import {createDrawerNavigator} from "@react-navigation/drawer";
 import FiufitDrawer from "../components/FiufitDrawer";
 import ProfileScreen from "../screens/ProfileScreen";
 import GoalsScreen from "../screens/GoalsScreen";
-import {Alert, Image, TouchableOpacity} from "react-native";
+import {Alert, TouchableOpacity} from "react-native";
 import ChatScreen from "../screens/ChatScreen";
 import InitialScreen from "../screens/InitialScreen";
 import {useEffect, useState} from "react";

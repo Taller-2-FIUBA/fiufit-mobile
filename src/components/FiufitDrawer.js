@@ -24,7 +24,7 @@ const FiufitDrawer = (props) => {
     }, []);
 
     const handleLogout = () => {
-        authService.logout().then(data => {
+        authService.logout().then(() => {
             props.navigation.replace('Login');
         }).catch(error => {
             console.log(error);

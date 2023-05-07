@@ -44,7 +44,6 @@ const LoginScreen = () => {
 
     const handleLogin = () => {
         if (validateInputs()) {
-            console.log("Logging in");
             authService.login(inputs).then(() => {
                 navigation.navigate('Trainings');
             }).catch(error => {
