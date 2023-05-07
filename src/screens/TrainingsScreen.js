@@ -184,11 +184,15 @@ const TrainingsScreen = () => {
                         editable={editable}
                         onChange={(text) => handleInputChange(index, "description", text)}
                     />
-                    <TrainingItem
-                        value={trainings[index].type}
-                        editable={editable}
-                        onChange={(text) => handleInputChange(index, "type", text)}
-                    />
+                    <Picker
+                            selectedValue={trainings[index].type}
+                            style={fiufitStyles.trainingPickerSelect}
+                            onValueChange={(index) => handleInputChange(index, "type", text)}
+                        >
+                            {trainingTypes.map(trainingType => (
+                                <Picker.Item label={trainingType} value={trainingType} />
+                            ))}
+                        </Picker>
                     {editable && 
                         <Picker
                             selectedValue={training.difficulty}
@@ -214,11 +218,18 @@ const TrainingsScreen = () => {
                     {errors.media &&
                         <Text style={{color: redColor, fontSize: 14, paddingBottom: 10, textAlign: 'left'}}>{errors.media}</Text>
                     }
-                    <TrainingItem
-                        value={trainings[index].goal}
-                        editable={editable}
-                        onChange={(text) => handleInputChange(index, "goal", text)}
-                    />
+                    <Picker
+                            selectedValue={trainings[index].exercises}
+                            style={fiufitStyles.trainingPickerSelect}
+                            onValueChange={(text) => handleInputChange(index, 'exercise', text)}
+                        >
+                            {exercises.map(([exercise, measure], index) => {
+                                const label = `${exercise} ${measure}`;
+                                return (
+                                    <Picker.Item key={index} label={label} value={`${exercise},${measure}`}/>
+                                );
+                            })}
+                        </Picker>
                     {!editable && 
                         <TouchableOpacity
                             style={fiufitStyles.editButton}
