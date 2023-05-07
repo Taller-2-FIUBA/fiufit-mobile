@@ -23,13 +23,16 @@ const CreateTrainingScreen = () => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
 
+    const trainingTypes = [ "cardio", "arms", "legs", "chest"];
+    const exercises = [["walk", "km"], ["walk", "minute"], ["jumping jacks", "repetitions"]];
+
     const [training, setTraining] = useState({
         title: '',
         description: '',
         type: '',
         difficulty: 'easy',
         media: '',
-        goal: '',
+        exercise: '',
     });
 
     const handleInputChange = (key, value) => {
@@ -105,9 +108,17 @@ const CreateTrainingScreen = () => {
                             label="Type"
                             placeholder="Enter a training type"
                             value={training.type}
-                            error={errors.type}
                             onChangeText={text => handleInputChange('type', text)}
                         />
+                        <Picker
+                            selectedValue={training.type}
+                            style={fiufitStyles.trainingPickerSelect}
+                            onValueChange={(itemValue) => handleInputChange('type', itemValue)}
+                        >
+                            {trainingTypes.map(trainingType => (
+                                <Picker.Item label={trainingType} value={trainingType} />
+                            ))}
+                        </Picker>
                         <Picker
                             selectedValue={training.difficulty}
                             style={fiufitStyles.trainingPickerSelect}
@@ -123,11 +134,18 @@ const CreateTrainingScreen = () => {
                             value={training.media}
                             onChangeText={text => handleInputChange('media', text)}
                         />
-                        <TrainingInput
-                            label="Goals"
-                            value={training.media}
-                            onChangeText={text => handleInputChange('goal', text)}
-                        />
+                        <Picker
+                            selectedValue={training.exercises}
+                            style={fiufitStyles.trainingPickerSelect}
+                            onValueChange={(itemValue) => handleInputChange('exercise', itemValue)}
+                        >
+                            {exercises.map(([exercise, measure], index) => {
+                                const label = `${exercise} ${measure}`;
+                                return (
+                                    <Picker.Item key={index} label={label} value={`${exercise},${measure}`}/>
+                                );
+                            })}
+                        </Picker>
                         <Button onPress={handleCreate} title="Register"/>
                     </View>
                 </ScrollView>

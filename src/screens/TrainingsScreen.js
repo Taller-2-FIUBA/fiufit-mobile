@@ -212,7 +212,7 @@ const TrainingsScreen = () => {
                         onChange={(text) => handleInputChange(index, "media", text)}
                     />
                     {errors.media &&
-                        <Text style={{color: redColor, fontSize: 14}}>{errors.media}</Text>
+                        <Text style={{color: redColor, fontSize: 14, paddingBottom: 10, textAlign: 'left'}}>{errors.media}</Text>
                     }
                     <TrainingItem
                         value={trainings[index].goal}
