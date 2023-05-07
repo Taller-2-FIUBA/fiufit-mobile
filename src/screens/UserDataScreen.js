@@ -8,55 +8,46 @@ import {
     validateName, validateNameLength,
     validateUsername, validateUsernameLength
 } from "../utils/validations";
-import {useNavigation} from "@react-navigation/native";
-import React, {useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor} from "../consts/colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import UserDataContext from "../contexts/userDataContext";
 
-const UserDataScreen = ({route}) => {
-    const navigation = useNavigation();
+const UserDataScreen = ({navigation}) => {
 
+    const {userData, setUserData} = useContext(UserDataContext);
     const [errors, setErrors] = useState({});
 
     const handleError = (error, input) => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
 
-    const [user, setUser] = useState({
-        email: route.params.email,
-        password: route.params.password,
-        name: '',
-        surname: '',
-        username: '',
-        location: '',
-    });
-
     const handleInputChange = (key, value) => {
-        setUser({...user, [key]: value});
+        setUserData({...userData, [key]: value});
     };
 
-    const validateForm = (user) => {
+    const validateForm = (userData) => {
         let valid = true;
         const validationData = [
-            {value: user.name, validator: validateName, errorMessage: 'Invalid name', field: 'name'},
-            {value: user.name, validator: validateNameLength, errorMessage: 'Name must be at least 2 characters long', field: 'name'},
-            {value: user.surname, validator: validateName, errorMessage: 'Invalid surname', field: 'surname'},
+            {value: userData.name, validator: validateName, errorMessage: 'Invalid name', field: 'name'},
+            {value: userData.name, validator: validateNameLength, errorMessage: 'Name must be at least 2 characters long', field: 'name'},
+            {value: userData.surname, validator: validateName, errorMessage: 'Invalid surname', field: 'surname'},
             {
-                value: user.surname,
+                value: userData.surname,
                 validator: validateNameLength,
                 errorMessage: 'Surname must be at least 2 characters long',
                 field: 'surname'
             },
             {
-                value: user.username,
+                value: userData.username,
                 validator: validateUsernameLength,
                 errorMessage: 'Username must be at least 4 characters long',
                 field: 'username'
             },
-            {value: user.username, validator: validateUsername, errorMessage: 'Invalid username', field: 'username'},
-            {value: user.location, validator: validateLocation, errorMessage: 'Invalid location', field: 'location'},
+            {value: userData.username, validator: validateUsername, errorMessage: 'Invalid username', field: 'username'},
+            {value: userData.location, validator: validateLocation, errorMessage: 'Invalid location', field: 'location'},
         ];
 
         for (const {value, validator, errorMessage, field} of validationData) {
@@ -69,9 +60,10 @@ const UserDataScreen = ({route}) => {
         return valid;
     }
 
-    const trimUserData = (user) => {
-        for (const key in user) {
-            user[key] = user[key].trim();
+    const trimUserData = (userData) => {
+        let trimableFields = ['email', 'name', 'surname', 'username', 'location'];
+        for (const key of trimableFields) {
+            userData[key] = userData[key].trim();
         }
     }
 
@@ -81,12 +73,12 @@ const UserDataScreen = ({route}) => {
         handleError(null, 'username')
         handleError(null, 'location')
 
-        trimUserData(user);
-        if (!validateForm(user)) {
+        trimUserData(userData);
+        if (!validateForm(userData)) {
             return;
         }
 
-        navigation.navigate('UserBiologics', {user: user});
+        navigation.navigate('UserBiologics');
     }
 
     return (

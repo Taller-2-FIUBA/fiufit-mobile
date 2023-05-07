@@ -5,10 +5,9 @@ import {
     View,
     TouchableOpacity,
 } from 'react-native'
-import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {primaryColor, secondaryColor, tertiaryColor, greyColor} from "../consts/colors";
+import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
 import { IconButton, List } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 
@@ -26,8 +25,7 @@ const TrainingItem = ({value, editable, onChange}) => {
     )
 }
 
-const TrainingsScreen = () => {
-    const navigation = useNavigation();
+const TrainingsScreen = (navigation) => {
     const [editable, setEditable] = useState(false);
 
     const [trainings, setTrainings] = useState([

@@ -6,10 +6,7 @@ import {validateEmail} from "../utils/validations";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {baseURL, loginURI} from "../consts/requests";
-
-let userId = null;
-export {userId};
+import authService from "../services/authService";
 
 const LoginScreen = () => {
     const navigation = useNavigation();
@@ -21,14 +18,14 @@ const LoginScreen = () => {
     const [errors, setErrors] = useState({});
 
     const handleInputChange = (key, value) => {
-        setInputs({ ...inputs, [key]: value });
+        setInputs({...inputs, [key]: value});
     };
 
     const handleError = (error, input) => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
 
-    const handleLogin = () => {
+    const validateInputs = () => {
         Keyboard.dismiss();
         handleError(null, 'email');
         handleError(null, 'password');
@@ -38,42 +35,22 @@ const LoginScreen = () => {
             handleError('Invalid email', 'email');
             valid = false;
         }
-
         if (!inputs.password) {
             handleError('Invalid password', 'password');
             valid = false;
         }
-
-        if (valid) {
-            login(inputs);
-        }
+        return valid;
     }
 
-    const login = (inputs) => {
-        console.log("Logging in");
-        fetch(baseURL + loginURI, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(inputs)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    Alert.alert(data.error);
-                } else if (data.id) {
-                    userId = data.id;
-                    console.log("Login successful");
-                    navigation.navigate('Trainings');
-                } else {
-                    Alert.alert(data.detail);
-                }
-            })
-            .catch(error => {
+    const handleLogin = () => {
+        if (validateInputs()) {
+            authService.login(inputs).then(() => {
+                navigation.navigate('Trainings');
+            }).catch(error => {
                 console.log(error);
-                Alert.alert(error.message);
+                Alert.alert("Error logging in", "Something went wrong. Please try again.");
             });
+        }
     }
 
     return (
@@ -117,7 +94,7 @@ const LoginScreen = () => {
                     />
                     <Button onPress={handleLogin} title="Login"/>
                     <Text
-                        onPress={() => navigation.navigate('SignUp')}
+                        onPress={() => navigation.navigate('Registration')}
                         style={fiufitStyles.haveAccount}>Do not have an account? Sign up</Text>
                 </View>
             </ScrollView>
