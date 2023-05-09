@@ -11,9 +11,8 @@ import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
 import Button from "../components/Button";
 import TrainingInput from "../components/TrainingInput";
 import {
-    validateName, validateTrainingNameLength,
-    validateMediaUrl
-} from "../utils/validations";
+    validateForm, trimUserData
+} from "../services/TrainingsService";
 
 const CreateTrainingScreen = () => {
     const navigation = useNavigation();
@@ -38,30 +37,6 @@ const CreateTrainingScreen = () => {
     const handleInputChange = (key, value) => {
         setTraining({...training, [key]: value});
     };
-
-    const validateForm = () => {
-        let valid = true;
-        const validationData = [
-            {value: training.title, validator: validateName, errorMessage: 'Invalid title', field: 'title'},
-            {value: training.title, validator: validateTrainingNameLength, errorMessage: 'Title must be at least 3 characters long', field: 'title'},
-            {value: training.media, validator: validateMediaUrl, errorMessage: 'Invalid link', field: 'media'},
-        ];
-
-        for (const {value, validator, errorMessage, field} of validationData) {
-            if (!validator(value)) {
-                handleError(errorMessage, field);
-                valid = false;
-            }
-        }
-
-        return valid;
-    }
-
-    const trimUserData = (training) => {
-        for (const key in training) {
-            training[key] = training[key].trim();
-        }
-    }
 
     const handleCreate = () => {
         handleError(null, 'title')

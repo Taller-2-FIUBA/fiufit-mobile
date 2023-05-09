@@ -12,9 +12,8 @@ import {primaryColor, secondaryColor, tertiaryColor, redColor} from "../consts/c
 import { FAB, IconButton, List } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 import {
-    validateName, validateTrainingNameLength,
-    validateMediaUrl
-} from "../utils/validations";
+    validateForm, trimUserData
+} from "../services/TrainingsService";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -38,6 +37,9 @@ const TrainingsScreen = () => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
 
+    const trainingTypes = [ "cardio", "arms", "legs", "chest"];
+    const exercises = [["walk", "km"], ["walk", "minute"], ["jumping jacks", "repetitions"]];
+
     const [trainings, setTrainings] = useState([
         {
             title: 'Training 1',
@@ -45,7 +47,7 @@ const TrainingsScreen = () => {
             type: 'Type 1',
             difficulty: 'easy',
             media: 'Media 1',
-            goal: 'Goal 1',
+            exercises: 'walk',
         },
         {
             title: 'Training 2',
@@ -53,7 +55,7 @@ const TrainingsScreen = () => {
             type: 'Type 2',
             difficulty: 'medium',
             media: 'Media 2',
-            goal: 'Goal 2',
+            exercises: 'walk',
         },
         {
             title: 'Training 3',
@@ -61,7 +63,7 @@ const TrainingsScreen = () => {
             type: 'Type 3',
             difficulty: 'hard',
             media: 'Media 3',
-            goal: 'Goal 3',
+            exercises: 'walk',
         }
     ]);
 
@@ -101,30 +103,6 @@ const TrainingsScreen = () => {
 
     const handleNext = () => {
         navigation.navigate('CreateTraining');
-    }
-
-    const validateForm = (training) => {
-        let valid = true;
-        const validationData = [
-            {value: training.title, validator: validateName, errorMessage: 'Invalid title', field: 'title'},
-            {value: training.title, validator: validateTrainingNameLength, errorMessage: 'Title must be at least 3 characters long', field: 'title'},
-            {value: training.media, validator: validateMediaUrl, errorMessage: 'Invalid link', field: 'media'},
-        ];
-
-        for (const {value, validator, errorMessage, field} of validationData) {
-            if (!validator(value)) {
-                handleError(errorMessage, field);
-                valid = false;
-            }
-        }
-
-        return valid;
-    }
-
-    const trimUserData = (training) => {
-        for (const key in training) {
-            training[key] = training[key].trim();
-        }
     }
 
     /*
@@ -184,15 +162,23 @@ const TrainingsScreen = () => {
                         editable={editable}
                         onChange={(text) => handleInputChange(index, "description", text)}
                     />
-                    <Picker
-                            selectedValue={trainings[index].type}
-                            style={fiufitStyles.trainingPickerSelect}
-                            onValueChange={(index) => handleInputChange(index, "type", text)}
-                        >
-                            {trainingTypes.map(trainingType => (
-                                <Picker.Item label={trainingType} value={trainingType} />
-                            ))}
-                        </Picker>
+                    {editable && 
+                        <Picker
+                                selectedValue={trainings[index].type}
+                                style={fiufitStyles.trainingPickerSelect}
+                                onValueChange={(index) => handleInputChange(index, "type", text)}
+                            >
+                                {trainingTypes.map(trainingType => (
+                                    <Picker.Item label={trainingType} value={trainingType} />
+                                ))}
+                            </Picker>
+                    }
+                    {!editable && <TrainingItem
+                        value={trainings[index].type}
+                        editable={editable}
+                        onChange={(text) => handleInputChange(index, "type", text)}
+                    />
+                    }
                     {editable && 
                         <Picker
                             selectedValue={training.difficulty}
@@ -218,7 +204,9 @@ const TrainingsScreen = () => {
                     {errors.media &&
                         <Text style={{color: redColor, fontSize: 14, paddingBottom: 10, textAlign: 'left'}}>{errors.media}</Text>
                     }
-                    <Picker
+                    
+                    {editable && 
+                        <Picker
                             selectedValue={trainings[index].exercises}
                             style={fiufitStyles.trainingPickerSelect}
                             onValueChange={(text) => handleInputChange(index, 'exercise', text)}
@@ -230,6 +218,13 @@ const TrainingsScreen = () => {
                                 );
                             })}
                         </Picker>
+                    }
+                    {!editable && <TrainingItem
+                        value={trainings[index].exercises}
+                        editable={editable}
+                        onChange={(text) => handleInputChange(index, "exercises", text)}
+                    />
+                    }
                     {!editable && 
                         <TouchableOpacity
                             style={fiufitStyles.editButton}
