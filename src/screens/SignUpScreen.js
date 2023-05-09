@@ -3,22 +3,21 @@ import {primaryColor} from "../consts/colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import {useNavigation} from "@react-navigation/native";
-import {useState} from "react";
+import {useContext, useState} from "react";
 import {validateEmail, validatePassword} from "../utils/validations";
 import {fiufitStyles} from "../consts/fiufitStyles";
+import UserDataContext from "../contexts/userDataContext";
 
 const SignUpScreen = () => {
     const navigation = useNavigation();
+    const {userData, setUserData} = useContext(UserDataContext);
 
-    const [inputs, setInputs] = useState({
-        email: '',
-        password1: '',
-        password2: '',
-    });
+    const [password1, setPassword1] = useState('');
+    const [password2, setPassword2] = useState('');
     const [errors, setErrors] = useState({});
 
     const handleInputChange = (key, value) => {
-        setInputs({ ...inputs, [key]: value });
+        setUserData({ ...userData, [key]: value });
     };
 
     const handleError = (error, input) => {
@@ -34,26 +33,27 @@ const SignUpScreen = () => {
 
         let valid = true;
 
-        if (!validateEmail(inputs.email)) {
+        if (!validateEmail(userData.email)) {
             handleError('Invalid email', 'email');
             valid = false;
         }
 
-        if (!validatePassword(inputs.password1)) {
+        if (!validatePassword(password1)) {
             handleError('Invalid password', 'password1');
             valid = false;
         }
 
-        if (!validatePassword(inputs.password2)) {
+        if (!validatePassword(password2)) {
             handleError('Invalid password', 'password2');
             valid = false;
-        } else if (inputs.password1 !== inputs.password2) {
+        } else if (password1 !== password2) {
             handleError('Passwords do not match', 'password2');
             valid = false;
         }
 
         if (valid) {
-            navigation.navigate('UserData', {email: inputs.email, password: inputs.password1});
+            handleInputChange('password', password1);
+            navigation.navigate('UserData');
         }
     }
 
@@ -76,7 +76,7 @@ const SignUpScreen = () => {
                         label="Email"
                         iconName="email-outline"
                         placeholder="Email address"
-                        onChangeText={text => handleInputChange('email', text)}
+                        onChangeText={text => handleInputChange('email', text.toLowerCase())}
                         keyboardType="email-address"
                         error={errors.email}
                     />
@@ -85,7 +85,7 @@ const SignUpScreen = () => {
                         iconName="lock-outline"
                         placeholder="Password"
                         password
-                        onChangeText={text => handleInputChange('password1', text)}
+                        onChangeText={text => setPassword1(text)}
                         error={errors.password1}
                     />
                     <Input
@@ -93,7 +93,7 @@ const SignUpScreen = () => {
                         iconName="lock-outline"
                         placeholder="Password"
                         password
-                        onChangeText={text => handleInputChange('password2', text)}
+                        onChangeText={text => setPassword2(text)}
                         error={errors.password2}
                     />
                     <Button onPress={handleNext} title="Next"/>

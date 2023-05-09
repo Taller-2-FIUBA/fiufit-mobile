@@ -6,6 +6,11 @@ module.exports = function (api) {
             'react-native-reanimated/plugin',
             'react-native-paper/babel',
             ['@babel/plugin-transform-modules-commonjs', {loose: true}],
+            ["module:react-native-dotenv", {
+                "envName": "APP_ENV",
+                "moduleName": "@env",
+                "path": ".env",
+            }]
         ]
     }
 };

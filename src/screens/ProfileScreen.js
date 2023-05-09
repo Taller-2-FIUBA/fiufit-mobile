@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import {View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Image} from 'react-native';
-import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor } from "../consts/colors";
-import {baseURL, userURI} from "../consts/requests";
-import {userId} from "./LoginScreen";
+import React, {useEffect, useState} from 'react';
+import {View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert} from 'react-native';
+import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from "../consts/colors";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import userService from "../services/userService";
 
 
 const ProfileItem = ({iconName, value, editable, onChange}) => {
@@ -12,7 +10,7 @@ const ProfileItem = ({iconName, value, editable, onChange}) => {
         <View style={styles.profileItemContainer}>
             <Icon name={iconName} style={{
                 fontSize: 22,
-                color: iconName == "email" ? greyColor : tertiaryColor,
+                color: iconName === "email" ? greyColor : tertiaryColor,
                 marginRight: 10,
             }}/>
             <TextInput
@@ -52,18 +50,15 @@ const ProfileScreen = () => {
 
     useEffect(() => {
         console.log("Fetching user profile...");
-
-        fetch(baseURL + userURI + '/' + userId)
-            .then((response) => response.json())
-            .then((profile) => {
-                setLoading(false);
-                setUserProfile(profile);
-            })
-            .catch((error) => {
-                setLoading(false);
-                setError(error);
-                console.log("Error: ", error.message);
-            });
+        setLoading(true);
+        userService.getUser().then((profile) => {
+            setLoading(false);
+            setUserProfile(profile);
+        }).catch((error) => {
+            setLoading(false);
+            setError(error);
+            console.log(error);
+        });
     }, []);
 
 
@@ -71,21 +66,11 @@ const ProfileScreen = () => {
         console.log("Update profile: ", userProfile);
         let copyProfile = {...userProfile};
         delete copyProfile.email
-        delete copyProfile.isAthlete
-        fetch(baseURL + userURI + '/' + userId, {
-        method: 'PATCH',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(copyProfile)
-        })
-        .then((response) => response.json())
-        .then(() => {
-            setEditable(false);
-        })
-        .catch((error) => {
-            console.log("Error: ", error.message);
+        userService.updateUser(copyProfile).then((profile) => {
+            setUserProfile(profile);
+        }).catch((error) => {
+            console.log(error);
+            Alert.alert("Error", "Something went wrong while updating user profile. Please try again later.");
         });
     };
 
@@ -103,14 +88,14 @@ const ProfileScreen = () => {
     };
 
     const handleInputChange = (key, value) => {
-        setUserProfile({ ...userProfile, [key]: value });
+        setUserProfile({...userProfile, [key]: value});
     };
 
     return (
         <ScrollView style={styles.profileContainer}>
             <ProfileAvatar
                 userName={userProfile.name}
-            /> 
+            />
             <ProfileItem
                 iconName="account"
                 value={userProfile.name}
@@ -135,7 +120,7 @@ const ProfileScreen = () => {
                 editable={editable}
                 onChange={(text) => handleInputChange("location", text)}
             />
-             <ProfileItem
+            <ProfileItem
                 iconName="human-male-height"
                 value={userProfile.height?.toString()}
                 editable={editable}
@@ -147,13 +132,13 @@ const ProfileScreen = () => {
                 editable={editable}
                 onChange={(text) => handleInputChange("weight", text)}
             />
-    
-            {!editable && 
+
+            {!editable &&
                 <TouchableOpacity style={{...styles.button, width: '100%'}} onPress={handleEditAction}>
                     <Text style={styles.buttonText}>{'Edit profile'}</Text>
                 </TouchableOpacity>
-            }   
-            {editable && 
+            }
+            {editable &&
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={{...styles.button, marginRight: 5}} onPress={handleSaveAction}>
                         <Text style={styles.buttonText}>{'Save'}</Text>
@@ -163,10 +148,10 @@ const ProfileScreen = () => {
                     </TouchableOpacity>
                 </View>
             }
-        </ScrollView>   
+        </ScrollView>
     );
 }
-      
+
 const styles = StyleSheet.create({
     profileContainer: {
         flex: 1,
@@ -183,7 +168,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginBottom: 5
     },
-    profileAvatarContainer: { 
+    profileAvatarContainer: {
         width: '100%',
         alignItems: 'center',
         marginBottom: 20

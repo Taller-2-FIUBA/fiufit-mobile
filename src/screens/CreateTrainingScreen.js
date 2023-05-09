@@ -7,7 +7,7 @@ import {Picker} from '@react-native-picker/picker';
 import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
+import {primaryColor} from "../consts/colors";
 import Button from "../components/Button";
 import TrainingInput from "../components/TrainingInput";
 import {

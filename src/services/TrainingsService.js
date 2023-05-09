@@ -3,6 +3,7 @@ import {
     validateName, validateTrainingNameLength,
     validateMediaUrl
 } from "../utils/validations";
+import requests from "../consts/requests";
 
 const createTraining = async (training) => {
     try {
@@ -22,7 +23,7 @@ const createTraining = async (training) => {
 
 const getTrainingsByUserId = async (userId) => {
     try {
-        const response = await axios.get(`${baseURL}${userURI}/${userId}${trainingsURI}`);
+        const response = await axios.get(`${requests.BASE_URL}${userURI}/${userId}${requests.TRAINING}`);
         return response.data;
     } catch (error) {
         console.log(error);
@@ -31,7 +32,7 @@ const getTrainingsByUserId = async (userId) => {
 
 const getTrainingsTypes = async () => {
     try {
-        const response = await axios.get(`${baseURL}${trainings}/types`);
+        const response = await axios.get(`${requests.BASE_URL}${requests.TRAINING}/types`);
         return response.data;
     } catch (error) {
         console.log(error);
@@ -40,7 +41,7 @@ const getTrainingsTypes = async () => {
 
 const getExercises = async () => {
     try {
-        const response = await axios.get(`${baseURL}${trainings}/exercises`);
+        const response = await axios.get(`${requests.BASE_URL}${requests.TRAINING}/exercises`);
         return response.data;
     } catch (error) {
         console.log(error);

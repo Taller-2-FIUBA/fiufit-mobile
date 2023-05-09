@@ -1,10 +1,11 @@
-export const baseURL = 'https://users-ingress-taller2-marianocinalli.cloud.okteto.net';
+import {API_URl} from '@env';
 
-export const loginURI = '/users/login';
+const requests = {
+    BASE_URL: API_URl,
+    LOGIN: '/users/login',
+    SIGNUP: '/users',
+    USER: '/users',
+    TRAINING: '/trainings',
+}
 
-export const signUpURI = '/users';
-
-export const userURI = '/users';
-
-export const trainingsURI = '/trainings';
-
+export default requests;
