@@ -5,7 +5,7 @@ const requests = {
     LOGIN: '/users/login',
     SIGNUP: '/users',
     USER: '/users',
-    TRAINING: '/training',
+    TRAINING: '/trainings',
 }
 
 export default requests;
