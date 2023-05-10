@@ -24,6 +24,7 @@ import UserDataContext from "../contexts/userDataContext";
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+const TopTab = createBottomTabNavigator();
 
 const AuthStack = () => {
     const theme = useTheme();
@@ -238,6 +239,17 @@ const RegistrationStackNavigator = () => {
     );
 }
 
+
+const TabsNavigation = () => {
+  return (
+    <TopTab.Navigator>
+      <TopTab.Screen name="Athletes" component={CreateTrainingScreen} />
+      <TopTab.Screen name="Trainers" component={SearchScreen} />
+      <TopTab.Screen name="Training" component={SearchScreen} />
+    </TopTab.Navigator>
+  );
+};
+
 const MainStackNavigator = () => {
     const theme = useTheme();
 
@@ -266,6 +278,14 @@ const MainStackNavigator = () => {
                               headerTintColor: theme.colors.tertiary,
                               statusBarColor: theme.colors.background,
                           }}/>
+            <Stack.Screen name="SearchResult" component={TabsNavigation}
+                            options={{
+                                headerStyle: {
+                                    backgroundColor: theme.colors.background,
+                                },
+                                headerTintColor: theme.colors.tertiary,
+                                statusBarColor: theme.colors.background,
+            }}/>
             <Stack.Screen name="Trainings" component={AuthStack}
                           options={{
                               headerShown: false,

@@ -22,6 +22,15 @@ const UserService = {
         } catch (error) {
             throw new Error(StatusCodes[error.response.status] + " " + error.response.status);
         }
+    },
+
+    async getUserByUsername(username) {
+        try {
+            const response = await axiosInstance.get(`${requests.USER}?username=${username}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(StatusCodes[error.response.status] + " " + error.response.status);
+        }
     }
 }
 

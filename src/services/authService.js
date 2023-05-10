@@ -13,7 +13,8 @@ const authService = {
             await AsyncStorage.setItem('@fiufit_userId', userId);
             return response.data;
         } catch (error) {
-            throw new Error(StatusCodes[error.response.status] + " " + error.response.status);
+            console.log("Error: " + error.message);
+            throw new Error(error.response.status.toString());
         }
     },
 
@@ -22,7 +23,7 @@ const authService = {
             const response = await axiosInstance.post(requests.SIGNUP, user);
             return response.data;
         } catch (error) {
-            throw new Error(StatusCodes[error.response.status] + " " + error.response.status);
+            throw new Error(error.response.status.toString());
         }
     },
 
