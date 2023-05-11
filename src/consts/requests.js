@@ -1,3 +1,5 @@
+import {API_URl} from '@env';
+
 const requests = {
     BASE_URL: process.env.BASE_URl,
     LOGIN: '/users/login',

@@ -224,4 +224,13 @@ export const fiufitStyles = StyleSheet.create({
         backgroundColor: tertiaryColor,
         borderRadius: 10
     },
+    googleButon: {
+        backgroundColor: primaryColor,
+        marginVertical: 10,
+        height: 55,
+        justifyContent: 'center',
+        borderRadius: 10,
+        borderColor: tertiaryColor,
+        borderWidth: 2,
+    }
 })
