@@ -5,12 +5,15 @@ import {
     View,
     TouchableOpacity,
 } from 'react-native'
+import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
-import { IconButton, List } from 'react-native-paper';
+import {primaryColor, secondaryColor, tertiaryColor, redColor} from "../consts/colors";
+import { FAB, IconButton, List } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
-
+import {
+    validateForm, trimUserData
+} from "../services/TrainingsService";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -25,8 +28,18 @@ const TrainingItem = ({value, editable, onChange}) => {
     )
 }
 
-const TrainingsScreen = (navigation) => {
+const TrainingsScreen = () => {
+    const navigation = useNavigation();
+
     const [editable, setEditable] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const handleError = (error, input) => {
+        setErrors(prevState => ({...prevState, [input]: error}));
+    };
+
+    const trainingTypes = [ "cardio", "arms", "legs", "chest"];
+    const exercises = [["walk", "km"], ["walk", "minute"], ["jumping jacks", "repetitions"]];
 
     const [trainings, setTrainings] = useState([
         {
@@ -35,7 +48,7 @@ const TrainingsScreen = (navigation) => {
             type: 'Type 1',
             difficulty: 'easy',
             media: 'Media 1',
-            goal: 'Goal 1',
+            exercises: 'walk',
         },
         {
             title: 'Training 2',
@@ -43,7 +56,7 @@ const TrainingsScreen = (navigation) => {
             type: 'Type 2',
             difficulty: 'medium',
             media: 'Media 2',
-            goal: 'Goal 2',
+            exercises: 'walk',
         },
         {
             title: 'Training 3',
@@ -51,7 +64,7 @@ const TrainingsScreen = (navigation) => {
             type: 'Type 3',
             difficulty: 'hard',
             media: 'Media 3',
-            goal: 'Goal 3',
+            exercises: 'walk',
         }
     ]);
 
@@ -75,6 +88,13 @@ const TrainingsScreen = (navigation) => {
 
     const handleSaveAction = (index) => {
         //updateTraining();
+        handleError(null, 'title')
+        handleError(null, 'media')
+
+        trimUserData(trainings[index]);
+        if (!validateForm(trainings[index])) {
+            return;
+        }        
         setEditable(false);
     };
 
@@ -110,9 +130,23 @@ const TrainingsScreen = (navigation) => {
 
     return (
             <ScrollView contentContainerStyle={fiufitStyles.container}>
-            <Text style={[fiufitStyles.titleText, { marginTop: -25 }]}>
-                Trainings
-            </Text>
+            <Text style={{
+                        ...fiufitStyles.titleText,
+                        alignSelf: 'center',
+                        marginTop: 10,
+                    }}>
+                        Trainings
+                    </Text>
+                    {trainings.length === 0 && (
+                        <Text style={{
+                            alignSelf: 'center',
+                            marginTop: 10,
+                            color: theme.colors.tertiary,
+                            fontSize: 20,
+                        }}>
+                            You have no trainings yet, add one!
+                        </Text>
+                    )}
     
             {trainings.map((training, index) => (
                 <List.Accordion
@@ -129,11 +163,23 @@ const TrainingsScreen = (navigation) => {
                         editable={editable}
                         onChange={(text) => handleInputChange(index, "description", text)}
                     />
-                    <TrainingItem
+                    {editable && 
+                        <Picker
+                                selectedValue={trainings[index].type}
+                                style={fiufitStyles.trainingPickerSelect}
+                                onValueChange={(index) => handleInputChange(index, "type", text)}
+                            >
+                                {trainingTypes.map(trainingType => (
+                                    <Picker.Item label={trainingType} value={trainingType} />
+                                ))}
+                            </Picker>
+                    }
+                    {!editable && <TrainingItem
                         value={trainings[index].type}
                         editable={editable}
                         onChange={(text) => handleInputChange(index, "type", text)}
                     />
+                    }
                     {editable && 
                         <Picker
                             selectedValue={training.difficulty}
@@ -156,11 +202,30 @@ const TrainingsScreen = (navigation) => {
                         editable={editable}
                         onChange={(text) => handleInputChange(index, "media", text)}
                     />
-                    <TrainingItem
-                        value={trainings[index].goal}
+                    {errors.media &&
+                        <Text style={{color: redColor, fontSize: 14, paddingBottom: 10, textAlign: 'left'}}>{errors.media}</Text>
+                    }
+                    
+                    {editable && 
+                        <Picker
+                            selectedValue={trainings[index].exercises}
+                            style={fiufitStyles.trainingPickerSelect}
+                            onValueChange={(text) => handleInputChange(index, 'exercise', text)}
+                        >
+                            {exercises.map(([exercise, measure], index) => {
+                                const label = `${exercise} ${measure}`;
+                                return (
+                                    <Picker.Item key={index} label={label} value={`${exercise},${measure}`}/>
+                                );
+                            })}
+                        </Picker>
+                    }
+                    {!editable && <TrainingItem
+                        value={trainings[index].exercises}
                         editable={editable}
-                        onChange={(text) => handleInputChange(index, "goal", text)}
+                        onChange={(text) => handleInputChange(index, "exercises", text)}
                     />
+                    }
                     {!editable && 
                         <TouchableOpacity
                             style={fiufitStyles.editButton}
@@ -187,14 +252,13 @@ const TrainingsScreen = (navigation) => {
                 </List.Accordion>
             ))}
     
-            <IconButton
+            <FAB
                 icon="plus"
                 type="contained-tonal"
-                iconColor={tertiaryColor}
-                containerColor={secondaryColor}
                 style={fiufitStyles.addTrainingButton}
                 size={45}
                 onPress={handleNext}
+                color={tertiaryColor}
             />
         </ScrollView>
     );
