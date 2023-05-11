@@ -5,6 +5,7 @@ import {
     View,
     TouchableOpacity,
 } from 'react-native'
+import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor, redColor} from "../consts/colors";
@@ -27,7 +28,9 @@ const TrainingItem = ({value, editable, onChange}) => {
     )
 }
 
-const TrainingsScreen = (navigation) => {
+const TrainingsScreen = () => {
+    const navigation = useNavigation();
+
     const [editable, setEditable] = useState(false);
     const [errors, setErrors] = useState({});
 
