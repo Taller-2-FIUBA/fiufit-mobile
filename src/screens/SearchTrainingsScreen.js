@@ -14,7 +14,7 @@ const SearchTrainingsScreen = () => {
   const [notFound, setNotFound] = React.useState(false);
   const [trainingTypes, setTrainingTypes] = React.useState({});
   const [trainingType, setTrainingType] = React.useState('');
-  const [trainingDifficulty, setTrainingDifficulty] = React.useState('');
+  const [trainingDifficulty, setTrainingDifficulty] = React.useState('Easy');
   const [trainings, setTrainings] = React.useState([]);
 
  /*  const navigation = useNavigation(); */

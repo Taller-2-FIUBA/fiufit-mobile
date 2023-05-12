@@ -51,10 +51,10 @@ const getExercises = async () => {
 const getTrainingByTypeAndDifficulty = async (type, difficulty) => {
     let url = `${requests.BASE_URL}${requests.TRAINING}`;
     if (type) {
-        url += `?type=${type}`;
+        url += `?training_type=${type}`;
     } 
     if (difficulty) {
-        url += `?difficulty=${difficulty}`;
+        url += type ? `&difficulty=${difficulty}` : `?difficulty=${difficulty}`;
     }
     console.log("Search trainings url: ", url);
     try {
