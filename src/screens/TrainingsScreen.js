@@ -1,20 +1,24 @@
+import axios from "axios";
 import {
     SafeAreaView, ScrollView,
     Text,
     TextInput,
     View,
+    ToastAndroid,
     TouchableOpacity,
 } from 'react-native'
 import React, {useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {primaryColor, secondaryColor, tertiaryColor, redColor} from "../consts/colors";
+import {primaryColor, secondaryColor, tertiaryColor, redColor, greyColor} from "../consts/colors";
 import { FAB, IconButton, List } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 import {
-    getTrainingsTypes, 
-    validateForm, trimUserData
+    getTrainingsTypes, getExercises, validateForm, trimUserData
 } from "../services/TrainingsService";
+import ExerciseInput from "../components/ExerciseInput";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import requests from "../consts/requests";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -43,28 +47,79 @@ const TrainingsScreen = () => {
 
     const [trainings, setTrainings] = useState([
         {
-            title: 'Training 1',
-            description: 'Description 1',
-            type: 'Type 1',
-            difficulty: 'easy',
-            media: 'Media 1',
-            exercises: 'walk',
+            trainer_id: "Ju6JXm1S8rVQf7C18mqL418JdgE2",
+            tittle: "Super arms",
+            description: "training for arms",
+            type: "Arm",
+            difficulty: "Easy",
+            media: "a_firebase_id",
+            exercises: [
+                {
+                    name: "Arnold press",
+                    type: "Arm",
+                    count: 1,
+                    series: 2
+                },
+                {
+                    name: "Hammer curl",
+                    type: "Arm",
+                    count: 5,
+                    series: 10
+                }
+            ],
+            id: 5,
+            rating: 0,
+            blocked: false
         },
         {
-            title: 'Training 2',
-            description: 'Description 2',
-            type: 'Type 2',
-            difficulty: 'medium',
-            media: 'Media 2',
-            exercises: 'walk',
+            trainer_id: "Ju6JXm1S8rVQf7C18mqL418JdgE2",
+            tittle: "Super arms 2",
+            description: "training for arms",
+            type: "Arm",
+            difficulty: "Easy",
+            media: "a_firebase_id",
+            exercises: [
+                {
+                    name: "Arnold press",
+                    type: "Arm",
+                    count: 1,
+                    series: 2
+                },
+                {
+                    name: "Hammer curl",
+                    type: "Arm",
+                    count: 5,
+                    series: 10
+                }
+            ],
+            id: 5,
+            rating: 0,
+            blocked: false
         },
         {
-            title: 'Training 3',
-            description: 'Description 3',
-            type: 'Type 3',
-            difficulty: 'hard',
-            media: 'Media 3',
-            exercises: 'walk',
+            trainer_id: "Ju6JXm1S8rVQf7C18mqL418JdgE2",
+            tittle: "Super arms 3",
+            description: "training for arms",
+            type: "Arm",
+            difficulty: "Easy",
+            media: "a_firebase_id",
+            exercises: [
+                {
+                    name: "Arnold press",
+                    type: "Arm",
+                    count: 1,
+                    series: 2
+                },
+                {
+                    name: "Hammer curl",
+                    type: "Arm",
+                    count: 5,
+                    series: 10
+                }
+            ],
+            id: 5,
+            rating: 0,
+            blocked: false
         }
     ]);
 
@@ -76,6 +131,16 @@ const TrainingsScreen = () => {
         };
     
         fetchTrainingTypes();
+    }, []);
+
+    useEffect(() => {
+        const fetchExercises = async () => {
+            console.log("Fetching exercises...");
+            const response = await getExercises();
+            setTrainingExercises(response);
+        };
+    
+        fetchExercises();
     }, []);
 
     const [expandedList, setExpandedList] = useState(trainings.map(() => false));
@@ -97,14 +162,14 @@ const TrainingsScreen = () => {
     }
 
     const handleSaveAction = (index) => {
-        //updateTraining();
-        handleError(null, 'title')
+        /* handleError(null, 'title')
         handleError(null, 'media')
 
         trimUserData(trainings[index]);
         if (!validateForm(trainings[index])) {
             return;
-        }        
+        } */
+        updateTraining(index);   
         setEditable(false);
     };
 
@@ -116,27 +181,34 @@ const TrainingsScreen = () => {
         navigation.navigate('CreateTraining');
     }
 
-    /*
-    const updateTraining = (index) => {
-         console.log("Update profile: ", expandedList[index]);
-        let copyTraining = {...userProfile};
+    const updateTraining = async (index) => {
+        console.log("Update profile: ", expandedList[index]);
+        const copyTraining = {...expandedList[index]};
+        let userId = await AsyncStorage.getItem('@fiufit_userId');
 
-        fetch(baseURL + trainingURI + '/' + trainingId, {
-        method: 'PATCH',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(copyTraining)
-        })
-        .then((response) => response.json())
-        .then(() => {
+        console.log('userId:', userId);
+        console.log('Training to update:', copyTraining);
+    
+        console.log(`${requests.BASE_URL}${requests.TRAINING}`);
+        const token = await AsyncStorage.getItem('@fiufit_token');
+        console.log('token:', token);
+    
+        try {
+            const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}/${copyTraining.id}`, JSON.stringify(copyTraining),
+            {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                }
+              });
+            console.log('Updated training:', response.data);
+            ToastAndroid.show("Training updated successfully", ToastAndroid.SHORT);
             setEditable(false);
-        })
-        .catch((error) => {
-            console.log("Error: ", error.message);
-        });
-    }; */
+            return response.data;
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     return (
             <ScrollView contentContainerStyle={fiufitStyles.container}>
@@ -163,7 +235,7 @@ const TrainingsScreen = () => {
                 key={index}
                 style={fiufitStyles.trainingsList}
                 left={(props) => <List.Icon {...props} icon="bike" />}
-                title={training.title}
+                title={training.tittle}
                 titleStyle={{ color: primaryColor }}
                 expanded={expandedList[index]}
                 onPress={() => handlePress(index)}
@@ -173,7 +245,7 @@ const TrainingsScreen = () => {
                         editable={editable}
                         onChange={(text) => handleInputChange(index, "description", text)}
                     />
-                    {editable && 
+                    {/* {editable && 
                         <Picker
                                 selectedValue={trainings[index].type}
                                 style={fiufitStyles.trainingPickerSelect}
@@ -189,7 +261,11 @@ const TrainingsScreen = () => {
                         editable={editable}
                         onChange={(text) => handleInputChange(index, "type", text)}
                     />
-                    }
+                    } */}
+                    <TrainingItem
+                        value={trainings[index].type}
+                        editable={false}
+                    />
                     {editable && 
                         <Picker
                             selectedValue={training.difficulty}
@@ -216,7 +292,7 @@ const TrainingsScreen = () => {
                         <Text style={{color: redColor, fontSize: 14, paddingBottom: 10, textAlign: 'left'}}>{errors.media}</Text>
                     }
                     
-                    {editable && 
+                    {/* {editable && 
                         <Picker
                             selectedValue={trainings[index].exercises}
                             style={fiufitStyles.trainingPickerSelect}
@@ -235,7 +311,25 @@ const TrainingsScreen = () => {
                         editable={editable}
                         onChange={(text) => handleInputChange(index, "exercises", text)}
                     />
-                    }
+                    } */}
+                    <View key={training.id}>
+                        <Text style={{color: greyColor,
+                            fontSize: 18,
+                            marginVertical: 10,
+                            marginRight: 1,
+                        }}>
+                            Exercises:
+                        </Text>
+                        {training.exercises.map((exercise, index) => (
+                        <View key={index} style={{paddingBottom: 10}}>
+                            <Text style={{ color: greyColor }}>{exercise.name} {exercise.unit ? `[${exercise.unit}]` : ''}</Text>
+                            <View style={fiufitStyles.exerciseDetails}>
+                                <Text style={{ color: greyColor }}>{`Count: ${exercise.count}`}</Text>
+                                <Text style={{ color: greyColor }}>{`Series: ${exercise.series}`}</Text>
+                            </View>
+                        </View>
+                        ))}
+                    </View>
                     {!editable && 
                         <TouchableOpacity
                             style={fiufitStyles.editButton}

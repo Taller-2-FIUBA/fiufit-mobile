@@ -1,4 +1,5 @@
 import {
+    Image,
     SafeAreaView, ScrollView,
     Text,
     View
@@ -7,13 +8,16 @@ import {Picker} from '@react-native-picker/picker';
 import {useNavigation} from "@react-navigation/native";
 import React, {useEffect, useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {primaryColor} from "../consts/colors";
+import {primaryColor, tertiaryColor} from "../consts/colors";
 import Button from "../components/Button";
 import TrainingInput from "../components/TrainingInput";
+import ExerciseInput from "../components/ExerciseInput";
 import {
-    getTrainingsTypes, getExercises,
+    getTrainingsTypes, getExercises, createTraining,
     validateForm, trimUserData
 } from "../services/TrainingsService";
+import * as ImagePicker from 'expo-image-picker';
+
 
 const CreateTrainingScreen = () => {
     const navigation = useNavigation();
@@ -22,13 +26,40 @@ const CreateTrainingScreen = () => {
     const [trainingExercises, setTrainingExercises] = useState([]);
     const [selectedExercises, setSelectedExercises] = useState([]);
     const [training, setTraining] = useState({
-        title: '',
+        tittle: '',
         description: '',
         type: '',
-        difficulty: 'easy',
+        difficulty: 'Easy',
         media: '',
         exercises: [],
     });
+    const [image, setImage] = useState(null);
+
+    useEffect(() => {
+        (async () => {
+          if (Platform.OS !== 'web') {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+              alert('Permiso denegado para acceder a la galería');
+            }
+          }
+        })();
+      }, []);
+
+    const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+        setImage(result.uri);
+    }
+    };
 
     const handleError = (error, input) => {
         setErrors(prevState => ({...prevState, [input]: error}));
@@ -48,7 +79,6 @@ const CreateTrainingScreen = () => {
         const fetchExercises = async () => {
             console.log("Fetching exercises...");
             const response = await getExercises();
-            console.log(response);
             setTrainingExercises(response);
         };
     
@@ -57,11 +87,7 @@ const CreateTrainingScreen = () => {
 
     const handleInputChange = (key, value) => {
         setTraining({...training, [key]: value});
-        console.log('setSelectedExercises');
-
         if (key === 'type' && trainingExercises && trainingExercises.length > 0) {
-            console.log('setSelectedExercises');
-            console.log(trainingExercises.filter(exercise => exercise.type === value));
             setSelectedExercises(trainingExercises.filter(exercise => exercise.type === value));
             setTraining(prevState => ({
               ...prevState,
@@ -70,9 +96,11 @@ const CreateTrainingScreen = () => {
         }
     };
 
-    const handleExerciseInputChange = (index, key, value) => {
+    const handleExerciseInputChange = (exercise, index, key, value) => {
         const updatedExercises = [...training.exercises];
-        updatedExercises[index][key] = value;
+        updatedExercises[index][key] = parseInt(value);
+        updatedExercises[index]['name'] = exercise.name;
+        updatedExercises[index]['type'] = exercise.type;
         setTraining(prevState => ({...prevState, exercises: updatedExercises}));
     };
 
@@ -91,13 +119,13 @@ const CreateTrainingScreen = () => {
     };
 
     const handleCreate = () => {
-        handleError(null, 'title')
+        handleError(null, 'tittle')
         handleError(null, 'media')
 
-        trimUserData(training);
+        /* trimUserData(training);
         if (!validateForm(training)) {
             return;
-        }
+        } */
         createTraining(training);
         navigation.navigate('Trainings');
     }
@@ -121,9 +149,9 @@ const CreateTrainingScreen = () => {
                         <TrainingInput
                             label="Title"
                             placeholder="Enter a title"
-                            value={training.title}
-                            error={errors.title}
-                            onChangeText={text => handleInputChange('title', text)}
+                            value={training.tittle}
+                            error={errors.tittle}
+                            onChangeText={text => handleInputChange('tittle', text)}
                         />
                         <TrainingInput
                             label="Description"
@@ -147,16 +175,21 @@ const CreateTrainingScreen = () => {
                             style={fiufitStyles.trainingPickerSelect}
                             onValueChange={(itemValue) => handleInputChange('difficulty', itemValue)}
                         >
-                            <Picker.Item label="easy" value="easy" />
-                            <Picker.Item label="medium" value="medium" />
-                            <Picker.Item label="hard" value="hard" />
+                            <Picker.Item label="Easy" value="Easy" />
+                            <Picker.Item label="Medium" value="Medium" />
+                            <Picker.Item label="Hard" value="Hard" />
                         </Picker>
-                        {<TrainingInput
+                        <TrainingInput
                             label="Media"
                             placeholder="Enter media link"
                             value={training.media}
                             onChangeText={text => handleInputChange('media', text)}
-                        />}
+                        />
+                        {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                            <Button tittle="Seleccionar imagen" onPress={pickImage} />
+                            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+                        </View> */}
+
                         {training.type && (
                             <View>
                                 <Text style={fiufitStyles.detailsText}>
@@ -164,19 +197,19 @@ const CreateTrainingScreen = () => {
                                 </Text>
                                 {selectedExercises.map((exercise, index) => (
                                     <View key={index}>
-                                    <Text>{exercise.name} {exercise.unit? `[${exercise.unit}]` : ''}</Text>
-                                        <View style={fiufitStyles.inlineBlock}>
-                                            <TrainingInput
+                                    <Text style={{color: tertiaryColor}}>{exercise.name} {exercise.unit? `[${exercise.unit}]` : ''}</Text>
+                                        <View style={fiufitStyles.exerciseDetails}>
+                                            <ExerciseInput
                                                 label="Count"
                                                 placeholder="Enter count"
                                                 value={training.exercises[index].count}
-                                                onChangeText={text => handleExerciseInputChange(index, 'count', text)}
+                                                onChangeText={text => handleExerciseInputChange(exercise, index, 'count', text)}
                                             />
-                                            <TrainingInput
+                                            <ExerciseInput
                                                 label="Series"
                                                 placeholder="Enter series"
                                                 value={training.exercises[index].series}
-                                                onChangeText={text => handleExerciseInputChange(index, 'series', text)}
+                                                onChangeText={text => handleExerciseInputChange(exercise, index, 'series', text)}
                                             />
                                         </View>
                                     </View>

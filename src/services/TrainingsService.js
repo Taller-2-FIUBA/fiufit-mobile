@@ -4,19 +4,39 @@ import {
     validateMediaUrl
 } from "../utils/validations";
 import requests from "../consts/requests";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {StatusCodes} from "http-status-codes";
+import {UserService} from "../services/userService";
+import {axiosInstance} from "./config/axiosConfig";
+import {
+    ToastAndroid
+} from "react-native";
 const createTraining = async (training) => {
+    training.exercises = training.exercises.filter(exercise => Object.keys(exercise).length !== 0);
+    let userId = await AsyncStorage.getItem('@fiufit_userId');
+    console.log('userId:', userId);
+    console.log('Training to create:', training);
+
+    training['trainer_id'] = "Ju6JXm1S8rVQf7C18mqL418JdgE2";
+    const user = UserService.getUser();
+    console.log(`${requests.BASE_URL}${requests.TRAINING}`);
+    const token = await AsyncStorage.getItem('@fiufit_token');
+    console.log('token:', token);
+
     try {
-        const response = await axios.post(baseURL + trainings, JSON.stringify(training));
-        if (response.data.error) {
-            Alert.alert(data.error);
-        }
+        //const response = await axiosInstance.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training));
+        const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
+        {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            }
+          });
+        console.log('created training:', response.data);
         ToastAndroid.show("Training created successfully", ToastAndroid.SHORT);
-        navigation.navigate('Trainings');
+        return response.data;
     } catch (error) {
         console.log(error);
-        Alert.alert(error.message);
-        navigation.navigate('Login');
     }
 }
 

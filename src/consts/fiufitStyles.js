@@ -224,7 +224,17 @@ export const fiufitStyles = StyleSheet.create({
         backgroundColor: tertiaryColor,
         borderRadius: 10
     },
-    inlineBlock: {
-        display: inline-block,
+    exerciseInput: {
+        height: 50,
+        backgroundColor: secondaryColor,
+        color: tertiaryColor,
+        borderWidth: 1,
+        borderRadius: 10,
+        width: '80%',
+        marginRight: 50,
+    },
+    exerciseDetails: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
     },
 })
