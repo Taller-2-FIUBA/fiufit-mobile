@@ -5,37 +5,89 @@ import {
 } from 'react-native'
 import {Picker} from '@react-native-picker/picker';
 import {useNavigation} from "@react-navigation/native";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor} from "../consts/colors";
 import Button from "../components/Button";
 import TrainingInput from "../components/TrainingInput";
 import {
+    getTrainingsTypes, getExercises,
     validateForm, trimUserData
 } from "../services/TrainingsService";
 
 const CreateTrainingScreen = () => {
     const navigation = useNavigation();
     const [errors, setErrors] = useState({});
-
-    const handleError = (error, input) => {
-        setErrors(prevState => ({...prevState, [input]: error}));
-    };
-
-    const trainingTypes = [ "cardio", "arms", "legs", "chest"];
-    const exercises = [["walk", "km"], ["walk", "minute"], ["jumping jacks", "repetitions"]];
-
+    const [trainingTypes, setTrainingTypes] = useState({});
+    const [trainingExercises, setTrainingExercises] = useState([]);
+    const [selectedExercises, setSelectedExercises] = useState([]);
     const [training, setTraining] = useState({
         title: '',
         description: '',
         type: '',
         difficulty: 'easy',
         media: '',
-        exercise: '',
+        exercises: [],
     });
+
+    const handleError = (error, input) => {
+        setErrors(prevState => ({...prevState, [input]: error}));
+    };
+
+    useEffect(() => {
+        const fetchTrainingTypes = async () => {
+            console.log("Fetching trainings types...");
+            const response = await getTrainingsTypes();
+            setTrainingTypes(response);
+        };
+    
+        fetchTrainingTypes();
+    }, []);
+
+    useEffect(() => {
+        const fetchExercises = async () => {
+            console.log("Fetching exercises...");
+            const response = await getExercises();
+            console.log(response);
+            setTrainingExercises(response);
+        };
+    
+        fetchExercises();
+    }, []);
 
     const handleInputChange = (key, value) => {
         setTraining({...training, [key]: value});
+        console.log('setSelectedExercises');
+
+        if (key === 'type' && trainingExercises && trainingExercises.length > 0) {
+            console.log('setSelectedExercises');
+            console.log(trainingExercises.filter(exercise => exercise.type === value));
+            setSelectedExercises(trainingExercises.filter(exercise => exercise.type === value));
+            setTraining(prevState => ({
+              ...prevState,
+              exercises: trainingExercises.filter(exercise => exercise.type === value).map(() => ({})),
+            }));
+        }
+    };
+
+    const handleExerciseInputChange = (index, key, value) => {
+        const updatedExercises = [...training.exercises];
+        updatedExercises[index][key] = value;
+        setTraining(prevState => ({...prevState, exercises: updatedExercises}));
+    };
+
+    const addExercise = (exercise) => {
+        setTraining(prevState => ({
+            ...prevState,
+            exercises: [...prevState.exercises, exercise],
+        }));
+    };
+
+    const removeExercise = (index) => {
+        setTraining(prevState => ({
+            ...prevState,
+            exercises: prevState.exercises.filter((_, i) => i !== index),
+        }));
     };
 
     const handleCreate = () => {
@@ -46,6 +98,7 @@ const CreateTrainingScreen = () => {
         if (!validateForm(training)) {
             return;
         }
+        createTraining(training);
         navigation.navigate('Trainings');
     }
 
@@ -78,23 +131,18 @@ const CreateTrainingScreen = () => {
                             value={training.description}
                             onChangeText={text => handleInputChange('description', text)}
                         />
-
-                        <TrainingInput
-                            label="Type"
-                            placeholder="Enter a training type"
-                            value={training.type}
-                            onChangeText={text => handleInputChange('type', text)}
-                        />
                         <Picker
+                            label="Type"
                             selectedValue={training.type}
                             style={fiufitStyles.trainingPickerSelect}
                             onValueChange={(itemValue) => handleInputChange('type', itemValue)}
                         >
-                            {trainingTypes.map(trainingType => (
-                                <Picker.Item label={trainingType} value={trainingType} />
+                            {trainingTypes && trainingTypes.length > 0 && trainingTypes.map(trainingType => (
+                                <Picker.Item key={trainingType} label={trainingType} value={trainingType} />
                             ))}
                         </Picker>
                         <Picker
+                            label="difficulty"
                             selectedValue={training.difficulty}
                             style={fiufitStyles.trainingPickerSelect}
                             onValueChange={(itemValue) => handleInputChange('difficulty', itemValue)}
@@ -103,24 +151,38 @@ const CreateTrainingScreen = () => {
                             <Picker.Item label="medium" value="medium" />
                             <Picker.Item label="hard" value="hard" />
                         </Picker>
-                        <TrainingInput
+                        {<TrainingInput
                             label="Media"
                             placeholder="Enter media link"
                             value={training.media}
                             onChangeText={text => handleInputChange('media', text)}
-                        />
-                        <Picker
-                            selectedValue={training.exercises}
-                            style={fiufitStyles.trainingPickerSelect}
-                            onValueChange={(itemValue) => handleInputChange('exercise', itemValue)}
-                        >
-                            {exercises.map(([exercise, measure], index) => {
-                                const label = `${exercise} ${measure}`;
-                                return (
-                                    <Picker.Item key={index} label={label} value={`${exercise},${measure}`}/>
-                                );
-                            })}
-                        </Picker>
+                        />}
+                        {training.type && (
+                            <View>
+                                <Text style={fiufitStyles.detailsText}>
+                                    Add Exercises:
+                                </Text>
+                                {selectedExercises.map((exercise, index) => (
+                                    <View key={index}>
+                                    <Text>{exercise.name} {exercise.unit? `[${exercise.unit}]` : ''}</Text>
+                                        <View style={fiufitStyles.inlineBlock}>
+                                            <TrainingInput
+                                                label="Count"
+                                                placeholder="Enter count"
+                                                value={training.exercises[index].count}
+                                                onChangeText={text => handleExerciseInputChange(index, 'count', text)}
+                                            />
+                                            <TrainingInput
+                                                label="Series"
+                                                placeholder="Enter series"
+                                                value={training.exercises[index].series}
+                                                onChangeText={text => handleExerciseInputChange(index, 'series', text)}
+                                            />
+                                        </View>
+                                    </View>
+                                ))}
+                            </View>
+                        )}
                         <Button onPress={handleCreate} title="Register"/>
                     </View>
                 </ScrollView>

@@ -7,7 +7,7 @@ import requests from "../consts/requests";
 
 const createTraining = async (training) => {
     try {
-        const response = await axios.post(baseURL + trainings, JSON.stringify(user));
+        const response = await axios.post(baseURL + trainings, JSON.stringify(training));
         if (response.data.error) {
             Alert.alert(data.error);
         }
@@ -32,8 +32,8 @@ const getTrainingsByUserId = async (userId) => {
 
 const getTrainingsTypes = async () => {
     try {
-        const response = await axios.get(`${requests.BASE_URL}${requests.TRAINING}/types`);
-        return response.data;
+        const response = await axios.get(`${requests.BASE_URL}${requests.TRAINING}/types/`);
+        return response.data.items;
     } catch (error) {
         console.log(error);
     }
@@ -41,8 +41,8 @@ const getTrainingsTypes = async () => {
 
 const getExercises = async () => {
     try {
-        const response = await axios.get(`${requests.BASE_URL}${requests.TRAINING}/exercises`);
-        return response.data;
+        const response = await axios.get(`${requests.BASE_URL}${requests.TRAINING}/exercises/`);
+        return response.data.items;
     } catch (error) {
         console.log(error);
     }

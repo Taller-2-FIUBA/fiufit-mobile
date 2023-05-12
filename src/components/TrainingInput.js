@@ -11,7 +11,7 @@ const TrainingInput = ({
 
     return (
         <View style={{marginBottom: 20,}}>
-            <Text style={{marginVertical: 5, marginHorizontal: 5, fontSize: 14, color: greyColor,}}>{label}</Text>
+            <Text style={{marginVertical: 5, marginHorizontal: 5, fontSize: 14, color: greyColor}}>{label}</Text>
             <View style={[
                 fiufitStyles.createTrainingInput,
                 {borderColor: error ? redColor : isFocused ? tertiaryColor : secondaryColor,
