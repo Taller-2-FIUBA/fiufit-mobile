@@ -83,6 +83,23 @@ const getExercises = async () => {
     }
 }
 
+const getTrainingByTypeAndDifficulty = async (type, difficulty) => {
+    let url = `${requests.BASE_URL}${requests.TRAINING}`;
+    if (type) {
+        url += `?training_type=${type}`;
+    } 
+    if (difficulty) {
+        url += type ? `&difficulty=${difficulty}` : `?difficulty=${difficulty}`;
+    }
+    console.log("Search trainings url: ", url);
+    try {
+        const response = await axios.get(url);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 const validateForm = (training) => {
     let valid = true;
     const validationData = [
@@ -107,4 +124,4 @@ const trimUserData = (training) => {
     }
 }
 
-export {createTraining, getTrainingsByUserId, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData}
+export {createTraining, getTrainingsByUserId, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData, getTrainingByTypeAndDifficulty}
