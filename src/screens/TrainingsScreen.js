@@ -5,13 +5,8 @@ import {
     View,
     TouchableOpacity,
 } from 'react-native'
-<<<<<<< HEAD
-import {useNavigation} from "@react-navigation/native";
-import React, {useState} from "react";
-=======
 import React, {useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
->>>>>>> 994088df4144247f6c6fa1a0f0555ff2bf46f142
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor, redColor} from "../consts/colors";
 import { FAB, IconButton, List } from 'react-native-paper';
