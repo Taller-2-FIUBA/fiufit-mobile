@@ -1,5 +1,5 @@
 const requests = {
-    BASE_URL: process.env.API_URL,
+    BASE_URL: process.env.BASE_URl,
     LOGIN: '/users/login',
     SIGNUP: '/users',
     USER: '/users',
