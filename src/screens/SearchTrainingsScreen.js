@@ -5,7 +5,7 @@ import { Searchbar } from 'react-native-paper';
 import {useNavigation} from "@react-navigation/native";
 
 
-const SearchScreen = () => {
+const SearchTrainingsScreen = () => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const navigation = useNavigation();
 
@@ -25,4 +25,4 @@ const SearchScreen = () => {
   );
 };
 
-export default SearchScreen
+export default SearchTrainingsScreen

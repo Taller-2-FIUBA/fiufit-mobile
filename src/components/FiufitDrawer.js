@@ -4,7 +4,7 @@ import {Avatar, useTheme} from "react-native-paper";
 import React, {useEffect, useState} from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import authService from "../services/authService";
-import userService from "../services/userService";
+import { UserService } from "../services/userService";
 
 const FiufitDrawer = (props) => {
     const theme = useTheme();
@@ -15,7 +15,7 @@ const FiufitDrawer = (props) => {
     });
 
     useEffect(() => {
-        userService.getUser().then((profile) => {
+        UserService.getUser().then((profile) => {
             setUserData(profile);
         }).catch((error) => {
             console.log(error);

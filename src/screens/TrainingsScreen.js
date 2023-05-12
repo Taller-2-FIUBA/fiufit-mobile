@@ -5,13 +5,19 @@ import {
     View,
     TouchableOpacity,
 } from 'react-native'
+<<<<<<< HEAD
 import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
+=======
+import React, {useEffect, useState} from "react";
+import {useNavigation} from "@react-navigation/native";
+>>>>>>> 994088df4144247f6c6fa1a0f0555ff2bf46f142
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor, redColor} from "../consts/colors";
 import { FAB, IconButton, List } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 import {
+    getTrainingsTypes, 
     validateForm, trimUserData
 } from "../services/TrainingsService";
 
@@ -30,15 +36,14 @@ const TrainingItem = ({value, editable, onChange}) => {
 
 const TrainingsScreen = () => {
     const navigation = useNavigation();
-
     const [editable, setEditable] = useState(false);
     const [errors, setErrors] = useState({});
+    const [trainingTypes, setTrainingTypes] = useState({});
 
     const handleError = (error, input) => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
 
-    const trainingTypes = [ "cardio", "arms", "legs", "chest"];
     const exercises = [["walk", "km"], ["walk", "minute"], ["jumping jacks", "repetitions"]];
 
     const [trainings, setTrainings] = useState([
@@ -67,6 +72,16 @@ const TrainingsScreen = () => {
             exercises: 'walk',
         }
     ]);
+
+    useEffect(() => {
+        const fetchTrainingTypes = async () => {
+            console.log("Fetching trainings types...");
+            const response = await getTrainingsTypes();
+            setTrainingTypes(response);
+        };
+    
+        fetchTrainingTypes();
+    }, []);
 
     const [expandedList, setExpandedList] = useState(trainings.map(() => false));
 
@@ -169,8 +184,8 @@ const TrainingsScreen = () => {
                                 style={fiufitStyles.trainingPickerSelect}
                                 onValueChange={(index) => handleInputChange(index, "type", text)}
                             >
-                                {trainingTypes.map(trainingType => (
-                                    <Picker.Item label={trainingType} value={trainingType} />
+                                {trainingTypes && trainingTypes.length > 0 && trainingTypes.map(trainingType => (
+                                    <Picker.Item key={trainingType} label={trainingType} value={trainingType} />
                                 ))}
                             </Picker>
                     }

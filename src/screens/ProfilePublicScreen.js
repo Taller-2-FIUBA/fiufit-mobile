@@ -34,7 +34,6 @@ const ProfileAvatar = ({userName, onChange}) => {
     )
 }
 
-
 const ProfileScreen = () => {
     const [userProfile, setUserProfile] = useState({
         name: '',
@@ -45,7 +44,6 @@ const ProfileScreen = () => {
         weight: undefined
     });
     const [loading, setLoading] = useState(true);
-    const [editable, setEditable] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -61,36 +59,6 @@ const ProfileScreen = () => {
         });
     }, []);
 
-
-    const updateProfile = () => {
-        console.log("Update profile: ", userProfile);
-        let copyProfile = {...userProfile};
-        delete copyProfile.email
-        UserService.updateUser(copyProfile).then((profile) => {
-            setUserProfile(profile);
-        }).catch((error) => {
-            console.log(error);
-            Alert.alert("Error", "Something went wrong while updating user profile. Please try again later.");
-        });
-    };
-
-    const handleEditAction = () => {
-        setEditable(true);
-    }
-
-    const handleSaveAction = () => {
-        updateProfile();
-        setEditable(false);
-    };
-
-    const handleCancelAction = () => {
-        setEditable(false);
-    };
-
-    const handleInputChange = (key, value) => {
-        setUserProfile({...userProfile, [key]: value});
-    };
-
     return (
         <ScrollView style={styles.profileContainer}>
             <ProfileAvatar
@@ -99,55 +67,19 @@ const ProfileScreen = () => {
             <ProfileItem
                 iconName="account"
                 value={userProfile.name}
-                editable={editable}
-                onChange={(text) => handleInputChange("name", text)}
             />
             <ProfileItem
                 iconName="account"
                 value={userProfile.surname}
-                editable={editable}
-                onChange={(text) => handleInputChange("surname", text)}
             />
             <ProfileItem
                 iconName="email"
                 value={userProfile.email}
-                editable={false}
-                onChange={(text) => handleInputChange("email", text)}
             />
             <ProfileItem
                 iconName="map-marker"
                 value={userProfile.location}
-                editable={editable}
-                onChange={(text) => handleInputChange("location", text)}
             />
-            <ProfileItem
-                iconName="human-male-height"
-                value={userProfile.height?.toString()}
-                editable={editable}
-                onChange={(text) => handleInputChange("height", text)}
-            />
-            <ProfileItem
-                iconName="weight-kilogram"
-                value={userProfile.weight?.toString()}
-                editable={editable}
-                onChange={(text) => handleInputChange("weight", text)}
-            />
-
-            {!editable &&
-                <TouchableOpacity style={{...styles.button, width: '100%'}} onPress={handleEditAction}>
-                    <Text style={styles.buttonText}>{'Edit profile'}</Text>
-                </TouchableOpacity>
-            }
-            {editable &&
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={{...styles.button, marginRight: 5}} onPress={handleSaveAction}>
-                        <Text style={styles.buttonText}>{'Save'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={handleCancelAction}>
-                        <Text style={styles.buttonText}>{'Cancel'}</Text>
-                    </TouchableOpacity>
-                </View>
-            }
         </ScrollView>
     );
 }
