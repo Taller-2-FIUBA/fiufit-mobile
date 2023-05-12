@@ -14,7 +14,7 @@ import {primaryColor, secondaryColor, tertiaryColor, redColor, greyColor} from "
 import { FAB, IconButton, List } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 import {
-    getTrainingsTypes, getExercises, validateForm, trimUserData
+    getTrainingsTypes, getExercises, getTrainingsByTrainerId, validateForm, trimUserData
 } from "../services/TrainingsService";
 import ExerciseInput from "../components/ExerciseInput";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -43,9 +43,9 @@ const TrainingsScreen = () => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
 
-    const exercises = [["walk", "km"], ["walk", "minute"], ["jumping jacks", "repetitions"]];
+    const [trainings, setTrainings] = useState([]);
 
-    const [trainings, setTrainings] = useState([
+    /* const [trainings, setTrainings] = useState([
         {
             trainer_id: "Ju6JXm1S8rVQf7C18mqL418JdgE2",
             tittle: "Super arms",
@@ -121,7 +121,7 @@ const TrainingsScreen = () => {
             rating: 0,
             blocked: false
         }
-    ]);
+    ]); */
 
     useEffect(() => {
         const fetchTrainingTypes = async () => {
@@ -134,13 +134,15 @@ const TrainingsScreen = () => {
     }, []);
 
     useEffect(() => {
-        const fetchExercises = async () => {
-            console.log("Fetching exercises...");
-            const response = await getExercises();
-            setTrainingExercises(response);
+        const fetchGetTrainingsByTrainerId = async () => {
+            console.log("Fetching trainings...");
+            const trainer_id = "Ju6JXm1S8rVQf7C18mqL418JdgE4";
+            const response = await getTrainingsByTrainerId(trainer_id);
+            console.log("Trainings: ", response);
+            setTrainings(response);
         };
     
-        fetchExercises();
+        fetchGetTrainingsByTrainerId();
     }, []);
 
     const [expandedList, setExpandedList] = useState(trainings.map(() => false));
@@ -182,28 +184,27 @@ const TrainingsScreen = () => {
     }
 
     const updateTraining = async (index) => {
-        console.log("Update profile: ", expandedList[index]);
-        const copyTraining = {...expandedList[index]};
+        const copyTraining = {tittle: trainings[index].tittle, description: trainings[index].description, media: trainings[index].media};
         let userId = await AsyncStorage.getItem('@fiufit_userId');
 
         console.log('userId:', userId);
         console.log('Training to update:', copyTraining);
     
-        console.log(`${requests.BASE_URL}${requests.TRAINING}`);
         const token = await AsyncStorage.getItem('@fiufit_token');
         console.log('token:', token);
-    
+        console.log(`${requests.BASE_URL}${requests.TRAINING}/${trainings[index].id}`);
         try {
-            const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}/${copyTraining.id}`, JSON.stringify(copyTraining),
+            const response = await axios.patch(`${requests.BASE_URL}${requests.TRAINING}/${trainings[index].id}`, JSON.stringify(copyTraining),
             {
                 headers: {
                   'Content-Type': 'application/json',
                   'Authorization': `Bearer ${token}`,
                 }
               });
-            console.log('Updated training:', response.data);
+            console.log('Updated training:', response);
             ToastAndroid.show("Training updated successfully", ToastAndroid.SHORT);
             setEditable(false);
+            setTrainings(trainings.push(copyTraining));
             return response.data;
         } catch (error) {
             console.log(error);
@@ -223,7 +224,7 @@ const TrainingsScreen = () => {
                         <Text style={{
                             alignSelf: 'center',
                             marginTop: 10,
-                            color: theme.colors.tertiary,
+                            color: tertiaryColor,
                             fontSize: 20,
                         }}>
                             You have no trainings yet, add one!
@@ -240,6 +241,11 @@ const TrainingsScreen = () => {
                 expanded={expandedList[index]}
                 onPress={() => handlePress(index)}
                 >
+                    <TrainingItem
+                        value={training.tittle}
+                        editable={editable}
+                        onChange={(text) => handleInputChange(index, "tittle", text)}
+                    />
                     <TrainingItem
                         value={training.description}
                         editable={editable}
@@ -272,9 +278,9 @@ const TrainingsScreen = () => {
                             style={fiufitStyles.trainingPickerSelect}
                             onValueChange={(itemValue) => handleInputChange(index, 'difficulty', itemValue)}
                         >
-                            <Picker.Item label="easy" value="easy" />
-                            <Picker.Item label="medium" value="medium" />
-                            <Picker.Item label="hard" value="hard" />
+                            <Picker.Item label="Easy" value="Easy" />
+                            <Picker.Item label="Medium" value="Medium" />
+                            <Picker.Item label="Hard" value="Hard" />
                         </Picker>
                     }
                     {!editable && <TrainingItem
@@ -283,14 +289,14 @@ const TrainingsScreen = () => {
                         onChange={(text) => handleInputChange(index, "difficulty", text)}
                     />
                     }
-                    <TrainingItem
+                    {/* <TrainingItem
                         value={trainings[index].media}
                         editable={editable}
                         onChange={(text) => handleInputChange(index, "media", text)}
                     />
                     {errors.media &&
                         <Text style={{color: redColor, fontSize: 14, paddingBottom: 10, textAlign: 'left'}}>{errors.media}</Text>
-                    }
+                    } */}
                     
                     {/* {editable && 
                         <Picker

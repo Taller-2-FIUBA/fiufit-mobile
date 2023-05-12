@@ -17,7 +17,7 @@ const createTraining = async (training) => {
     console.log('userId:', userId);
     console.log('Training to create:', training);
 
-    training['trainer_id'] = "Ju6JXm1S8rVQf7C18mqL418JdgE2";
+    training['trainer_id'] = "Ju6JXm1S8rVQf7C18mqL418JdgE4";
     const user = UserService.getUser();
     console.log(`${requests.BASE_URL}${requests.TRAINING}`);
     const token = await AsyncStorage.getItem('@fiufit_token');
@@ -45,6 +45,21 @@ const getTrainingsByUserId = async (userId) => {
     try {
         const response = await axios.get(`${requests.BASE_URL}${userURI}/${userId}${requests.TRAINING}`);
         return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const getTrainingsByTrainerId = async (trainer_id) => {
+    try {
+        const token = await AsyncStorage.getItem('@fiufit_token');
+        const response = await axios.get(`${requests.BASE_URL}${requests.TRAINING}?trainer_id=${trainer_id}`,
+        {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            }
+          });        
+        return response.data.items;
     } catch (error) {
         console.log(error);
     }
@@ -92,4 +107,4 @@ const trimUserData = (training) => {
     }
 }
 
-export {createTraining, getTrainingsByUserId, getTrainingsTypes, getExercises, validateForm, trimUserData}
+export {createTraining, getTrainingsByUserId, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData}
