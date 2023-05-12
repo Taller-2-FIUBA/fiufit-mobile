@@ -17,7 +17,7 @@ const createTraining = async (training) => {
     console.log('userId:', userId);
     console.log('Training to create:', training);
 
-    training['trainer_id'] = "Ju6JXm1S8rVQf7C18mqL418JdgE4";
+    training['trainer_id'] = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
     const user = UserService.getUser();
     console.log(`${requests.BASE_URL}${requests.TRAINING}`);
     const token = await AsyncStorage.getItem('@fiufit_token');

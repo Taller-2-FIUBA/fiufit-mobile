@@ -136,7 +136,7 @@ const TrainingsScreen = () => {
     useEffect(() => {
         const fetchGetTrainingsByTrainerId = async () => {
             console.log("Fetching trainings...");
-            const trainer_id = "Ju6JXm1S8rVQf7C18mqL418JdgE4";
+            const trainer_id = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
             const response = await getTrainingsByTrainerId(trainer_id);
             console.log("Trainings: ", response);
             setTrainings(response);
@@ -212,6 +212,7 @@ const TrainingsScreen = () => {
     }
 
     return (
+        <View style={{flex: 1}}>
             <ScrollView contentContainerStyle={fiufitStyles.container}>
             <Text style={{
                         ...fiufitStyles.titleText,
@@ -371,6 +372,7 @@ const TrainingsScreen = () => {
                 color={tertiaryColor}
             />
         </ScrollView>
+        </View>
     );
   };
   
