@@ -224,7 +224,4 @@ export const fiufitStyles = StyleSheet.create({
         backgroundColor: tertiaryColor,
         borderRadius: 10
     },
-    inlineBlock: {
-        display: inline-block,
-    },
 })
