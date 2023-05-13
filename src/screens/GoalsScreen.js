@@ -1,4 +1,4 @@
-import {View, FlatList, SafeAreaView, TouchableOpacity, Text, ScrollView} from "react-native";
+import {View, FlatList, SafeAreaView, TouchableOpacity, Text, ScrollView, Alert} from "react-native";
 import React, {useEffect, useRef, useState} from "react";
 import Goal from "../components/Goal";
 import {
@@ -18,9 +18,7 @@ import {Picker} from "@react-native-picker/picker";
 import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
-// TODO: Hardcodeadad las metras y las unidades, hay que ver como llegan del backend
-const METRICS_DATA = [["Walk", "Steps"], ["Run", "Km"]]
+import goalsService from "../services/goalsService";
 
 const GoalsScreen = () => {
     const theme = useTheme();
@@ -30,13 +28,15 @@ const GoalsScreen = () => {
     const [selectedIds, setSelectedIds] = useState([]);
     const [newGoalFormVisible, setNewGoalFormVisible] = useState(false);
     const [editMode, setEditMode] = useState(false);
+    const [metricsData, setMetricsData] = useState(null);
 
     // New goal form fields
     const [goalTitle, setGoalTitle] = useState('');
     const [goalDescription, setGoalDescription] = useState('');
-    const [goalMetric, setGoalMetric] = useState(METRICS_DATA[0][0]);
-    const [goalUnit, setGoalUnit] = useState(METRICS_DATA[0][1]);
+    const [goalMetric, setGoalMetric] = useState('');
+    const [goalUnit, setGoalUnit] = useState('');
     const [goalObjective, setGoalObjective] = useState('');
+    const [currentProgress, setCurrentProgress] = useState('');
     const [goalTimeLimit, setGoalTimeLimit] = useState(null);
 
     // Dialog to confirm the deletion of selected goals
@@ -44,26 +44,31 @@ const GoalsScreen = () => {
     const showDialog = () => setVisible(true);
     const hideDialog = () => setVisible(false);
 
+    useEffect(() => {
+        goalsService.getMetrics().then(response => {
+            console.log("Fetching metrics data");
+            setMetricsData(response);
+            setGoalMetric(response[0].name);
+        }).catch(error => {
+            console.log(error);
+            Alert.alert("Error fetching data", "Something went wrong. Please try again.");
+        });
+    }, []);
+
+
     // Hook to change automatically the goal unit when the goal metric changes
     useEffect(() => {
-        const selectedTuple = METRICS_DATA.find(tuple => tuple[0] === goalMetric);
-        if (selectedTuple) {
-            setGoalUnit(selectedTuple[1]);
+        if (!metricsData) return;
+        const selectedMetric = metricsData.find(metric => metric.name === goalMetric);
+        if (selectedMetric) {
+            setGoalUnit(selectedMetric.unit);
         } else {
-            const selectedOption = metricsOptions.find(option => option.value === goalMetric);
+            const selectedOption = metricsData.find(option => option.name === goalMetric);
             if (selectedOption) {
-                setGoalUnit(selectedOption.value);
+                setGoalUnit(selectedOption.unit);
             }
         }
     }, [goalMetric]);
-
-    // Mapped the METRICS_DATA to the format required by the Picker component
-    const metricsOptions = METRICS_DATA.map((tuple) => {
-        return {
-            label: tuple[0],
-            value: tuple[1],
-        };
-    });
 
     // Delete selected goals when user confirms
     const handleConfirm = () => {
@@ -129,6 +134,7 @@ const GoalsScreen = () => {
             card.title = goalTitle;
             card.description = goalDescription;
             card.activity = goalMetric;
+            card.progress = currentProgress;
             card.objective = goalObjective;
             setGoals(prevCardData => [...prevCardData]);
             setEditMode(false);
@@ -145,7 +151,7 @@ const GoalsScreen = () => {
                 activity: goalMetric,
                 objective: goalObjective,
                 unit: goalUnit,
-                progress: Math.round(goalObjective / (Math.floor(Math.random() * 10) + 1)),  // TODO: El progreso está puedo aleatorio
+                progress: currentProgress,
                 timeLimit: goalTimeLimit,
             }]);
         }
@@ -195,7 +201,7 @@ const GoalsScreen = () => {
         setGoalDescription('');
         setGoalObjective('');
         setGoalTimeLimit(null);
-        setGoalMetric(METRICS_DATA[0][0]);
+        setGoalMetric(metricsData[0].name);
         setSelectedIds([]);
     }
 
@@ -354,10 +360,17 @@ const GoalsScreen = () => {
                             />
                             <HelperText type="error" visible={descriptionHasErrors()} style={{
                                 marginTop: -20,
-                                marginBottom: descriptionHasErrors() ? 0 : -40,
+                                marginBottom: descriptionHasErrors() ? 0 : -20,
                             }}>
                                 Description should be between 1 and 30 characters long
                             </HelperText>
+                            <Input label={`Current ${goalUnit ? `(${goalUnit})` : ''}`}
+                                   placeholder="Enter your progress"
+                                   keyboardType={'numeric'}
+                                   value={currentProgress}
+                                   onChangeText={text => setCurrentProgress(text)}
+                            />
+                            {/*// TODO: Helper text*/}
                             <Input label={`Objective ${goalUnit ? `(${goalUnit})` : ''}`}
                                    placeholder="Enter objective"
                                    keyboardType={'numeric'}
@@ -445,7 +458,7 @@ const GoalsScreen = () => {
                                 <Text style={{
                                     color: theme.colors.tertiary,
                                     marginBottom: 5,
-                                    marginTop: descriptionHasErrors() ? 10 : -35,
+                                    marginTop: descriptionHasErrors() ? 10 : -15,
                                 }}>Activity</Text>
                                 <View style={{
                                     borderRadius: 10,
@@ -467,11 +480,11 @@ const GoalsScreen = () => {
                                         mode={'dropdown'}
                                         prompt={'Select an activity'}
                                     >
-                                        {metricsOptions.map((option, index) => (
+                                        {metricsData.map((option, index) => (
                                             <Picker.Item style={{
                                                 backgroundColor: secondaryColor,
                                                 color: tertiaryColor
-                                            }} label={option.label} value={option.label} key={index}/>
+                                            }} label={option.name} value={option.name} key={index}/>
                                         ))}
                                     </Picker>
                                 </View>

@@ -1,9 +1,9 @@
-import axios from "axios";
+import {axiosInstance} from "./config/axiosConfig";
 
 const goalsService = {
     async create(goal) {
         try {
-            const response = await axios.post("test", goal);
+            const response = await axiosInstance.post("test", goal);
             return response.data;
         } catch (error) {
             console.log(error);
@@ -12,7 +12,7 @@ const goalsService = {
 
     async getByUserId(userId) {
         try {
-            const response = await axios.get(`/users/${userId}/goals`, userId);
+            const response = await axiosInstance.get(`/users/${userId}/goals`, userId);
             return response.data;
         } catch (error) {
             console.log(error);
@@ -21,7 +21,7 @@ const goalsService = {
 
     async getMetrics() {
         try {
-            const response = await axios.get(`/goals/metrics`);
+            const response = await axiosInstance.get(`/goals/metrics`);
             return response.data;
         } catch (error) {
             console.log(error);
@@ -30,7 +30,7 @@ const goalsService = {
 
     async update(goal) {
         try {
-            const response = await axios.patch(`/goals/${goal.id}`, goal);
+            const response = await axiosInstance.patch(`/goals/${goal.id}`, goal);
             return response.data;
         } catch (error) {
             console.log(error);
@@ -39,10 +39,12 @@ const goalsService = {
 
     async deleteById(goalId) {
         try {
-            const response = await axios.delete(`/goals/${goalId}`);
+            const response = await axiosInstance.delete(`/goals/${goalId}`);
             return response.data;
         } catch (error) {
             console.log(error);
         }
     }
 }
+
+export default goalsService;
