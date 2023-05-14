@@ -18,6 +18,10 @@ const Utils = {
         await AsyncStorage.removeItem('@fiufit_userId');
         Alert.alert("Session expired", "Please login again");
         navigation.replace("Login");
+    },
+
+    async getUserId() {
+        return await AsyncStorage.getItem('@fiufit_userId');
     }
 }
 
