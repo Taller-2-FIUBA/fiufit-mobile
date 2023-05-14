@@ -1,4 +1,4 @@
-import {View, FlatList, SafeAreaView, TouchableOpacity, Text, ScrollView, Alert} from "react-native";
+import {View, FlatList, SafeAreaView, TouchableOpacity, Text, ScrollView} from "react-native";
 import React, {useEffect, useRef, useState} from "react";
 import Goal from "../components/Goal";
 import {
