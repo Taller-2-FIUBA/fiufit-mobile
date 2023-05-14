@@ -28,7 +28,7 @@ const GoalsScreen = () => {
     const [selectedIds, setSelectedIds] = useState([]);
     const [newGoalFormVisible, setNewGoalFormVisible] = useState(false);
     const [editMode, setEditMode] = useState(false);
-    const [metricsData, setMetricsData] = useState(null);
+    const [metricsData, setMetricsData] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // New goal form fields
@@ -78,8 +78,10 @@ const GoalsScreen = () => {
         try {
             setLoading(true);
             const response = await goalsService.get();
-            setGoals(response);
-            setLoading(false)
+            if (response) {
+                setGoals(response);
+                setLoading(false)
+            }
         } catch (error) {
             throw new Error(error);
         }
@@ -87,8 +89,10 @@ const GoalsScreen = () => {
 
     const getMetrics = async () => {
         const response = await goalsService.getMetrics();
-        setMetricsData(response);
-        setGoalMetric(response[0].name);
+        if (response) {
+            setMetricsData(response);
+            setGoalMetric(response[0].name);
+        }
     };
 
     // Delete selected goals when user confirms
@@ -166,6 +170,10 @@ const GoalsScreen = () => {
 
     // Saves the changes made to the selected goal
     const editSelectedGoal = () => {
+        if (!validateGoalForm()) {
+            Alert.alert("Invalid form", "Please fill all the non optional fields.");
+            return;
+        }
         setLoading(true);
         const cardIndex = goals.findIndex(card => card.id === selectedIds[0]);
         const card = goals[cardIndex];
@@ -193,7 +201,21 @@ const GoalsScreen = () => {
             });
     }
 
+    const validateGoalForm = () => {
+        let valid = true;
+
+        if (!validateGoalTitle(goalTitle, false)) valid = false;
+        if (!validateGoalDescription(goalDescription, false)) valid = false;
+        if (!validateGoalObjective(goalObjective, false)) valid = false;
+
+        return valid;
+    }
+
     const createGoal = () => {
+        if (!validateGoalForm()) {
+            Alert.alert("Error creating goal", "Please fill all the non optional fields.");
+            return;
+        }
         setLoading(true);
         const newGoal = {
             title: goalTitle,
@@ -217,34 +239,15 @@ const GoalsScreen = () => {
             });
     }
 
-    const titleHasErrors = () => {
-        if (goalTitle === '') {
-            return false;
-        }
-        return !validateGoalTitle(goalTitle);
-    };
-
-    const descriptionHasErrors = () => {
-        if (goalDescription === '') {
-            return false;
-        }
-        return !validateGoalDescription(goalDescription);
-    }
-
-    const objectiveHasErrors = () => {
-        if (goalObjective === '') {
-            return false;
-        }
-        return !validateGoalObjective(goalObjective);
-    }
-
     const resetNewGoalForm = () => {
         setNewGoalFormVisible(false)
         setGoalTitle('');
         setGoalDescription('');
         setGoalObjective('');
         setGoalTimeLimit('');
-        setGoalMetric(metricsData[0].name);
+        if (metricsData.length > 0) {
+            setGoalMetric(metricsData[0].name);
+        }
         setSelectedIds([]);
     }
 
@@ -398,10 +401,10 @@ const GoalsScreen = () => {
                                                value={goalTitle}
                                                onChangeText={text => setGoalTitle(text)}
                                         />
-                                        <HelperText type="error" visible={titleHasErrors()}
+                                        <HelperText type="error" visible={!validateGoalTitle(goalTitle, true)}
                                                     style={{
                                                         marginTop: -20,
-                                                        marginBottom: titleHasErrors() ? 0 : -20,
+                                                        marginBottom: validateGoalTitle(goalTitle, true) ? -20 : 0,
                                                     }}>
                                             Title should be between 1 and 15 characters long
                                         </HelperText>
@@ -410,9 +413,10 @@ const GoalsScreen = () => {
                                                value={goalDescription}
                                                onChangeText={text => setGoalDescription(text)}
                                         />
-                                        <HelperText type="error" visible={descriptionHasErrors()} style={{
+                                        <HelperText type="error" visible={!validateGoalDescription(goalDescription, true)}
+                                                    style={{
                                             marginTop: -20,
-                                            marginBottom: descriptionHasErrors() ? 0 : -20,
+                                            marginBottom: !validateGoalDescription(goalDescription, true) ? -20 : 0,
                                         }}>
                                             Description should be between 1 and 30 characters long
                                         </HelperText>
@@ -422,17 +426,16 @@ const GoalsScreen = () => {
                                                value={currentProgress}
                                                onChangeText={text => setCurrentProgress(text)}
                                         />
-                                        {/*// TODO: Helper text*/}
                                         <Input label={`Objective ${goalUnit ? `(${goalUnit})` : ''}`}
                                                placeholder="Enter objective"
                                                keyboardType={'numeric'}
                                                value={goalObjective}
                                                onChangeText={text => setGoalObjective(text)}
                                         />
-                                        <HelperText type="error" visible={objectiveHasErrors()}
+                                        <HelperText type="error" visible={!validateGoalObjective(goalObjective, true)}
                                                     style={{
                                                         marginTop: -20,
-                                                        marginBottom: objectiveHasErrors() ? 0 : -20,
+                                                        marginBottom: !validateGoalObjective(goalObjective, true) ? -20 : 0,
                                                     }}>
                                             Objective should be a natural number
                                         </HelperText>
@@ -490,10 +493,11 @@ const GoalsScreen = () => {
                                                    value={goalTitle}
                                                    onChangeText={text => setGoalTitle(text)}
                                             />
-                                            <HelperText type="error" visible={titleHasErrors()}
+                                            <HelperText type="error"
+                                                        visible={!validateGoalTitle(goalTitle, true)}
                                                         style={{
                                                             marginTop: -20,
-                                                            marginBottom: titleHasErrors() ? 0 : -20,
+                                                            marginBottom: validateGoalTitle(goalTitle, true) ? -20 : 0,
                                                         }}>
                                                 Title should be between 1 and 15 characters long
                                             </HelperText>
@@ -502,7 +506,9 @@ const GoalsScreen = () => {
                                                    value={goalDescription}
                                                    onChangeText={text => setGoalDescription(text)}
                                             />
-                                            <HelperText type="error" visible={descriptionHasErrors()} style={{
+                                            <HelperText type="error"
+                                                        visible={!validateGoalDescription(goalDescription, true)}
+                                                        style={{
                                                 marginTop: -20
                                             }}>
                                                 Description should be between 1 and 30 characters long
@@ -510,7 +516,7 @@ const GoalsScreen = () => {
                                             <Text style={{
                                                 color: theme.colors.tertiary,
                                                 marginBottom: 5,
-                                                marginTop: descriptionHasErrors() ? 10 : -35,
+                                                marginTop: validateGoalDescription(goalDescription, true) ? -35 : 5,
                                             }}>Activity</Text>
                                             <View style={{
                                                 borderRadius: 10,
@@ -546,10 +552,10 @@ const GoalsScreen = () => {
                                                    value={goalObjective}
                                                    onChangeText={text => setGoalObjective(text)}
                                             />
-                                            <HelperText type="error" visible={objectiveHasErrors()}
+                                            <HelperText type="error" visible={!validateGoalObjective(goalObjective, true)}
                                                         style={{
                                                             marginTop: -20,
-                                                            marginBottom: objectiveHasErrors() ? 0 : -20,
+                                                            marginBottom: validateGoalObjective(goalObjective, true) ? -20 : 0,
                                                         }}>
                                                 Objective should be a natural number
                                             </HelperText>
@@ -557,7 +563,7 @@ const GoalsScreen = () => {
                                                 <Text style={{
                                                     color: theme.colors.tertiary,
                                                     marginBottom: -10,
-                                                    marginTop: objectiveHasErrors() ? 10 : 5,
+                                                    marginTop: validateGoalObjective(goalObjective, true) ? 5 : 10,
                                                 }}>Time limit</Text>
                                                 <TouchableOpacity
                                                     style={fiufitStyles.buttonDate}

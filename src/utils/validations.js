@@ -59,15 +59,24 @@ export const validateLocation = (location) => {
     return !containsOnlyNumbersAndSpaces && (location === '' || containsOnlyLettersAndSpecialChars);
 }
 
-export const validateGoalTitle = (title) => {
+export const validateGoalTitle = (title, isHelperText) => {
+    if (isHelperText && title.length === 0) {
+        return true;
+    }
     return title.length >= 1 && title.length <= 15;
 }
 
-export const validateGoalDescription = (description) => {
+export const validateGoalDescription = (description, isHelperText) => {
+    if (isHelperText && description.length === 0) {
+        return true;
+    }
     return description.length >= 1 && description.length <= 30;
 }
 
-export const validateGoalObjective = (objective) => {
+export const validateGoalObjective = (objective, isHelperText) => {
+    if (isHelperText && objective.length === 0) {
+        return true;
+    }
     const regex = /^[0-9]+$/;
     return regex.test(objective);
 }
