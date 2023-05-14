@@ -90,12 +90,29 @@ const GoalsScreen = () => {
 
     // Delete selected goals when user confirms
     const handleConfirm = () => {
-        deleteSelectedGoals();
-        hideDialog();
+        deleteSelectedGoals().then(() => {
+            hideDialog();
+        });
     };
 
-    const deleteSelectedGoals = () => {
-        // setGoals(goals.filter(card => !selectedIds.includes(card.id)));  // TODO: Delete from backend
+    const deleteSelectedGoals = async () => {
+        try {
+            const promises = selectedIds.map(id => goalsService.delete(id));
+            await Promise.all(promises);
+        } catch (error) {
+            console.log(error);
+            Alert.alert("Error deleting goals", "An error has occurred. Please try again later.");
+        }
+
+        setLoading(true);
+        getGoals()
+            .then(() => {
+                setLoading(false)
+            })
+            .catch(error => {
+                console.log(error);
+                Alert.alert("Error fetching data", "An error has occurred. Please try again later.");
+            });
         setSelectedIds([]);
     }
 
