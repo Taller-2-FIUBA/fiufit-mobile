@@ -5,9 +5,6 @@ import {
     useTheme,
     Button,
     FAB,
-    Portal,
-    Dialog,
-    Paragraph,
     Card,
     HelperText, ActivityIndicator
 } from "react-native-paper";
@@ -19,17 +16,19 @@ import {DateTimePickerAndroid} from "@react-native-community/datetimepicker";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import goalsService from "../services/goalsService";
+import FiufitDialog from "../components/FiufitDialog";
 
 const GoalsScreen = () => {
     const theme = useTheme();
     const rolePickerRef = useRef();
 
     const [goals, setGoals] = useState([]);
+    const [completedGoals, setCompletedGoals] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
     const [newGoalFormVisible, setNewGoalFormVisible] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [metricsData, setMetricsData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     // New goal form fields
     const [goalTitle, setGoalTitle] = useState('');
@@ -40,8 +39,12 @@ const GoalsScreen = () => {
     const [currentProgress, setCurrentProgress] = useState('');
     const [goalTimeLimit, setGoalTimeLimit] = useState('');
 
-    // Dialog to confirm the deletion of selected goals
+    // Dialog
     const [visible, setVisible] = useState(false);
+    const [dialogTitle, setDialogTitle] = useState('');
+    const [dialogContent, setDialogContent] = useState('');
+    const [dialogIsOk, setDialogIsOk] = useState(false);
+
     const showDialog = () => setVisible(true);
     const hideDialog = () => setVisible(false);
 
@@ -50,13 +53,15 @@ const GoalsScreen = () => {
         setLoading(true);
         getMetrics()
             .catch(error => {
+                setLoading(false);
                 console.log(error);
-                Alert.alert("Error fetching data", "An error has occurred. Please try again later.");
+                setDialog(false);
             });
         getGoals()
             .catch(error => {
+                setLoading(false);
                 console.log(error);
-                Alert.alert("Error fetching data", "An error has occurred. Please try again later.");
+                setDialog(false);
             });
     }, []);
 
@@ -79,7 +84,15 @@ const GoalsScreen = () => {
             setLoading(true);
             const response = await goalsService.get();
             if (response) {
-                setGoals(response);
+                setGoals([]);
+                setCompletedGoals([]);
+                response.forEach(goal => {
+                    if (goal.objective <= goal.progress) {
+                        setCompletedGoals(prevState => [...prevState, goal]);
+                    } else {
+                        setGoals(prevState => [...prevState, goal]);
+                    }
+                });
                 setLoading(false)
             }
         } catch (error) {
@@ -101,10 +114,18 @@ const GoalsScreen = () => {
         hideDialog();
         deleteSelectedGoals()
             .catch(error => {
+                setLoading(false);
                 console.log(error);
-                Alert.alert("Error deleting goals", "An error has occurred. Please try again later.");
+                setDialog(false);
             });
     };
+
+    const handleDelete = () => {
+        setDialogTitle('Delete goals');
+        setDialogContent('Are you sure you want to delete the selected goals?');
+        setDialogIsOk(false);
+        showDialog();
+    }
 
     const deleteSelectedGoals = async () => {
         try {
@@ -112,13 +133,13 @@ const GoalsScreen = () => {
             await Promise.all(promises);
         } catch (error) {
             console.log(error);
-            Alert.alert("Error deleting goals", "An error has occurred. Please try again later.");
+            setDialog(false);
         }
 
         getGoals()
             .catch(error => {
                 console.log(error);
-                Alert.alert("Error fetching data", "An error has occurred. Please try again later.");
+                setDialog(false);
             });
         setSelectedIds([]);
     }
@@ -171,7 +192,7 @@ const GoalsScreen = () => {
     // Saves the changes made to the selected goal
     const editSelectedGoal = () => {
         if (!validateGoalForm()) {
-            Alert.alert("Invalid form", "Please fill all the non optional fields.");
+            setDialog(true);
             return;
         }
         setLoading(true);
@@ -189,13 +210,13 @@ const GoalsScreen = () => {
         goalsService.update(card)
             .catch(error => {
                 console.log(error);
-                Alert.alert("Error updating goal", "An error has occurred. Please try again later.");
+                setDialog(false);
             })
             .finally(() => {
                 getGoals()
                     .catch(error => {
                         console.log(error);
-                        Alert.alert("Error fetching data", "An error has occurred. Please try again later.");
+                        setDialog(false);
                     });
                 resetNewGoalForm();
             });
@@ -213,7 +234,7 @@ const GoalsScreen = () => {
 
     const createGoal = () => {
         if (!validateGoalForm()) {
-            Alert.alert("Error creating goal", "Please fill all the non optional fields.");
+            setDialog(true);
             return;
         }
         setLoading(true);
@@ -228,13 +249,13 @@ const GoalsScreen = () => {
         goalsService.create(newGoal)
             .catch(error => {
                 console.log(error);
-                Alert.alert("Error creating goal", "An error has occurred. Please try again later.");
+                setDialog(false);
             })
             .finally(() => {
                 getGoals()
                     .catch(error => {
                         console.log(error);
-                        Alert.alert("Error fetching data", "An error has occurred. Please try again later.");
+                        setDialog(false);
                     });
             });
     }
@@ -249,6 +270,18 @@ const GoalsScreen = () => {
             setGoalMetric(metricsData[0].name);
         }
         setSelectedIds([]);
+    }
+
+    const setDialog = (isUserError) => {
+        setDialogIsOk(true);
+        if (isUserError) {
+            setDialogTitle("Error");
+            setDialogContent("Invalid form. Please fill all the non optional fields and try again.");
+        } else {
+            setDialogTitle("Network error");
+            setDialogContent("An error has occurred while trying to connect to the server. Please try again later.");
+        }
+        showDialog();
     }
 
     const renderGoals = ({item}) => {
@@ -287,7 +320,7 @@ const GoalsScreen = () => {
                     <View style={{flex: 1}}>
                         {!newGoalFormVisible && !editMode && (
                             <View>
-                                {goals && goals.length === 0 && (
+                                {goals && goals.length === 0 && completedGoals.length === 0 && (
                                     <Text style={{
                                         alignSelf: 'center',
                                         marginTop: 10,
@@ -297,12 +330,31 @@ const GoalsScreen = () => {
                                         You have no goals yet, add one!
                                     </Text>
                                 )}
+                                {completedGoals && completedGoals.length > 0 && (
+                                    <Text style={{
+                                        alignSelf: 'center',
+                                        marginTop: 10,
+                                        color: theme.colors.tertiary,
+                                    }}>
+                                        Completed goals
+                                    </Text>
+                                )}
+                                <FlatList data={completedGoals} renderItem={renderGoals} keyExtractor={item => item.id}/>
+                                {goals && goals.length > 0 && (
+                                    <Text style={{
+                                        alignSelf: 'center',
+                                        marginTop: 10,
+                                        color: theme.colors.tertiary,
+                                    }}>
+                                        Active goals
+                                    </Text>
+                                )}
                                 <FlatList data={goals} renderItem={renderGoals} keyExtractor={item => item.id}/>
                             </View>
                         )}
                         <FAB
                             icon={'delete'}
-                            onPress={showDialog}
+                            onPress={handleDelete}
                             style={{
                                 position: 'absolute',
                                 margin: 16,
@@ -315,42 +367,16 @@ const GoalsScreen = () => {
                             color={theme.colors.secondary}
                             visible={selectedIds.length > 0}
                         />
-                        <Portal>
-                            <Dialog visible={visible} onDismiss={hideDialog} style={{
-                                backgroundColor: theme.colors.background,
-                            }}>
-                                <Dialog.Title style={{
-                                    color: theme.colors.secondary,
-                                }}>
-                                    Delete selected goals
-                                </Dialog.Title>
-                                <Dialog.Content>
-                                    <Paragraph style={{
-                                        color: theme.colors.tertiary,
-                                    }}>
-                                        Are you sure you want to delete the selected goals?
-                                    </Paragraph>
-                                </Dialog.Content>
-                                <Dialog.Actions style={{
-                                    justifyContent: 'space-around',
-                                }}>
-                                    <Button onPress={handleConfirm}
-                                            textColor={theme.colors.secondary}
-                                            style={{
-                                                backgroundColor: theme.colors.background,
-                                                width: 120,
-                                                borderWidth: 1,
-                                                borderColor: theme.colors.secondary,
-                                            }}>Confirm</Button>
-                                    <Button onPress={hideDialog}
-                                            textColor={theme.colors.background}
-                                            style={{
-                                                backgroundColor: theme.colors.primary,
-                                                width: 120,
-                                            }}>Cancel</Button>
-                                </Dialog.Actions>
-                            </Dialog>
-                        </Portal>
+                        <FiufitDialog
+                            visible={visible}
+                            onDismiss={hideDialog}
+                            title={dialogTitle}
+                            content={dialogContent}
+                            handleConfirm={handleConfirm}
+                            handleCancel={hideDialog}
+                            handleOk={hideDialog}
+                            isOk={dialogIsOk}
+                        />
                         <FAB
                             icon={'pencil'}
                             onPress={handleEdit}
@@ -413,11 +439,12 @@ const GoalsScreen = () => {
                                                value={goalDescription}
                                                onChangeText={text => setGoalDescription(text)}
                                         />
-                                        <HelperText type="error" visible={!validateGoalDescription(goalDescription, true)}
+                                        <HelperText type="error"
+                                                    visible={!validateGoalDescription(goalDescription, true)}
                                                     style={{
-                                            marginTop: -20,
-                                            marginBottom: !validateGoalDescription(goalDescription, true) ? -20 : 0,
-                                        }}>
+                                                        marginTop: -20,
+                                                        marginBottom: !validateGoalDescription(goalDescription, true) ? -20 : 0,
+                                                    }}>
                                             Description should be between 1 and 30 characters long
                                         </HelperText>
                                         <Input label={`Current ${goalUnit ? `(${goalUnit})` : ''}`}
@@ -509,8 +536,8 @@ const GoalsScreen = () => {
                                             <HelperText type="error"
                                                         visible={!validateGoalDescription(goalDescription, true)}
                                                         style={{
-                                                marginTop: -20
-                                            }}>
+                                                            marginTop: -20
+                                                        }}>
                                                 Description should be between 1 and 30 characters long
                                             </HelperText>
                                             <Text style={{
@@ -552,7 +579,8 @@ const GoalsScreen = () => {
                                                    value={goalObjective}
                                                    onChangeText={text => setGoalObjective(text)}
                                             />
-                                            <HelperText type="error" visible={!validateGoalObjective(goalObjective, true)}
+                                            <HelperText type="error"
+                                                        visible={!validateGoalObjective(goalObjective, true)}
                                                         style={{
                                                             marginTop: -20,
                                                             marginBottom: validateGoalObjective(goalObjective, true) ? -20 : 0,
