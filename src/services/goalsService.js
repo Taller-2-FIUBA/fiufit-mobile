@@ -1,11 +1,12 @@
 import {axiosInstance} from "./config/axiosConfig";
 import utils from "../utils/Utils";
+import requests from "../consts/requests";
 
 const goalsService = {
     async create(goal) {
         try {
             let userId = await utils.getUserId();
-            const response = await axiosInstance.post(`/goals/${userId}`, goal);
+            const response = await axiosInstance.post(`${requests.GOALS}/${userId}`, goal);
             return response.data;
         } catch (error) {
             console.log(error);
@@ -15,7 +16,7 @@ const goalsService = {
     async get() {
         try {
             let userId = await utils.getUserId();
-            const response = await axiosInstance.get(`/goals/${userId}`);
+            const response = await axiosInstance.get(`${requests.GOALS}/${userId}`);
             return response.data;
         } catch (error) {
             console.log(error);
@@ -24,7 +25,7 @@ const goalsService = {
 
     async getMetrics() {
         try {
-            const response = await axiosInstance.get(`/goals/metrics`);
+            const response = await axiosInstance.get(`${requests.METRICS}`);
             return response.data;
         } catch (error) {
             console.log(error);
@@ -33,7 +34,7 @@ const goalsService = {
 
     async update(goal) {
         try {
-            const response = await axiosInstance.patch(`/goals/${goal.id}`, goal);
+            const response = await axiosInstance.patch(`${requests.GOALS}/${goal.id}`, goal);
             return response.data;
         } catch (error) {
             console.log(error);
@@ -42,7 +43,7 @@ const goalsService = {
 
     async delete(goalId) {
         try {
-            const response = await axiosInstance.delete(`/goals/${goalId}`);
+            const response = await axiosInstance.delete(`${requests.GOALS}/${goalId}`);
             return response.data;
         } catch (error) {
             console.log(error);

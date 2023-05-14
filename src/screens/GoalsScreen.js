@@ -166,6 +166,7 @@ const GoalsScreen = () => {
 
     // Saves the changes made to the selected goal
     const editSelectedGoal = () => {
+        setLoading(true);
         const cardIndex = goals.findIndex(card => card.id === selectedIds[0]);
         const card = goals[cardIndex];
         if (cardIndex !== -1) {

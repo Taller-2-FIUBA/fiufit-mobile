@@ -6,6 +6,8 @@ const requests = {
     SIGNUP: '/users',
     USER: '/users',
     TRAINING: '/trainings',
+    GOALS: '/goals',
+    METRICS: '/goals/metrics',
 }
 
 export default requests;
