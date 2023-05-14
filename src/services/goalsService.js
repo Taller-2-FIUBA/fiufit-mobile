@@ -4,7 +4,7 @@ import utils from "../utils/Utils";
 const goalsService = {
     async create(goal) {
         try {
-            let userId = utils.getUserId();
+            let userId = await utils.getUserId();
             const response = await axiosInstance.post(`/goals/${userId}`, goal);
             return response.data;
         } catch (error) {

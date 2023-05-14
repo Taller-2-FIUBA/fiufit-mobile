@@ -38,7 +38,7 @@ const GoalsScreen = () => {
     const [goalUnit, setGoalUnit] = useState('');
     const [goalObjective, setGoalObjective] = useState('');
     const [currentProgress, setCurrentProgress] = useState('');
-    const [goalTimeLimit, setGoalTimeLimit] = useState(null);
+    const [goalTimeLimit, setGoalTimeLimit] = useState('');
 
     // Dialog to confirm the deletion of selected goals
     const [visible, setVisible] = useState(false);
@@ -54,9 +54,6 @@ const GoalsScreen = () => {
                 Alert.alert("Error fetching data", "An error has occurred. Please try again later.");
             });
         getGoals()
-            .then(() => {
-                setLoading(false)
-            })
             .catch(error => {
                 console.log(error);
                 Alert.alert("Error fetching data", "An error has occurred. Please try again later.");
@@ -78,8 +75,14 @@ const GoalsScreen = () => {
     }, [goalMetric]);
 
     const getGoals = async () => {
-        const response = await goalsService.get();
-        setGoals(response);
+        try {
+            setLoading(true);
+            const response = await goalsService.get();
+            setGoals(response);
+            setLoading(false)
+        } catch (error) {
+            throw new Error(error);
+        }
     };
 
     const getMetrics = async () => {
@@ -90,9 +93,13 @@ const GoalsScreen = () => {
 
     // Delete selected goals when user confirms
     const handleConfirm = () => {
-        deleteSelectedGoals().then(() => {
-            hideDialog();
-        });
+        setLoading(true);
+        hideDialog();
+        deleteSelectedGoals()
+            .catch(error => {
+                console.log(error);
+                Alert.alert("Error deleting goals", "An error has occurred. Please try again later.");
+            });
     };
 
     const deleteSelectedGoals = async () => {
@@ -104,11 +111,7 @@ const GoalsScreen = () => {
             Alert.alert("Error deleting goals", "An error has occurred. Please try again later.");
         }
 
-        setLoading(true);
         getGoals()
-            .then(() => {
-                setLoading(false)
-            })
             .catch(error => {
                 console.log(error);
                 Alert.alert("Error fetching data", "An error has occurred. Please try again later.");
@@ -161,39 +164,56 @@ const GoalsScreen = () => {
         }
     }
 
-    // Saves the changes made to the selected goal  // TODO: Save changes to backend
+    // Saves the changes made to the selected goal
     const editSelectedGoal = () => {
         const cardIndex = goals.findIndex(card => card.id === selectedIds[0]);
+        const card = goals[cardIndex];
         if (cardIndex !== -1) {
-            const card = goals[cardIndex];
             card.title = goalTitle;
             card.description = goalDescription;
-            card.activity = goalMetric;
-            card.progress = currentProgress;
             card.objective = goalObjective;
+            goalTimeLimit ? (card.time_limit = goalTimeLimit) : (card.time_limit = '');
+            currentProgress.length > 0 ? (card.progress = currentProgress) : (card.progress = 0);
             setGoals(prevCardData => [...prevCardData]);
             setEditMode(false);
         }
-        resetNewGoalForm();
+        goalsService.update(card)
+            .catch(error => {
+                console.log(error);
+                Alert.alert("Error updating goal", "An error has occurred. Please try again later.");
+            })
+            .finally(() => {
+                getGoals()
+                    .catch(error => {
+                        console.log(error);
+                        Alert.alert("Error fetching data", "An error has occurred. Please try again later.");
+                    });
+                resetNewGoalForm();
+            });
     }
 
     const createGoal = () => {
-        function validateNewGoal() {
-            if (goalTitle === '') {
-                alert('Title cannot be empty');
-                return false;
-            }
-            if (goalDescription === '') {
-                alert('Description cannot be empty');
-                return false;
-            }
-            return true;
+        setLoading(true);
+        const newGoal = {
+            title: goalTitle,
+            description: goalDescription,
+            metric: goalMetric,
+            objective: goalObjective,
+            time_limit: goalTimeLimit,
         }
-
-        if (validateNewGoal()) {
-            // createNewCard(); // TODO: Create new card
-            resetNewGoalForm();
-        }
+        resetNewGoalForm();
+        goalsService.create(newGoal)
+            .catch(error => {
+                console.log(error);
+                Alert.alert("Error creating goal", "An error has occurred. Please try again later.");
+            })
+            .finally(() => {
+                getGoals()
+                    .catch(error => {
+                        console.log(error);
+                        Alert.alert("Error fetching data", "An error has occurred. Please try again later.");
+                    });
+            });
     }
 
     const titleHasErrors = () => {
@@ -222,7 +242,7 @@ const GoalsScreen = () => {
         setGoalTitle('');
         setGoalDescription('');
         setGoalObjective('');
-        setGoalTimeLimit(null);
+        setGoalTimeLimit('');
         setGoalMetric(metricsData[0].name);
         setSelectedIds([]);
     }
@@ -489,7 +509,7 @@ const GoalsScreen = () => {
                                             <Text style={{
                                                 color: theme.colors.tertiary,
                                                 marginBottom: 5,
-                                                marginTop: descriptionHasErrors() ? 10 : -15,
+                                                marginTop: descriptionHasErrors() ? 10 : -35,
                                             }}>Activity</Text>
                                             <View style={{
                                                 borderRadius: 10,
