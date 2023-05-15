@@ -2,7 +2,7 @@ import {Button, Paragraph, Portal, Dialog, useTheme} from "react-native-paper";
 import React from "react";
 import {View} from "react-native";
 
-const FiufitDialog = ({visible, onDismiss, title, content, isOk, handleConfirm, handleCancel, handleOk}) => {
+const FiufitDialog = ({visible, title, content, isOk, onDismiss, handleConfirm, handleCancel, handleOk}) => {
     const theme = useTheme();
 
     return (
