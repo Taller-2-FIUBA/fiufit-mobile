@@ -5,7 +5,6 @@ import { UserService } from "../services/userService";
 import {useNavigation} from "@react-navigation/native";
 
 const SearchUsersScreen = () => {
-    console.log("SearchScreen init");
   const [usersSearch, setUsersSearch] = React.useState(null);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [notFound, setNotFound] = React.useState(false);

@@ -145,7 +145,7 @@ const TrainingsScreen = () => {
         fetchGetTrainingsByTrainerId();
     }, []);
 
-    const [expandedList, setExpandedList] = useState(trainings.map(() => false));
+    const [expandedList, setExpandedList] = useState(trainings && trainings.map(() => false));
 
     const handlePress = (index) => {
         const newList = [...expandedList];
@@ -204,7 +204,6 @@ const TrainingsScreen = () => {
             console.log('Updated training:', response);
             ToastAndroid.show("Training updated successfully", ToastAndroid.SHORT);
             setEditable(false);
-            setTrainings(trainings.push(copyTraining));
             return response.data;
         } catch (error) {
             console.log(error);
@@ -212,35 +211,34 @@ const TrainingsScreen = () => {
     }
 
     return (
-        <View style={{flex: 1}}>
-            <ScrollView contentContainerStyle={fiufitStyles.container}>
-            <Text style={{
-                        ...fiufitStyles.titleText,
-                        alignSelf: 'center',
-                        marginTop: 10,
-                    }}>
-                        Trainings
-                    </Text>
-                    {trainings.length === 0 && (
-                        <Text style={{
-                            alignSelf: 'center',
-                            marginTop: 10,
-                            color: tertiaryColor,
-                            fontSize: 20,
-                        }}>
-                            You have no trainings yet, add one!
-                        </Text>
-                    )}
+        <View style={fiufitStyles.container}>
+            <ScrollView contentContainerStyle={{flexGrow: 1}}>
+            <Text style={{...fiufitStyles.titleText,
+                alignSelf: 'center',
+                marginTop: 10,
+            }}>
+                Trainings
+            </Text>
+            {trainings?.length === 0 && (
+                <Text style={{
+                    alignSelf: 'center',
+                    marginTop: 10,
+                    color: tertiaryColor,
+                    fontSize: 20,
+                }}>
+                    You have no trainings yet, add one!
+                </Text>
+            )}
     
-            {trainings.map((training, index) => (
+            {trainings && trainings.map((training, index) => (
                 <List.Accordion
-                key={index}
-                style={fiufitStyles.trainingsList}
-                left={(props) => <List.Icon {...props} icon="bike" />}
-                title={training.tittle}
-                titleStyle={{ color: primaryColor }}
-                expanded={expandedList[index]}
-                onPress={() => handlePress(index)}
+                    key={index}
+                    style={fiufitStyles.trainingsList}
+                    left={(props) => <List.Icon {...props} icon="bike" />}
+                    title={training.tittle}
+                    titleStyle={{ color: primaryColor }}
+                    expanded={expandedList[index]}
+                    onPress={() => handlePress(index)}
                 >
                     <TrainingItem
                         value={training.tittle}

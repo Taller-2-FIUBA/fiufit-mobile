@@ -6,6 +6,7 @@ import { getTrainingsTypes, getTrainingByTypeAndDifficulty } from "../services/T
 import {Picker} from '@react-native-picker/picker';
 import Button from "../components/Button";
 import {fiufitStyles} from "../consts/fiufitStyles";
+import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
 
 
 
@@ -25,13 +26,14 @@ const SearchTrainingsScreen = () => {
     const response = await getTrainingByTypeAndDifficulty(trainingType, trainingDifficulty);
     console.log("response trainings search: ", response);
     setTrainings(response.items);
+    setNotFound(response?.items?.length === 0);
   };
 
   useEffect(() => {
     const fetchTrainingTypes = async () => {
-        console.log("Fetching trainings types...");
-        const response = await getTrainingsTypes();
-        setTrainingTypes(response);
+    console.log("Fetching trainings types...");
+    const response = await getTrainingsTypes();
+    setTrainingTypes(response);
     };
 
     fetchTrainingTypes();
@@ -74,7 +76,9 @@ const SearchTrainingsScreen = () => {
       )}
       {trainings && trainings.length > 0 && trainings.map(training => (
         <View key={training.id} style={{ alignItems: "center", marginTop: 20 }}>
-            <Text>{training.tittle}</Text>
+            <Text style={{padding: 10, backgroundColor: secondaryColor, color: tertiaryColor}}>{
+              training.tittle}
+            </Text>
         </View>
       ))
       }
