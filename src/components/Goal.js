@@ -1,9 +1,12 @@
-import {Text, StyleSheet, View} from 'react-native';
+import {Text, StyleSheet, View, Image} from 'react-native';
 import {Card, useTheme} from 'react-native-paper';
-import {useState} from "react";
+import React, {useState} from "react";
 import ProgressCircle from 'progress-circle-react-native'
 
-const Goal = ({title, description, activity, unit, objective, progress, timeLimit, onSelectedChange, changedSelection}) => {
+const Goal = ({
+                  title, description, activity, unit, objective, progress,
+                  timeLimit, onSelectedChange, changedSelection, image
+              }) => {
     const theme = useTheme();
     const [expanded, setExpanded] = useState(false);
     const [selected, setSelected] = useState(false);
@@ -82,6 +85,15 @@ const Goal = ({title, description, activity, unit, objective, progress, timeLimi
                                         marginTop: 10,
                                     }}>Finishes on {timeLimit}</Text>
                                 )}
+                                {image &&
+                                    <Image source={{uri: image}}
+                                           style={{
+                                               width: 120,
+                                               height: 120,
+                                               marginTop: 10,
+                                               borderRadius: 5,
+                                           }}/>
+                                }
                             </View>
                         )}
                     </View>

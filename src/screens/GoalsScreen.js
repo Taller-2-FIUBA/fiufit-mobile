@@ -17,6 +17,7 @@ import {fiufitStyles} from "../consts/fiufitStyles";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import goalsService from "../services/goalsService";
 import FiufitDialog from "../components/FiufitDialog";
+import * as ImagePicker from "expo-image-picker";
 
 const GoalsScreen = () => {
     const theme = useTheme();
@@ -38,6 +39,7 @@ const GoalsScreen = () => {
     const [goalObjective, setGoalObjective] = useState('');
     const [currentProgress, setCurrentProgress] = useState('');
     const [goalTimeLimit, setGoalTimeLimit] = useState('');
+    const [goalImage, setGoalImage] = useState(null);
 
     // Dialog
     const [visible, setVisible] = useState(false);
@@ -244,6 +246,7 @@ const GoalsScreen = () => {
             metric: goalMetric,
             objective: goalObjective,
             time_limit: goalTimeLimit,
+            // image: goalImage
         }
         resetNewGoalForm();
         goalsService.create(newGoal)
@@ -284,6 +287,19 @@ const GoalsScreen = () => {
         showDialog();
     }
 
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setGoalImage(result.assets[0].uri);
+        }
+    };
+
     const renderGoals = ({item}) => {
         return (
             <Goal
@@ -296,6 +312,7 @@ const GoalsScreen = () => {
                 timeLimit={item.time_limit}
                 onSelectedChange={(selected) => handleSelectedChange(item.id, selected)}
                 changedSelection={selectedIds.length > 0}
+                image={goalImage}  // TODO: item.image
             />
         );
     }
@@ -443,7 +460,7 @@ const GoalsScreen = () => {
                                                     visible={!validateGoalDescription(goalDescription, true)}
                                                     style={{
                                                         marginTop: -20,
-                                                        marginBottom: !validateGoalDescription(goalDescription, true) ? -20 : 0,
+                                                        marginBottom: !validateGoalDescription(goalDescription, true) ? -20 : -30,
                                                     }}>
                                             Description should be between 1 and 30 characters long
                                         </HelperText>
@@ -587,25 +604,41 @@ const GoalsScreen = () => {
                                                         }}>
                                                 Objective should be a natural number
                                             </HelperText>
-                                            <View>
-                                                <Text style={{
-                                                    color: theme.colors.tertiary,
-                                                    marginBottom: -10,
-                                                    marginTop: validateGoalObjective(goalObjective, true) ? 5 : 10,
-                                                }}>Time limit</Text>
-                                                <TouchableOpacity
-                                                    style={fiufitStyles.buttonDate}
-                                                    onPress={showDatepicker}
-                                                >
-                                                    <Icon name={"calendar-range"} style={fiufitStyles.iconStyle}/>
+                                            <View style={{
+                                                flexDirection: 'row',
+                                                justifyContent: 'space-between',
+                                            }}>
+                                                <View>
                                                     <Text style={{
-                                                        color: goalTimeLimit ? tertiaryColor : greyColor,
-                                                        marginLeft: 33,
-                                                        marginTop: -20
-                                                    }}>
-                                                        {goalTimeLimit ? goalTimeLimit : "Enter time limit (optional)"}
-                                                    </Text>
-                                                </TouchableOpacity>
+                                                        color: theme.colors.tertiary,
+                                                        marginBottom: -10,
+                                                        marginTop: validateGoalObjective(goalObjective, true) ? 5 : 10,
+                                                    }}>Time limit (optional)</Text>
+                                                    <TouchableOpacity
+                                                        style={{...fiufitStyles.buttonDate, width: 150}}
+                                                        onPress={showDatepicker}
+                                                    >
+                                                        <Icon name={"calendar-range"} style={fiufitStyles.iconStyle}/>
+                                                        <Text style={{
+                                                            color: goalTimeLimit ? tertiaryColor : greyColor,
+                                                            marginLeft: 33,
+                                                            marginTop: -20
+                                                        }}>
+                                                            {goalTimeLimit ? goalTimeLimit : "Enter date"}
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                                <View>
+                                                    <Text style={{
+                                                        color: theme.colors.tertiary,
+                                                        marginBottom: -7,
+                                                        marginTop: validateGoalObjective(goalObjective, true) ? 5 : 10,
+                                                    }}>Image (optional)</Text>
+                                                    <Button onPress={pickImage}
+                                                            style={fiufitStyles.imagePickerButton}>
+                                                        <Icon name={"camera"} style={{...fiufitStyles.iconStyle}}/>
+                                                    </Button>
+                                                </View>
                                             </View>
                                             <View style={{
                                                 flexDirection: 'row',
