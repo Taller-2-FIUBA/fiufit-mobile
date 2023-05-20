@@ -12,7 +12,7 @@ import {greyColor, primaryColor, secondaryColor, tertiaryColor} from "../consts/
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Picker} from "@react-native-picker/picker";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {parseWeight} from "../utils/utils";
+import Utils from "../utils/Utils";
 import Button from "../components/Button";
 import {
     validateBirthDate,
@@ -69,7 +69,7 @@ const UserBiologicsScreen = ({navigation}) => {
     };
 
     const handleWeight = (value) => {
-        setWeight(parseWeight(value));
+        setWeight(Utils.parseWeight(value));
     }
 
     const handleSignUp = () => {
