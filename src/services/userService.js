@@ -30,7 +30,8 @@ export const UserService = {
             console.log('response: ', response.data);
             return response.data;
         } catch (error) {
-            throw new Error(StatusCodes[error.response?.status] + " " + error.response?.status);
+            console.log("NOT_FOUND 404");
+            return {};
         }
     }
 }

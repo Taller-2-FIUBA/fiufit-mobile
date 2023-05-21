@@ -1,8 +1,10 @@
-import {Button, Text, View, ScrollView} from "react-native";
+import {Button, Text, View, ScrollView, TouchableOpacity} from "react-native";
+import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from "../consts/colors";
 import React from "react";
 import { Searchbar } from 'react-native-paper';
 import { UserService } from "../services/userService";
 import {useNavigation} from "@react-navigation/native";
+import {fiufitStyles} from "../consts/fiufitStyles";
 
 const SearchUsersScreen = () => {
   const [usersSearch, setUsersSearch] = React.useState(null);
@@ -16,33 +18,30 @@ const SearchUsersScreen = () => {
     console.log("searchQuery: ", searchQuery);
     const response = await UserService.getUserByUsername(searchQuery);
     setUsersSearch(response)
-    if (usersSearch === 'NOT_FOUND 404') {
-        console.log("NOT_FOUND 404");
+    if (Object.keys(response).length === 0) {
         setNotFound(true);
-    } else {
-        navigation.navigate("ProfilePublic", {user: response});
     }
   };
 
-  const handleUserClick = (user) => {
-    if (usersSearch === ' NOT_FOUND 404') {
-        setNotFound(true);
-    } else {
-        navigation.navigate("ProfilePublic", {user: user});
-    }
-  }
-
   return (
-    <ScrollView>
+    <ScrollView style={{backgroundColor: primaryColor}}>
         <Searchbar
             placeholder="Search"
             onSubmitEditing={handleSearch}
             onChangeText={onChangeSearch}
             value={searchQuery}
+            style={{backgroundColor: secondaryColor, marginTop: 5}}
         />
+        {usersSearch && (
+            <TouchableOpacity
+            style={fiufitStyles.userContainer}
+            onPress={() => navigation.navigate("ProfilePublic", {user: usersSearch})}>
+                <Text style={fiufitStyles.userName}>{usersSearch.username}</Text>
+            </TouchableOpacity>
+        )}
         {notFound && (
             <View style={{ alignItems: "center", marginTop: 20 }}>
-                <Text>No hay resultados para su búsqueda.</Text>
+                <Text>There are no results for your search.</Text>
             </View>
             )}
     </ScrollView>

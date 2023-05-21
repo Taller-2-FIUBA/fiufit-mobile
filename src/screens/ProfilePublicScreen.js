@@ -34,51 +34,33 @@ const ProfileAvatar = ({userName, onChange}) => {
     )
 }
 
-const ProfileScreen = () => {
-    const [userProfile, setUserProfile] = useState({
-        name: '',
-        surname: '',
-        email: '',
-        location: '',
-        height: undefined,
-        weight: undefined
-    });
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        console.log("Fetching user profile...");
-        setLoading(true);
-        UserService.getUser().then((profile) => {
-            setLoading(false);
-            setUserProfile(profile);
-        }).catch((error) => {
-            setLoading(false);
-            setError(error);
-            console.log(error);
-        });
-    }, []);
+const ProfileScreen = ({ route }) => {
+    const { user } = route.params;
 
     return (
         <ScrollView style={styles.profileContainer}>
             <ProfileAvatar
-                userName={userProfile.name}
+                userName={user.name}
             />
             <ProfileItem
                 iconName="account"
-                value={userProfile.name}
+                value={user.name}
             />
             <ProfileItem
                 iconName="account"
-                value={userProfile.surname}
+                value={user.surname}
+            />
+            <ProfileItem
+                iconName="account"
+                value={user.username}
             />
             <ProfileItem
                 iconName="email"
-                value={userProfile.email}
+                value={user.email}
             />
             <ProfileItem
                 iconName="map-marker"
-                value={userProfile.location}
+                value={user.location}
             />
         </ScrollView>
     );

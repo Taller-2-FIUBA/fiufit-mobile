@@ -237,4 +237,14 @@ export const fiufitStyles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-evenly',
     },
+    userContainer: {
+        backgroundColor: '#eaeaea',
+        padding: 10,
+        marginVertical: 10,
+        borderRadius: 5,
+      },
+      userName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+      },
 })

@@ -40,7 +40,7 @@ const SearchTrainingsScreen = () => {
   }, []);
 
   return (
-    <ScrollView>
+    <ScrollView style={{backgroundColor: primaryColor}}>
      {/*  <Searchbar
         placeholder="Search"
         onSubmitEditing={handleSearch}
@@ -71,7 +71,7 @@ const SearchTrainingsScreen = () => {
 
       {notFound && (
         <View style={{ alignItems: "center", marginTop: 20 }}>
-            <Text>There is no result for your search.</Text>
+            <Text>There are no results for your search.</Text>
         </View>
       )}
       {trainings && trainings.length > 0 && trainings.map(training => (

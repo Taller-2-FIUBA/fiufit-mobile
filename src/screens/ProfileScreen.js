@@ -39,6 +39,7 @@ const ProfileScreen = () => {
     const [userProfile, setUserProfile] = useState({
         name: '',
         surname: '',
+        userName: '',
         email: '',
         location: '',
         height: undefined,

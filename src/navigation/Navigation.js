@@ -1,5 +1,6 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import TrainingsScreen from "../screens/TrainingsScreen";
 import LoginScreen from "../screens/LoginScreen";
 import SignUpScreen from "../screens/SignUpScreen";
@@ -22,11 +23,12 @@ import InitialScreen from "../screens/InitialScreen";
 import {useEffect, useState} from "react";
 import { UserService } from "../services/userService";
 import UserDataContext from "../contexts/userDataContext";
+import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from "../consts/colors";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
-const TopTab = createBottomTabNavigator();
+const TopTab = createMaterialTopTabNavigator();
 
 const AuthStack = () => {
     const theme = useTheme();
