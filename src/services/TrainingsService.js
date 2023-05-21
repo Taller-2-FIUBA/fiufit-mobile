@@ -14,17 +14,12 @@ import {
 const createTraining = async (training) => {
     training.exercises = training.exercises.filter(exercise => Object.keys(exercise).length !== 0);
     let userId = await AsyncStorage.getItem('@fiufit_userId');
-    console.log('userId:', userId);
-    console.log('Training to create:', training);
 
     training['trainer_id'] = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
     const user = UserService.getUser();
-    console.log(`${requests.BASE_URL}${requests.TRAINING}`);
     const token = await AsyncStorage.getItem('@fiufit_token');
-    console.log('token:', token);
 
     try {
-        //const response = await axiosInstance.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training));
         const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
         {
             headers: {
@@ -32,7 +27,6 @@ const createTraining = async (training) => {
               'Authorization': `Bearer ${token}`,
             }
           });
-        console.log('created training:', response.data);
         ToastAndroid.show("Training created successfully", ToastAndroid.SHORT);
         return response.data;
     } catch (error) {
@@ -91,7 +85,6 @@ const getTrainingByTypeAndDifficulty = async (type, difficulty) => {
     if (difficulty) {
         url += type ? `&difficulty=${difficulty}` : `?difficulty=${difficulty}`;
     }
-    console.log("Search trainings url: ", url);
     try {
         const response = await axios.get(url);
         return response.data;

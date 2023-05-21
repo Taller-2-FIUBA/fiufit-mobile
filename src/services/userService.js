@@ -26,10 +26,8 @@ export const UserService = {
     async getUserByUsername(username) {
         try {
             const response = await axiosInstance.get(`${requests.USER}?username=${username}`);
-            console.log('response: ', response.data);
             return response.data;
         } catch (error) {
-            console.log("NOT_FOUND 404");
             return {};
         }
     }

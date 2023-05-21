@@ -64,7 +64,6 @@ const ProfileScreen = () => {
 
 
     const updateProfile = () => {
-        console.log("Update profile: ", userProfile);
         let copyProfile = {...userProfile};
         delete copyProfile.email
         UserService.updateUser(copyProfile).then((profile) => {

@@ -26,7 +26,6 @@ const FiufitDrawer = (props) => {
         authService.logout().then(() => {
             props.navigation.replace('Login');
         }).catch(error => {
-            console.log(error);
             Alert.alert("Error", "Something went wrong while logging out. Please try again later.");
         });
     }

@@ -1,5 +1,4 @@
 import {
-    Image,
     SafeAreaView, ScrollView,
     Text,
     View
@@ -16,7 +15,6 @@ import {
     getTrainingsTypes, getExercises, createTraining,
     validateForm, trimUserData
 } from "../services/TrainingsService";
-import * as ImagePicker from 'expo-image-picker';
 
 
 const CreateTrainingScreen = () => {
@@ -33,33 +31,6 @@ const CreateTrainingScreen = () => {
         media: '',
         exercises: [],
     });
-    const [image, setImage] = useState(null);
-
-    useEffect(() => {
-        (async () => {
-          if (Platform.OS !== 'web') {
-            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-            if (status !== 'granted') {
-              alert('Permiso denegado para acceder a la galería');
-            }
-          }
-        })();
-      }, []);
-
-    const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.canceled) {
-        setImage(result.uri);
-    }
-    };
 
     const handleError = (error, input) => {
         setErrors(prevState => ({...prevState, [input]: error}));
