@@ -184,8 +184,6 @@ const TrainingsScreen = () => {
 
     const updateTraining = async (index) => {
         const copyTraining = {tittle: trainings[index].tittle, description: trainings[index].description, media: trainings[index].media};
-        let userId = await AsyncStorage.getItem('@fiufit_userId');
-
     
         const token = await AsyncStorage.getItem('@fiufit_token');
         try {
