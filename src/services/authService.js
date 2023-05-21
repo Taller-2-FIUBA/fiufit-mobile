@@ -1,6 +1,5 @@
 import {axiosInstance} from "./config/axiosConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {StatusCodes} from "http-status-codes";
 import requests from "../consts/requests";
 
 const authService = {
@@ -13,7 +12,6 @@ const authService = {
             await AsyncStorage.setItem('@fiufit_userId', userId);
             return response.data;
         } catch (error) {
-            console.log("Error: " + error.message);
             throw new Error(error.response.status.toString());
         }
     },

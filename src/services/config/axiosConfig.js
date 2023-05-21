@@ -2,6 +2,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {StatusCodes} from "http-status-codes";
 import requests from "../../consts/requests";
+import Utils from "../../utils/Utils";
 
 let navigation;
 
@@ -32,9 +33,9 @@ axiosInstance.interceptors.response.use(
         return response;
     },
     async (error) => {
+        console.error(StatusCodes[error.response.status] + " " + error.response.status);
         if (error.response.status === StatusCodes.UNAUTHORIZED) {
-            await AsyncStorage.removeItem('@fiufit_token');
-            await AsyncStorage.removeItem('@fiufit_userId');
+            await Utils.handleUnauthorized(navigation);
         }
         return Promise.reject(error);
     }

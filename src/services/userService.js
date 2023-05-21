@@ -1,6 +1,5 @@
 import {axiosInstance} from "./config/axiosConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {StatusCodes} from "http-status-codes";
 import requests from "../consts/requests";
 
 export const UserService = {
@@ -10,7 +9,7 @@ export const UserService = {
             const response = await axiosInstance.get(`${requests.USER}/${userId}`);
             return response.data;
         } catch (error) {
-            throw new Error(StatusCodes[error.response.status] + " " + error.response.status);
+            throw new Error(error.response.status.toString());
         }
     },
 
@@ -20,7 +19,7 @@ export const UserService = {
             const response = await axiosInstance.patch(`${requests.USER}/${userId}`, user);
             return response.data;
         } catch (error) {
-            throw new Error(StatusCodes[error.response.status] + " " + error.response.status);
+            throw new Error(error.response.status.toString());
         }
     },
 

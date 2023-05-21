@@ -247,4 +247,16 @@ export const fiufitStyles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
       },
+    imagePickerButton: {
+        backgroundColor: primaryColor,
+        borderWidth: 1,
+        borderColor: tertiaryColor,
+        width: 100,
+        height: 50,
+        alignSelf: 'center',
+        justifyContent: 'center',
+        marginTop: 12,
+        borderRadius: 50,
+        marginRight: 15,
+    }
 })
