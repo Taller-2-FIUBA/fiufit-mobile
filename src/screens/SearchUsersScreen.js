@@ -15,7 +15,6 @@ const SearchUsersScreen = () => {
   const onChangeSearch = query => setSearchQuery(query);
 
   const handleSearch= async () => {
-    console.log("searchQuery: ", searchQuery);
     const response = await UserService.getUserByUsername(searchQuery);
     setUsersSearch(response)
     if (Object.keys(response).length === 0) {

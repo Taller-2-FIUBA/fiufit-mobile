@@ -24,7 +24,6 @@ const SearchTrainingsScreen = () => {
 
   const handleSearch= async () => {
     const response = await getTrainingByTypeAndDifficulty(trainingType, trainingDifficulty);
-    console.log("response trainings search: ", response);
     setTrainings(response.items);
     setNotFound(response?.items?.length === 0);
   };

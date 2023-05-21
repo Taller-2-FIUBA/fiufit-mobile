@@ -138,7 +138,6 @@ const TrainingsScreen = () => {
             console.log("Fetching trainings...");
             const trainer_id = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
             const response = await getTrainingsByTrainerId(trainer_id);
-            console.log("Trainings: ", response);
             setTrainings(response);
         };
     
@@ -187,12 +186,8 @@ const TrainingsScreen = () => {
         const copyTraining = {tittle: trainings[index].tittle, description: trainings[index].description, media: trainings[index].media};
         let userId = await AsyncStorage.getItem('@fiufit_userId');
 
-        console.log('userId:', userId);
-        console.log('Training to update:', copyTraining);
     
         const token = await AsyncStorage.getItem('@fiufit_token');
-        console.log('token:', token);
-        console.log(`${requests.BASE_URL}${requests.TRAINING}/${trainings[index].id}`);
         try {
             const response = await axios.patch(`${requests.BASE_URL}${requests.TRAINING}/${trainings[index].id}`, JSON.stringify(copyTraining),
             {
@@ -201,7 +196,6 @@ const TrainingsScreen = () => {
                   'Authorization': `Bearer ${token}`,
                 }
               });
-            console.log('Updated training:', response);
             ToastAndroid.show("Training updated successfully", ToastAndroid.SHORT);
             setEditable(false);
             return response.data;
