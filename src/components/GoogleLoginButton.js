@@ -14,7 +14,9 @@ const GoogleLoginButton = ({navigation}) => {
     });
 
     useEffect(() => {
-        handleSignInWithGoogle().then(r => {console.log(r)});
+        handleSignInWithGoogle().then(r => {
+            console.log(r)
+        });
     }, [response]);
 
     const handleSignInWithGoogle = async () => {
@@ -39,7 +41,7 @@ const GoogleLoginButton = ({navigation}) => {
         }
         try {
             const response = await fetch('https://www.googleapis.com/userinfo/v2/me', {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: {Authorization: `Bearer ${token}`},
             });
             const user = await response.json();
             setUserInfo(user);
@@ -51,7 +53,7 @@ const GoogleLoginButton = ({navigation}) => {
 
     return (
         <Button
-            style={fiufitStyles.googleButon}
+            style={fiufitStyles.googleButton}
             icon="google"
             mode="contained"
             textColor={theme.colors.secondary}

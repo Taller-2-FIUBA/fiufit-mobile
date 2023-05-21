@@ -22,6 +22,13 @@ app.
 You can now make changes to the code and after saving, the app will be reloaded
 automatically on your phone.
 
+### Google login
+In order to use the Google login, you will need to run the app on an emulator
+using the following command:
+```
+npx expo run:android
+```
+
 ### Testing with jest
 In order to test the app with jest, run the following command on your terminal:
 ```
