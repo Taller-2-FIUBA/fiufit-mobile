@@ -224,13 +224,16 @@ export const fiufitStyles = StyleSheet.create({
         backgroundColor: tertiaryColor,
         borderRadius: 10
     },
-    googleButon: {
+    imagePickerButton: {
         backgroundColor: primaryColor,
-        marginVertical: 10,
-        height: 55,
-        justifyContent: 'center',
-        borderRadius: 10,
+        borderWidth: 1,
         borderColor: tertiaryColor,
-        borderWidth: 2,
+        width: 100,
+        height: 50,
+        alignSelf: 'center',
+        justifyContent: 'center',
+        marginTop: 12,
+        borderRadius: 50,
+        marginRight: 15,
     }
 })

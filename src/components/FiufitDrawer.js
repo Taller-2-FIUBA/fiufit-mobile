@@ -17,8 +17,7 @@ const FiufitDrawer = (props) => {
     useEffect(() => {
         userService.getUser().then((profile) => {
             setUserData(profile);
-        }).catch((error) => {
-            console.log(error);
+        }).catch(() => {
             Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
         });
     }, []);
