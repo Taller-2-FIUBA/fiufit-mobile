@@ -8,9 +8,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {StatusCodes} from "http-status-codes";
 import {UserService} from "../services/userService";
 import {axiosInstance} from "./config/axiosConfig";
-import {
-    ToastAndroid
-} from "react-native";
 const createTraining = async (training) => {
     training.exercises = training.exercises.filter(exercise => Object.keys(exercise).length !== 0);
     let userId = await AsyncStorage.getItem('@fiufit_userId');
@@ -27,7 +24,6 @@ const createTraining = async (training) => {
               'Authorization': `Bearer ${token}`,
             }
           });
-        ToastAndroid.show("Training created successfully", ToastAndroid.SHORT);
         return response.data;
     } catch (error) {
         console.log(error);

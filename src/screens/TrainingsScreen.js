@@ -1,10 +1,9 @@
 import axios from "axios";
 import {
-    SafeAreaView, ScrollView,
+    ScrollView,
     Text,
     TextInput,
     View,
-    ToastAndroid,
     TouchableOpacity,
 } from 'react-native'
 import React, {useEffect, useState} from "react";
@@ -16,7 +15,6 @@ import {Picker} from '@react-native-picker/picker';
 import {
     getTrainingsTypes, getExercises, getTrainingsByTrainerId, validateForm, trimUserData
 } from "../services/TrainingsService";
-import ExerciseInput from "../components/ExerciseInput";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
 
@@ -44,6 +42,15 @@ const TrainingsScreen = () => {
     };
 
     const [trainings, setTrainings] = useState([]);
+
+    // Dialog
+    const [visible, setVisible] = useState(false);
+    const [dialogTitle, setDialogTitle] = useState('');
+    const [dialogContent, setDialogContent] = useState('');
+    const [dialogIsOk, setDialogIsOk] = useState(false);
+
+    const showDialog = () => setVisible(true);
+    const hideDialog = () => setVisible(false);
 
     /* const [trainings, setTrainings] = useState([
         {
