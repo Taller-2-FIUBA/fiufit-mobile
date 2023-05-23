@@ -43,14 +43,15 @@ const LoginScreen = () => {
     }
 
     const handleLogin = () => {
-        if (validateInputs()) {
+        /* if (validateInputs()) {
             authService.login(inputs).then(() => {
                 navigation.navigate('Trainings');
             }).catch(error => {
                 console.log(error);
                 Alert.alert("Error logging in", "Something went wrong. Please try again.");
             });
-        }
+        } */
+        navigation.navigate('Trainings');
     }
 
     return (

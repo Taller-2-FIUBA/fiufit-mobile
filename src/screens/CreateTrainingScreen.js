@@ -1,4 +1,5 @@
 import {
+    Image,
     SafeAreaView, ScrollView,
     Text,
     View
@@ -22,15 +23,12 @@ const CreateTrainingScreen = () => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
 
-    const trainingTypes = [ "cardio", "arms", "legs", "chest"];
-    const exercises = [["walk", "km"], ["walk", "minute"], ["jumping jacks", "repetitions"]];
-
     const [training, setTraining] = useState({
         title: '',
         description: '',
         type: '',
         difficulty: 'easy',
-        media: '',
+        media: null,
         exercise: '',
     });
 
@@ -121,6 +119,15 @@ const CreateTrainingScreen = () => {
                                 );
                             })}
                         </Picker>
+                        {training.media &&
+                                    <Image source={{uri: training.media}}
+                                           style={{
+                                               width: 120,
+                                               height: 120,
+                                               marginTop: 10,
+                                               borderRadius: 5,
+                                           }}/>
+                                }
                         <Button onPress={handleCreate} title="Register"/>
                     </View>
                 </ScrollView>
