@@ -43,9 +43,9 @@ const TrainingsScreen = () => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
 
-    const [trainings, setTrainings] = useState([]);
-
-    /* const [trainings, setTrainings] = useState([
+/*     const [trainings, setTrainings] = useState([]);
+ */
+    const [trainings, setTrainings] = useState([
         {
             trainer_id: "Ju6JXm1S8rVQf7C18mqL418JdgE2",
             tittle: "Super arms",
@@ -121,7 +121,7 @@ const TrainingsScreen = () => {
             rating: 0,
             blocked: false
         }
-    ]); */
+    ]);
 
     useEffect(() => {
         const fetchTrainingTypes = async () => {
@@ -133,7 +133,7 @@ const TrainingsScreen = () => {
         fetchTrainingTypes();
     }, []);
 
-    useEffect(() => {
+    /* useEffect(() => {
         const fetchGetTrainingsByTrainerId = async () => {
             console.log("Fetching trainings...");
             const trainer_id = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
@@ -142,7 +142,7 @@ const TrainingsScreen = () => {
         };
     
         fetchGetTrainingsByTrainerId();
-    }, []);
+    }, []); */
 
     const [expandedList, setExpandedList] = useState(trainings && trainings.map(() => false));
 

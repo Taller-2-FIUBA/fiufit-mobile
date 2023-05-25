@@ -4,11 +4,15 @@ import {
     Text,
     View
 } from 'react-native'
+import {
+    Button as PapperButton,
+    FAB,
+} from "react-native-paper";
 import {Picker} from '@react-native-picker/picker';
 import {useNavigation} from "@react-navigation/native";
 import React, {useEffect, useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {primaryColor, tertiaryColor} from "../consts/colors";
+import {primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
 import Button from "../components/Button";
 import TrainingInput from "../components/TrainingInput";
 import ExerciseInput from "../components/ExerciseInput";
@@ -16,6 +20,8 @@ import {
     getTrainingsTypes, getExercises, createTraining,
     validateForm, trimUserData
 } from "../services/TrainingsService";
+import * as ImagePicker from "expo-image-picker";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 
 const CreateTrainingScreen = () => {
@@ -29,7 +35,7 @@ const CreateTrainingScreen = () => {
         description: '',
         type: '',
         difficulty: 'Easy',
-        media: '',
+        media: null,
         exercises: [],
     });
 
@@ -68,26 +74,25 @@ const CreateTrainingScreen = () => {
         }
     };
 
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            training.media = result.assets[0].uri;
+        }
+    };
+
     const handleExerciseInputChange = (exercise, index, key, value) => {
         const updatedExercises = [...training.exercises];
         updatedExercises[index][key] = parseInt(value);
         updatedExercises[index]['name'] = exercise.name;
         updatedExercises[index]['type'] = exercise.type;
         setTraining(prevState => ({...prevState, exercises: updatedExercises}));
-    };
-
-    const addExercise = (exercise) => {
-        setTraining(prevState => ({
-            ...prevState,
-            exercises: [...prevState.exercises, exercise],
-        }));
-    };
-
-    const removeExercise = (index) => {
-        setTraining(prevState => ({
-            ...prevState,
-            exercises: prevState.exercises.filter((_, i) => i !== index),
-        }));
     };
 
     const handleCreate = () => {
@@ -151,12 +156,6 @@ const CreateTrainingScreen = () => {
                             <Picker.Item label="Medium" value="Medium" />
                             <Picker.Item label="Hard" value="Hard" />
                         </Picker>
-                        <TrainingInput
-                            label="Media"
-                            placeholder="Enter media link"
-                            value={training.media}
-                            onChangeText={text => handleInputChange('media', text)}
-                        />
                         {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                             <Button tittle="Seleccionar imagen" onPress={pickImage} />
                             {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
@@ -197,6 +196,21 @@ const CreateTrainingScreen = () => {
                                                borderRadius: 5,
                                            }}/>
                                 }
+                        <View>
+                            <Text style={{
+                                color: tertiaryColor,
+                                marginBottom: -7,
+                                marginTop: 10,
+                            }}>Image (optional)</Text>
+                            <PapperButton onPress={pickImage}
+                                    style={fiufitStyles.imagePickerButton}>
+                                <Icon name={"camera"} style={{
+                                    fontSize: 22,
+                                    color: secondaryColor,
+                                    marginRight: 10,
+                                }}/>
+                            </PapperButton>
+                        </View>
                         <Button onPress={handleCreate} title="Register"/>
                     </View>
                 </ScrollView>
