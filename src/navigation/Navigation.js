@@ -191,10 +191,10 @@ const BottomTabNavigator = () => {
     );
 };
 
-const RegistrationStackNavigator = () => {
+const RegistrationStackNavigator = (props) => {
     const theme = useTheme();
     const [userData, setUserData] = useState({
-        email: '',
+        email: props.route.params?.email,
         password: '',
         name: '',
         surname: '',
@@ -209,7 +209,7 @@ const RegistrationStackNavigator = () => {
 
     return (
         <UserDataContext.Provider value={{userData: userData, setUserData: setUserData}}>
-            <Stack.Navigator>
+            <Stack.Navigator initialRouteName={userData.email ? "UserData" : "SignUp"}>
                 <Stack.Screen name={"SignUp"} component={SignUpScreen}
                               options={{
                                   headerShown: false,

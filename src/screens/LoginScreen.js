@@ -48,7 +48,7 @@ const LoginScreen = () => {
             authService.login(inputs).then(() => {
                 navigation.navigate('Trainings');
             }).catch(error => {
-                console.log(error);
+                console.log(error.message);
                 Alert.alert("Error logging in", "Something went wrong. Please try again.");
             });
         }
@@ -86,7 +86,7 @@ const LoginScreen = () => {
                         error={errors.password}
                     />
                     <Button onPress={handleLogin} title="Login"/>
-                    <GoogleLoginButton/>
+                    <GoogleLoginButton navigation={navigation}/>
                     <Text
                         onPress={() => navigation.navigate('Registration')}
                         style={fiufitStyles.haveAccount}>Do not have an account? Sign up</Text>

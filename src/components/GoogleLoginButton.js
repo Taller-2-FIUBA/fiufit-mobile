@@ -9,45 +9,75 @@ import {ANDROID_CLIENT_ID} from '@env';
 const GoogleLoginButton = ({navigation}) => {
     const theme = useTheme();
     const [userInfo, setUserInfo] = useState(null);
+    const [token, setToken] = useState(null);
     const [request, response, promptAsync] = Google.useAuthRequest({
         androidClientId: process.env.ANDROID_CLIENT_ID
     });
 
     useEffect(() => {
-        handleSignInWithGoogle().then(r => {
-            console.log(r)
-        });
-    }, [response]);
+        handleGetUserInfo();
+    }, [response, token]);
 
-    const handleSignInWithGoogle = async () => {
-        if (response?.type === 'success') {
-            await getUserInfo(response.authentication.accessToken);
-            authService.loginWithGoogle(userInfo.email, response.authentication.accessToken).then(() => {
-                console.log("logged in with google");
-                navigation.replace('Trainings');
-            }).catch(error => {
-                if (error.message && error.message === "No IDP user with such an email") {
-                    navigation.replace('Register');  // TODO: Pasar el email con un contexto
-                }
-                console.log(error);
+    useEffect(() => {
+        handleLogin()
+            .catch(error => {
+                console.log(error.message);
                 Alert.alert("Error logging in", "Something went wrong. Please try again.");
-            });
+            })
+    }, [userInfo]);
+
+    const handleGetUserInfo = () => {
+        if (response?.type === 'success') {
+            setToken(response.authentication.accessToken);
+            getUserInfo(token)
+                .catch(error => {
+                    console.log(error.message);
+                    Alert.alert("Error logging in", "Something went wrong. Please try again.");
+                });
         }
     }
 
     const getUserInfo = async (token) => {
-        if (!token) {
-            return;
-        }
+        if (!token) return;
         try {
             const response = await fetch('https://www.googleapis.com/userinfo/v2/me', {
                 headers: {Authorization: `Bearer ${token}`},
             });
-            const user = await response.json();
-            setUserInfo(user);
-            console.log(JSON.stringify(user));
+            setUserInfo(await response.json());
         } catch (e) {
             console.log(e);
+        }
+    }
+
+    const handleLogin = async () => {
+        if (userInfo) {
+            authService.loginWithGoogle(userInfo.email, token)
+                .then(r => {
+                    console.log("Logged in with Google: ", r);
+                    navigation.replace('Trainings');
+                })
+                .catch(error => {
+                    if (error?.message === "Should register IDP user") {
+                        handleRegister();
+                    } else {
+                        console.log(error.message);
+                        Alert.alert("Error logging in", "Something went wrong. Please try again.");
+                    }
+                });
+        }
+    }
+
+    const handleRegister = async () => {
+        if (userInfo) {
+            authService.registerWithGoogle(userInfo.email, token)
+                .then(() => {
+                    console.log("Registered with Google");
+                    navigation.replace('Trainings');
+                })
+                .catch(error => {
+                    console.log(error.message);
+                    Alert.alert("Error signing up", "Something went wrong. Please try again.");
+                });
         }
     }
 
@@ -57,9 +87,8 @@ const GoogleLoginButton = ({navigation}) => {
             icon="google"
             mode="contained"
             textColor={theme.colors.secondary}
-            onPress={() => {
-                promptAsync().then(() => {
-                });
+            onPress={async () => {
+                await promptAsync();
             }}
             disabled={!request}
         >

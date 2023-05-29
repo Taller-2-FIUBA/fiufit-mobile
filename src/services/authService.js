@@ -1,37 +1,31 @@
 import {axiosInstance} from "./config/axiosConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
+import axios from "axios";
 
 const authService = {
-    storeSensitiveData: async function (response) {
+    _storeSensitiveData: async function (response) {
         const token = response.data.token;
         const userId = response.data.id;
         await AsyncStorage.setItem('@fiufit_token', token);
         await AsyncStorage.setItem('@fiufit_userId', userId);
     },
 
-    async login(user) {
-        try {
-            const response = await axiosInstance.post(requests.LOGIN, user);
-            await this.storeSensitiveData(response);
-            return response.data;
-        } catch (error) {
-            throw new Error(error.response.status.toString());
+    _handleError: function (error) {
+        if (error.response?.data.detail) {
+            throw new Error(error.response.data.detail);
+        } else {
+            throw new Error(error.response.status + " " + error.response.statusText);
         }
     },
 
-    async loginWithGoogle(user, googleToken) {
+    async login(user) {
         try {
-            axiosInstance.headers.Authorization = `${googleToken}`;
-            const response = await axiosInstance.post(requests.GOOGLE_LOGIN, user);
-            await this.storeSensitiveData(response);
+            const response = await axiosInstance.post(requests.LOGIN, user);
+            await this._storeSensitiveData(response);
             return response.data;
         } catch (error) {
-            if (error.response.data.message()) {
-                throw new Error(error.response.data.message());
-            } else {
-                throw new Error(StatusCodes[error.response.status] + " " + error.response.status);
-            }
+            this._handleError(error);
         }
     },
 
@@ -40,17 +34,39 @@ const authService = {
             const response = await axiosInstance.post(requests.SIGNUP, user);
             return response.data;
         } catch (error) {
-            throw new Error(error.response.status.toString());
+            this._handleError(error);
         }
     },
 
-    async registerWithGoogle(user, googleToken) {
+    async loginWithGoogle(userEmail, googleToken) {
         try {
-            axiosInstance.headers.Authorization = `${googleToken}`;
-            await axiosInstance.post(requests.GOOGLE_SIGNUP, user);
-            await this.loginWithGoogle(user.email, googleToken);
+            const response = await axios.post(`${requests.BASE_URL}${requests.GOOGLE_LOGIN}`,
+                {email: userEmail},
+                {
+                    headers: {Authorization: googleToken}
+                });
+            await this._storeSensitiveData(response);
+            return response?.data;
         } catch (error) {
-            throw new Error(StatusCodes[error.response.status] + " " + error.response.status);
+            if (error.response?.data?.detail.message === "No IDP user with such an email") {
+                throw new Error("Should register IDP user");
+            } else {
+                this._handleError(error);
+            }
+        }
+    },
+
+    async registerWithGoogle(userEmail, googleToken) {
+        try {
+            const response = await axios.post(`${requests.BASE_URL}${requests.GOOGLE_SIGNUP}`,
+                {email: userEmail},
+                {
+                    headers: {Authorization: googleToken}
+                });
+            await this._storeSensitiveData(response);
+            return response?.data;
+        } catch (error) {
+            this._handleError(error);
         }
     },
 

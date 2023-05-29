@@ -20,6 +20,10 @@ const UserDataScreen = ({navigation}) => {
     const {userData, setUserData} = useContext(UserDataContext);
     const [errors, setErrors] = useState({});
 
+    useEffect(() => {
+        console.log(JSON.stringify(userData, null, 2));
+    }, [userData]);
+
     const handleError = (error, input) => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
