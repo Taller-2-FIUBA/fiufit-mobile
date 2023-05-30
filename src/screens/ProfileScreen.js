@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert} from 'react-native';
 import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from "../consts/colors";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import userService from "../services/userService";
+import {UserService} from "../services/userService";
 
 
 const ProfileItem = ({iconName, value, editable, onChange}) => {
@@ -39,6 +39,7 @@ const ProfileScreen = () => {
     const [userProfile, setUserProfile] = useState({
         name: '',
         surname: '',
+        userName: '',
         email: '',
         location: '',
         height: undefined,
@@ -51,7 +52,7 @@ const ProfileScreen = () => {
     useEffect(() => {
         console.log("Fetching user profile...");
         setLoading(true);
-        userService.getUser().then((profile) => {
+        UserService.getUser().then((profile) => {
             setLoading(false);
             setUserProfile(profile);
         }).catch((error) => {
@@ -63,10 +64,9 @@ const ProfileScreen = () => {
 
 
     const updateProfile = () => {
-        console.log("Update profile: ", userProfile);
         let copyProfile = {...userProfile};
         delete copyProfile.email
-        userService.updateUser(copyProfile).then((profile) => {
+        UserService.updateUser(copyProfile).then((profile) => {
             setUserProfile(profile);
         }).catch((error) => {
             console.log(error);

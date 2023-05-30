@@ -3,7 +3,7 @@ import {primaryColor} from "../consts/colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import {useNavigation} from "@react-navigation/native";
-import {useContext, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {validateEmail, validatePassword} from "../utils/validations";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import UserDataContext from "../contexts/userDataContext";

@@ -1,10 +1,12 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import TrainingsScreen from "../screens/TrainingsScreen";
 import LoginScreen from "../screens/LoginScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import UserDataScreen from "../screens/UserDataScreen";
-import SearchScreen from "../screens/SearchScreen";
+import SearchUsersScreen from "../screens/SearchUsersScreen";
+import SearchTrainingsScreen from "../screens/SearchTrainingsScreen";
 import UserBiologicsScreen from "../screens/UserBiologicsScreen";
 import {Avatar, BottomNavigation, useTheme} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -13,17 +15,20 @@ import {CommonActions, DrawerActions, useNavigation} from "@react-navigation/nat
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import FiufitDrawer from "../components/FiufitDrawer";
 import ProfileScreen from "../screens/ProfileScreen";
+import ProfilePublicScreen from "../screens/ProfilePublicScreen";
 import GoalsScreen from "../screens/GoalsScreen";
 import {Alert, TouchableOpacity} from "react-native";
 import ChatScreen from "../screens/ChatScreen";
 import InitialScreen from "../screens/InitialScreen";
 import {useEffect, useState} from "react";
-import userService from "../services/userService";
+import { UserService } from "../services/userService";
 import UserDataContext from "../contexts/userDataContext";
+import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from "../consts/colors";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+const TopTab = createMaterialTopTabNavigator();
 
 const AuthStack = () => {
     const theme = useTheme();
@@ -34,7 +39,7 @@ const AuthStack = () => {
     });
 
     useEffect(() => {
-        userService.getUser().then((profile) => {
+        UserService.getUser().then((profile) => {
             setUserData(profile);
         }).catch((error) => {
             console.log(error);
@@ -238,6 +243,16 @@ const RegistrationStackNavigator = () => {
     );
 }
 
+
+const TabsNavigation = () => {
+  return (
+    <TopTab.Navigator>
+      <TopTab.Screen name="Users" component={SearchUsersScreen} />
+      <TopTab.Screen name="Trainings" component={SearchTrainingsScreen} />
+    </TopTab.Navigator>
+  );
+};
+
 const MainStackNavigator = () => {
     const theme = useTheme();
 
@@ -258,7 +273,7 @@ const MainStackNavigator = () => {
                               headerShown: false,
                               statusBarColor: theme.colors.primary
                           }}/>
-            <Stack.Screen name="Search" component={SearchScreen}
+            <Stack.Screen name="Search" component={TabsNavigation}
                           options={{
                               headerStyle: {
                                   backgroundColor: theme.colors.background,
@@ -266,12 +281,25 @@ const MainStackNavigator = () => {
                               headerTintColor: theme.colors.tertiary,
                               statusBarColor: theme.colors.background,
                           }}/>
+           {/*  <Stack.Screen name="SearchResult" component={TabsNavigation}
+                            options={{
+                                headerStyle: {
+                                    backgroundColor: theme.colors.background,
+                                },
+                                headerTintColor: theme.colors.tertiary,
+                                statusBarColor: theme.colors.background,
+            }}/> */}
             <Stack.Screen name="Trainings" component={AuthStack}
                           options={{
                               headerShown: false,
                               statusBarColor: theme.colors.background,
                           }}/>
             <Stack.Screen name="CreateTraining" component={CreateTrainingScreen}
+                          options={{
+                              headerShown: false,
+                              statusBarColor: theme.colors.background,
+                          }}/>
+            <Stack.Screen name="ProfilePublic" component={ProfilePublicScreen}
                           options={{
                               headerShown: false,
                               statusBarColor: theme.colors.background,

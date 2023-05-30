@@ -1,13 +1,17 @@
 import {axiosInstance} from "./config/axiosConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
+import axios from "axios";
+
 
 const authService = {
     async login(user) {
         try {
-            const response = await axiosInstance.post(requests.LOGIN, user);
+            //const response = await axiosInstance.post(requests.LOGIN, user);
+            const response = await axios.post(requests.BASE_URL+requests.LOGIN, user);
             const token = response.data.token;
-            const userId = response.data.id;
+            const userId = response.data.id.toString();
+
             await AsyncStorage.setItem('@fiufit_token', token);
             await AsyncStorage.setItem('@fiufit_userId', userId);
             return response.data;

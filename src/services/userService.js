@@ -2,7 +2,7 @@ import {axiosInstance} from "./config/axiosConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
 
-const UserService = {
+export const UserService = {
     async getUser() {
         try {
             let userId = await AsyncStorage.getItem('@fiufit_userId');
@@ -21,7 +21,14 @@ const UserService = {
         } catch (error) {
             throw new Error(error.response.status.toString());
         }
+    },
+
+    async getUserByUsername(username) {
+        try {
+            const response = await axiosInstance.get(`${requests.USER}?username=${username}`);
+            return response.data;
+        } catch (error) {
+            return {};
+        }
     }
 }
-
-export default UserService;
