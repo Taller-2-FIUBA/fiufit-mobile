@@ -24,6 +24,7 @@ import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 
+
 const CreateTrainingScreen = () => {
     const navigation = useNavigation();
     const [errors, setErrors] = useState({});

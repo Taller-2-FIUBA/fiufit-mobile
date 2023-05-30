@@ -21,6 +21,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
+import ExerciseInput from "../components/ExerciseInput";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import requests from "../consts/requests";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
