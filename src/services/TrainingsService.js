@@ -11,6 +11,8 @@ import {axiosInstance} from "./config/axiosConfig";
 import {
     ToastAndroid
 } from "react-native";
+import { encode } from 'base-64';
+
 const createTraining = async (training) => {
     training.exercises = training.exercises.filter(exercise => Object.keys(exercise).length !== 0);
     let userId = await AsyncStorage.getItem('@fiufit_userId');
@@ -19,6 +21,9 @@ const createTraining = async (training) => {
     const user = UserService.getUser();
     const token = await AsyncStorage.getItem('@fiufit_token');
 
+    training.media = training.media ? encode(training.media) : null;
+
+    console.log('training media: ', training.media);
     try {
         const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
         {

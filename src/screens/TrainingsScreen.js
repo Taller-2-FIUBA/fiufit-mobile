@@ -1,6 +1,7 @@
 import axios from "axios";
 import {
-    SafeAreaView, ScrollView,
+    Image,
+    ScrollView,
     Text,
     TextInput,
     View,
@@ -16,9 +17,10 @@ import {Picker} from '@react-native-picker/picker';
 import {
     getTrainingsTypes, getExercises, getTrainingsByTrainerId, validateForm, trimUserData
 } from "../services/TrainingsService";
-import ExerciseInput from "../components/ExerciseInput";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -43,9 +45,9 @@ const TrainingsScreen = () => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
 
-/*     const [trainings, setTrainings] = useState([]);
- */
-    const [trainings, setTrainings] = useState([
+    const [trainings, setTrainings] = useState([]);
+
+    /* const [trainings, setTrainings] = useState([
         {
             trainer_id: "Ju6JXm1S8rVQf7C18mqL418JdgE2",
             tittle: "Super arms",
@@ -121,7 +123,7 @@ const TrainingsScreen = () => {
             rating: 0,
             blocked: false
         }
-    ]);
+    ]); */
 
     useEffect(() => {
         const fetchTrainingTypes = async () => {
@@ -133,7 +135,7 @@ const TrainingsScreen = () => {
         fetchTrainingTypes();
     }, []);
 
-    /* useEffect(() => {
+    useEffect(() => {
         const fetchGetTrainingsByTrainerId = async () => {
             console.log("Fetching trainings...");
             const trainer_id = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
@@ -142,7 +144,7 @@ const TrainingsScreen = () => {
         };
     
         fetchGetTrainingsByTrainerId();
-    }, []); */
+    }, []);
 
     const [expandedList, setExpandedList] = useState(trainings && trainings.map(() => false));
 
@@ -181,6 +183,19 @@ const TrainingsScreen = () => {
     const handleNext = () => {
         navigation.navigate('CreateTraining');
     }
+
+    const pickImage = async (index) => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            handleInputChange(index, "media", result.assets[0].uri);
+        }
+    };
 
     const updateTraining = async (index) => {
         const copyTraining = {tittle: trainings[index].tittle, description: trainings[index].description, media: trainings[index].media};
@@ -327,6 +342,31 @@ const TrainingsScreen = () => {
                         </View>
                         ))}
                     </View>
+                    {editable && training.media &&
+                            <Image source={{uri: training.media}}
+                                    style={{
+                                        width: 120,
+                                        height: 120,
+                                        marginTop: 10,
+                                        borderRadius: 5,
+                                    }}/>
+                        }
+                    {editable && <View>
+                            <Text style={{
+                                color: tertiaryColor,
+                                marginBottom: -7,
+                                marginTop: 10,
+                            }}>Image (optional)</Text>
+                            <PapperButton onPress={() => pickImage(index)}
+                                    style={fiufitStyles.imagePickerButton}>
+                                <Icon name={"camera"} style={{
+                                    fontSize: 22,
+                                    color: secondaryColor,
+                                    marginRight: 10,
+                                }}/>
+                            </PapperButton>
+                        </View>
+                    }
                     {!editable && 
                         <TouchableOpacity
                             style={fiufitStyles.editButton}

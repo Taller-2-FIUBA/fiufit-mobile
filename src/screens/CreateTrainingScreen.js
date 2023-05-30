@@ -84,6 +84,7 @@ const CreateTrainingScreen = () => {
 
         if (!result.canceled) {
             training.media = result.assets[0].uri;
+            console.log('training media first: ', result.assets[0]);
         }
     };
 
@@ -188,14 +189,14 @@ const CreateTrainingScreen = () => {
                             </View>
                         )}
                         {training.media &&
-                                    <Image source={{uri: training.media}}
-                                           style={{
-                                               width: 120,
-                                               height: 120,
-                                               marginTop: 10,
-                                               borderRadius: 5,
-                                           }}/>
-                                }
+                            <Image source={{uri: training.media}}
+                                    style={{
+                                        width: 120,
+                                        height: 120,
+                                        marginTop: 10,
+                                        borderRadius: 5,
+                                    }}/>
+                        }
                         <View>
                             <Text style={{
                                 color: tertiaryColor,
