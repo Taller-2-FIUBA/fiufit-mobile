@@ -43,8 +43,6 @@ const LoginScreen = () => {
     }
 
     const handleLogin = () => {
-/*         navigation.navigate('Trainings');
- */
         if (validateInputs()) {
             authService.login(inputs).then(() => {
                 navigation.navigate('Trainings');
