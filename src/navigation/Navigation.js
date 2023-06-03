@@ -15,6 +15,8 @@ import {CommonActions, DrawerActions, useNavigation} from "@react-navigation/nat
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import FiufitDrawer from "../components/FiufitDrawer";
 import ProfileScreen from "../screens/ProfileScreen";
+import FollowedsScreen from "../screens/FollowedsScreen";
+import FollowersScreen from "../screens/FollowersScreen";
 import ProfilePublicScreen from "../screens/ProfilePublicScreen";
 import GoalsScreen from "../screens/GoalsScreen";
 import {Alert, TouchableOpacity} from "react-native";
@@ -23,12 +25,13 @@ import InitialScreen from "../screens/InitialScreen";
 import {useEffect, useState} from "react";
 import { UserService } from "../services/userService";
 import UserDataContext from "../contexts/userDataContext";
-import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from "../consts/colors";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 const TopTab = createMaterialTopTabNavigator();
+const FollowsTopTab = createMaterialTopTabNavigator();
+
 
 const AuthStack = () => {
     const theme = useTheme();
@@ -253,6 +256,16 @@ const TabsNavigation = () => {
   );
 };
 
+const FollowTabsNavigation = ({ route }) => {
+    const { user } = route.params;
+    return (
+      <FollowsTopTab.Navigator>
+        <FollowsTopTab.Screen name="Following" component={FollowedsScreen} initialParams={{ user }}/>
+        <FollowsTopTab.Screen name="Followers" component={FollowersScreen} initialParams={{ user }}/>
+      </FollowsTopTab.Navigator>
+    );
+  };
+
 const MainStackNavigator = () => {
     const theme = useTheme();
 
@@ -281,14 +294,14 @@ const MainStackNavigator = () => {
                               headerTintColor: theme.colors.tertiary,
                               statusBarColor: theme.colors.background,
                           }}/>
-           {/*  <Stack.Screen name="SearchResult" component={TabsNavigation}
-                            options={{
-                                headerStyle: {
-                                    backgroundColor: theme.colors.background,
-                                },
-                                headerTintColor: theme.colors.tertiary,
-                                statusBarColor: theme.colors.background,
-            }}/> */}
+            <Stack.Screen name="FollowTabs" component={FollowTabsNavigation}
+                          options={{
+                              headerStyle: {
+                                  backgroundColor: theme.colors.background,
+                              },
+                              headerTintColor: theme.colors.tertiary,
+                              statusBarColor: theme.colors.background,
+                          }}/>
             <Stack.Screen name="Trainings" component={AuthStack}
                           options={{
                               headerShown: false,

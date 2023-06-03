@@ -3,6 +3,8 @@ import {View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Image, 
 import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from "../consts/colors";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {UserService} from "../services/userService";
+import {useNavigation} from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const ProfileItem = ({iconName, value, editable, onChange}) => {
@@ -36,14 +38,20 @@ const ProfileAvatar = ({userName, onChange}) => {
 
 
 const ProfileScreen = () => {
+    const navigation = useNavigation();
+
     const [userProfile, setUserProfile] = useState({
+        id: 0,
         name: '',
         surname: '',
         userName: '',
         email: '',
+        birth_date: '',
         location: '',
         height: undefined,
-        weight: undefined
+        weight: undefined,
+        is_athlete: false,
+        is_blocked: false,
     });
     const [loading, setLoading] = useState(true);
     const [editable, setEditable] = useState(false);
@@ -52,9 +60,14 @@ const ProfileScreen = () => {
     useEffect(() => {
         console.log("Fetching user profile...");
         setLoading(true);
-        UserService.getUser().then((profile) => {
+        UserService.getUser().then(async (profile) => {
+            const token = await AsyncStorage.getItem('@fiufit_token');
+
+            console.log("User profile: ", profile, 'token: ', token);
             setLoading(false);
             setUserProfile(profile);
+            console.log("User profile2: ", userProfile);
+
         }).catch((error) => {
             setLoading(false);
             setError(error);
@@ -96,6 +109,19 @@ const ProfileScreen = () => {
             <ProfileAvatar
                 userName={userProfile.name}
             />
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('FollowTabs', { user: userProfile })}
+            >
+                <Text style={styles.buttonText}>Following</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('FollowTabs', { user: userProfile })}
+            >
+                <Text style={styles.buttonText}>Followers</Text>
+            </TouchableOpacity>
             <ProfileItem
                 iconName="account"
                 value={userProfile.name}

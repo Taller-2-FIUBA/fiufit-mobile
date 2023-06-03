@@ -16,9 +16,12 @@ const SearchUsersScreen = () => {
 
   const handleSearch= async () => {
     const response = await UserService.getUserByUsername(searchQuery);
-    setUsersSearch(response)
+    console.log('getUserByUsername response: ', response);
     if (Object.keys(response).length === 0) {
         setNotFound(true);
+    } else {
+      response['username'] = searchQuery;
+      setUsersSearch(response)
     }
   };
 
@@ -33,9 +36,9 @@ const SearchUsersScreen = () => {
         />
         {usersSearch && (
             <TouchableOpacity
-            style={fiufitStyles.userContainer}
-            onPress={() => navigation.navigate("ProfilePublic", {user: usersSearch})}>
-                <Text style={fiufitStyles.userName}>{usersSearch.username}</Text>
+              style={fiufitStyles.userContainer}
+              onPress={() => navigation.navigate("ProfilePublic", {user: usersSearch})}>
+                  <Text style={fiufitStyles.userName}>{usersSearch.username}</Text>
             </TouchableOpacity>
         )}
         {notFound && (
