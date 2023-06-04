@@ -15,7 +15,6 @@ const authService = {
             await AsyncStorage.setItem('@fiufit_userId', userId);
             return response.data;
         } catch (error) {
-            console.log('error: ', error);
             throw new Error(error.response.status.toString());
         }
     },

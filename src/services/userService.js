@@ -30,5 +30,45 @@ export const UserService = {
         } catch (error) {
             return {};
         }
-    }
+    },
+
+    async getFolloweds(userId) {
+        try {
+            console.log('Fetching followeds for user: ', userId);
+            const response = await axiosInstance.get(`${requests.USER}/${userId}/followed`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.status.toString());
+        }
+    },
+
+    async getFollowers(userId) {
+        try {
+            console.log('Fetching followers for user: ', userId);
+            const response = await axiosInstance.get(`${requests.USER}/${userId}/followers`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.status.toString());
+        }
+    },
+
+    async followUser(userId, followedId) {
+        try {
+            console.log('Follow user with id: ', followedId);
+            const response = await axiosInstance.post(`${requests.USER}/${userId}/followed/${followedId}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.status.toString());
+        }
+    },
+
+    async deleteFollowed(userId, followedId) {
+        try {
+            console.log('Delete follow user with id: ', followedId);
+            const response = await axiosInstance.delete(`${requests.USER}/${userId}/followed/${followedId}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.status.toString());
+        }
+    },
 }

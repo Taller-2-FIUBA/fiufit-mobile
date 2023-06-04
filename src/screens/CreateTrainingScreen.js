@@ -46,7 +46,6 @@ const CreateTrainingScreen = () => {
 
     useEffect(() => {
         const fetchTrainingTypes = async () => {
-            console.log("Fetching trainings types...");
             const response = await getTrainingsTypes();
             setTrainingTypes(response);
         };
@@ -56,7 +55,6 @@ const CreateTrainingScreen = () => {
 
     useEffect(() => {
         const fetchExercises = async () => {
-            console.log("Fetching exercises...");
             const response = await getExercises();
             setTrainingExercises(response);
         };
@@ -85,7 +83,6 @@ const CreateTrainingScreen = () => {
 
         if (!result.canceled) {
             training.media = result.assets[0].uri;
-            console.log('training media first: ', result.assets[0]);
         }
     };
 

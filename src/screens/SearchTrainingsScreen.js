@@ -30,7 +30,6 @@ const SearchTrainingsScreen = () => {
 
   useEffect(() => {
     const fetchTrainingTypes = async () => {
-    console.log("Fetching trainings types...");
     const response = await getTrainingsTypes();
     setTrainingTypes(response);
     };

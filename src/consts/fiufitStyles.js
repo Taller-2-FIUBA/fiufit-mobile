@@ -161,12 +161,13 @@ export const fiufitStyles = StyleSheet.create({
     },
     addTrainingButton: {
         position: 'absolute',
-        margin: 16,
+        marginBottom: 16,
         right: 0,
         bottom: 0,
         borderRadius: 30,
         backgroundColor: secondaryColor,
-        color: tertiaryColor
+        color: tertiaryColor,
+        alignSelf: 'flex-end',
     },
     editButton: {
         position: 'absolute',
