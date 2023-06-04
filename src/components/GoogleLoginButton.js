@@ -69,15 +69,7 @@ const GoogleLoginButton = ({navigation}) => {
 
     const handleRegister = async () => {
         if (userInfo) {
-            authService.registerWithGoogle(userInfo.email, token)
-                .then(() => {
-                    console.log("Registered with Google");
-                    navigation.replace('Trainings');
-                })
-                .catch(error => {
-                    console.log(error.message);
-                    Alert.alert("Error signing up", "Something went wrong. Please try again.");
-                });
+            navigation.replace('Registration', {email: userInfo.email, token: token});
         }
     }
 

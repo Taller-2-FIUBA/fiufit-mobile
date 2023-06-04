@@ -56,12 +56,15 @@ const authService = {
         }
     },
 
-    async registerWithGoogle(userEmail, googleToken) {
+    async registerWithGoogle(user) {
         try {
+            console.log(JSON.stringify(user, null, 2))
+            let google_token = user.google_token;
+            delete user.token;
             const response = await axios.post(`${requests.BASE_URL}${requests.GOOGLE_SIGNUP}`,
-                {email: userEmail},
+                user,
                 {
-                    headers: {Authorization: googleToken}
+                    headers: {Authorization: google_token}
                 });
             await this._storeSensitiveData(response);
             return response?.data;

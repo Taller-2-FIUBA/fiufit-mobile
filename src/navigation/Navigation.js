@@ -205,11 +205,12 @@ const RegistrationStackNavigator = (props) => {
         weight: 0,
         birth_date: '',
         registration_date: new Date().toISOString().split('T')[0],
+        google_token: props.route.params?.token
     });
 
     return (
         <UserDataContext.Provider value={{userData: userData, setUserData: setUserData}}>
-            <Stack.Navigator initialRouteName={userData.email ? "UserData" : "SignUp"}>
+            <Stack.Navigator initialRouteName={(userData.email && userData.google_token) ? "UserData" : "SignUp"}>
                 <Stack.Screen name={"SignUp"} component={SignUpScreen}
                               options={{
                                   headerShown: false,
