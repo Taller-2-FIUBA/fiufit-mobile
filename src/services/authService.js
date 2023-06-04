@@ -3,7 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
 import axios from "axios";
 
-
 const authService = {
     async login(user) {
         try {
@@ -16,6 +15,7 @@ const authService = {
             await AsyncStorage.setItem('@fiufit_userId', userId);
             return response.data;
         } catch (error) {
+            console.log('error: ', error);
             throw new Error(error.response.status.toString());
         }
     },
