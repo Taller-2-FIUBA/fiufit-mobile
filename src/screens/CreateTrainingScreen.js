@@ -155,11 +155,6 @@ const CreateTrainingScreen = () => {
                             <Picker.Item label="Medium" value="Medium" />
                             <Picker.Item label="Hard" value="Hard" />
                         </Picker>
-                        {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                            <Button tittle="Seleccionar imagen" onPress={pickImage} />
-                            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-                        </View> */}
-
                         {training.type && (
                             <View>
                                 <Text style={fiufitStyles.detailsText}>

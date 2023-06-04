@@ -17,12 +17,15 @@ const createTraining = async (training) => {
     training.exercises = training.exercises.filter(exercise => Object.keys(exercise).length !== 0);
     let userId = await AsyncStorage.getItem('@fiufit_userId');
 
-    training['trainer_id'] = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
+    //training['trainer_id'] = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
+    training['trainer_id'] = userId;
+
     const user = UserService.getUser();
     const token = await AsyncStorage.getItem('@fiufit_token');
 
     training.media = training.media ? encode(training.media) : null;
 
+    JSON.stringify(training)    
     try {
         const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
         {

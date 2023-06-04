@@ -7,6 +7,7 @@ export const UserService = {
         try {
             let userId = await AsyncStorage.getItem('@fiufit_userId');
             const response = await axiosInstance.get(`${requests.USER}/${userId}`);
+            console.log('USER: ' + JSON.stringify(response.data));
             return response.data;
         } catch (error) {
             throw new Error(error.response.status.toString());

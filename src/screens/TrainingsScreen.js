@@ -135,7 +135,8 @@ const TrainingsScreen = () => {
 
     useEffect(() => {
         const fetchGetTrainingsByTrainerId = async () => {
-            const trainer_id = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
+            let userId = await AsyncStorage.getItem('@fiufit_userId');
+            const trainer_id = userId;
             const response = await getTrainingsByTrainerId(trainer_id);
             setTrainings(response);
         };
