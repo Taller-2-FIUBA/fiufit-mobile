@@ -75,7 +75,7 @@ const SearchTrainingsScreen = () => {
       {trainings && trainings.length > 0 && trainings.map(training => (
         <View key={training.id} style={{ alignItems: "center", marginTop: 20 }}>
             <Text style={{padding: 10, backgroundColor: secondaryColor, color: tertiaryColor}}>{
-              training.tittle}
+              training.title}
             </Text>
         </View>
       ))

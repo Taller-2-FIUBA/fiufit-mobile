@@ -49,7 +49,7 @@ const TrainingsScreen = () => {
     /* const [trainings, setTrainings] = useState([
         {
             trainer_id: "Ju6JXm1S8rVQf7C18mqL418JdgE2",
-            tittle: "Super arms",
+            title: "Super arms",
             description: "training for arms",
             type: "Arm",
             difficulty: "Easy",
@@ -74,7 +74,7 @@ const TrainingsScreen = () => {
         },
         {
             trainer_id: "Ju6JXm1S8rVQf7C18mqL418JdgE2",
-            tittle: "Super arms 2",
+            title: "Super arms 2",
             description: "training for arms",
             type: "Arm",
             difficulty: "Easy",
@@ -99,7 +99,7 @@ const TrainingsScreen = () => {
         },
         {
             trainer_id: "Ju6JXm1S8rVQf7C18mqL418JdgE2",
-            tittle: "Super arms 3",
+            title: "Super arms 3",
             description: "training for arms",
             type: "Arm",
             difficulty: "Easy",
@@ -196,7 +196,7 @@ const TrainingsScreen = () => {
     };
 
     const updateTraining = async (index) => {
-        const copyTraining = {tittle: trainings[index].tittle, description: trainings[index].description, media: trainings[index].media};
+        const copyTraining = {title: trainings[index].title, description: trainings[index].description, media: trainings[index].media};
     
         const token = await AsyncStorage.getItem('@fiufit_token');
         try {
@@ -240,15 +240,15 @@ const TrainingsScreen = () => {
                     key={index}
                     style={fiufitStyles.trainingsList}
                     left={(props) => <List.Icon {...props} icon="bike" />}
-                    title={training.tittle}
+                    title={training.title}
                     titleStyle={{ color: primaryColor }}
                     expanded={expandedList[index]}
                     onPress={() => handlePress(index)}
                 >
                     <TrainingItem
-                        value={training.tittle}
+                        value={training.title}
                         editable={editable}
-                        onChange={(text) => handleInputChange(index, "tittle", text)}
+                        onChange={(text) => handleInputChange(index, "title", text)}
                     />
                     <TrainingItem
                         value={training.description}
