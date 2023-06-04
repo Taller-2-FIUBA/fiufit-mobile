@@ -3,7 +3,7 @@ import {greyColor, redColor, secondaryColor, tertiaryColor} from "../consts/colo
 import {useState} from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 
-const TrainingInput = ({
+const ExerciseInput = ({
                    label, error, onFocus = () => {
     }, ...props
                }) => {
@@ -13,7 +13,7 @@ const TrainingInput = ({
         <View style={{marginBottom: 20,}}>
             <Text style={{marginVertical: 5, marginHorizontal: 5, fontSize: 14, color: greyColor}}>{label}</Text>
             <View style={[
-                fiufitStyles.createTrainingInput,
+                fiufitStyles.exerciseInput,
                 {borderColor: error ? redColor : isFocused ? tertiaryColor : secondaryColor,
                 }]}>
                 <TextInput
@@ -35,4 +35,4 @@ const TrainingInput = ({
     )
 }
 
-export default TrainingInput;
+export default ExerciseInput;
