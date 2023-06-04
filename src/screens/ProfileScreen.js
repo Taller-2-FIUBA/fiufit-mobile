@@ -44,7 +44,7 @@ const ProfileScreen = () => {
         id: 0,
         name: '',
         surname: '',
-        userName: '',
+        username: '',
         email: '',
         birth_date: '',
         location: '',
@@ -62,12 +62,8 @@ const ProfileScreen = () => {
         setLoading(true);
         UserService.getUser().then(async (profile) => {
             const token = await AsyncStorage.getItem('@fiufit_token');
-
-            console.log("User profile: ", profile, 'token: ', token);
             setLoading(false);
             setUserProfile(profile);
-            console.log("User profile2: ", userProfile);
-
         }).catch((error) => {
             setLoading(false);
             setError(error);
@@ -109,19 +105,6 @@ const ProfileScreen = () => {
             <ProfileAvatar
                 userName={userProfile.name}
             />
-            <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate('FollowTabs', { user: userProfile })}
-            >
-                <Text style={styles.buttonText}>Following</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate('FollowTabs', { user: userProfile })}
-            >
-                <Text style={styles.buttonText}>Followers</Text>
-            </TouchableOpacity>
             <ProfileItem
                 iconName="account"
                 value={userProfile.name}
@@ -133,6 +116,12 @@ const ProfileScreen = () => {
                 value={userProfile.surname}
                 editable={editable}
                 onChange={(text) => handleInputChange("surname", text)}
+            />
+            <ProfileItem
+                iconName="account"
+                value={userProfile.username}
+                editable={editable}
+                onChange={(text) => handleInputChange("username", text)}
             />
             <ProfileItem
                 iconName="email"
@@ -174,6 +163,21 @@ const ProfileScreen = () => {
                     </TouchableOpacity>
                 </View>
             }
+            <View style={styles.followersContainer}>
+                <TouchableOpacity
+                    style={[styles.button, styles.followingButton]}
+                    onPress={() => navigation.navigate('FollowTabs', { user: userProfile })}
+                >
+                    <Text style={styles.buttonText}>Following</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('FollowTabs', { user: userProfile })}
+                >
+                    <Text style={styles.buttonText}>Followers</Text>
+                </TouchableOpacity>
+            </View>
         </ScrollView>
     );
 }
@@ -234,7 +238,14 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
-    }
+    },
+    followersContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    followingButton: {
+        marginRight: 5,
+    },
 });
 
 export default ProfileScreen;

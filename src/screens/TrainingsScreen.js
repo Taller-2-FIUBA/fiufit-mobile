@@ -126,7 +126,6 @@ const TrainingsScreen = () => {
 
     useEffect(() => {
         const fetchTrainingTypes = async () => {
-            console.log("Fetching trainings types...");
             const response = await getTrainingsTypes();
             setTrainingTypes(response);
         };
@@ -136,7 +135,6 @@ const TrainingsScreen = () => {
 
     useEffect(() => {
         const fetchGetTrainingsByTrainerId = async () => {
-            console.log("Fetching trainings...");
             const trainer_id = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
             const response = await getTrainingsByTrainerId(trainer_id);
             setTrainings(response);

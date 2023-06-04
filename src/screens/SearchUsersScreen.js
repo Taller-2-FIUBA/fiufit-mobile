@@ -16,7 +16,6 @@ const SearchUsersScreen = () => {
 
   const handleSearch= async () => {
     const response = await UserService.getUserByUsername(searchQuery);
-    console.log('getUserByUsername response: ', response);
     if (Object.keys(response).length === 0) {
         setNotFound(true);
     } else {

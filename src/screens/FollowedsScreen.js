@@ -7,7 +7,6 @@ import {useNavigation} from "@react-navigation/native";
 import {fiufitStyles} from "../consts/fiufitStyles";
 
 const FollowedsScreen = ({ route }) => {
-    console.log('route: ', route);
     const { user } = route.params;
 
     const [followeds, setFolloweds] = React.useState(null);
@@ -30,10 +29,10 @@ const FollowedsScreen = ({ route }) => {
         <ScrollView style={{backgroundColor: primaryColor}}>
             {notFound && (
                 <View style={{ alignItems: "center", marginTop: 20 }}>
-                    <Text>There are no results for your search.</Text>
+                    <Text>No followeds found.</Text>
                 </View>
             )}
-            {followeds && followeds.length > 0 && usersSearch.map(user => (
+            {followeds && followeds.length > 0 && followeds.map(user => (
                 <TouchableOpacity
                     style={fiufitStyles.userContainer}
                     onPress={() => navigation.navigate("ProfilePublic", {user: user})}>

@@ -62,9 +62,7 @@ const ProfilePublicScreen = ({ route }) => {
             let userId = await AsyncStorage.getItem('@fiufit_userId');
 
             UserService.getFolloweds(userId).then(async (followers) => {
-                console.log('followers: ', followers);
-                //const id = user.id;
-                const id = 7; //TODO: Cambiar por el id del usuario buscado
+                const id = user.id;
 
                 if (followers.length > 0 && followers.some((item) => item.id === id)) {
                     setIsFollowed(true);
@@ -79,19 +77,16 @@ const ProfilePublicScreen = ({ route }) => {
 
     const handleFollowPress = async () => {
         let userId = await AsyncStorage.getItem('@fiufit_userId');
-        //const id = user.id;
-        const id = 7; //TODO: Cambiar por el id del usuario buscado
+        const id = user.id;
     
         if(isFollowed) {
             UserService.deleteFollowed(userId, id).then(async (followers) => {
-                console.log('followers: ', followers);
                 setIsFollowed(false);
             }).catch((error) => {
                 console.log(error);
             });
         } else {
             UserService.followUser(userId, id).then(async (followers) => {
-                console.log('followers: ', followers);
                 setIsFollowed(true);
             }).catch((error) => {
                 console.log(error);

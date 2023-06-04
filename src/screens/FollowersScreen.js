@@ -14,22 +14,23 @@ const FollowersScreen = ({ route }) => {
     const navigation = useNavigation();
 
     useEffect(() => {
-        const getFolloweds = async () => {
-            const response = await UserService.getFolloweds(user.id);
+        const getFollowers = async () => {
+            const response = await UserService.getFollowers(user.id);
+            console.log('fetching followers for: ', user.id, response);
             setUsersSearch(response)
             if (Object.keys(response).length === 0) {
                 setNotFound(true);
             }
         };
     
-        getFolloweds();
+        getFollowers();
     }, []);
 
     return (
         <ScrollView style={{backgroundColor: primaryColor}}>
             {notFound && (
                 <View style={{ alignItems: "center", marginTop: 20 }}>
-                    <Text>There are no results for your search.</Text>
+                    <Text>No followers found.</Text>
                 </View>
             )}
             {usersSearch && usersSearch.length > 0 && usersSearch.map(user => (

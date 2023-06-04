@@ -23,7 +23,6 @@ const createTraining = async (training) => {
 
     training.media = training.media ? encode(training.media) : null;
 
-    console.log('training media: ', training.media);
     try {
         const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
         {
