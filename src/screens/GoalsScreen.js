@@ -18,6 +18,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import goalsService from "../services/goalsService";
 import FiufitDialog from "../components/FiufitDialog";
 import * as ImagePicker from "expo-image-picker";
+import { encode } from 'base-64';
 
 const GoalsScreen = () => {
     const theme = useTheme();
@@ -246,7 +247,7 @@ const GoalsScreen = () => {
             metric: goalMetric,
             objective: goalObjective,
             time_limit: goalTimeLimit,
-            // image: goalImage
+            image: encode(goalImage)
         }
         resetNewGoalForm();
         goalsService.create(newGoal)
@@ -312,7 +313,7 @@ const GoalsScreen = () => {
                 timeLimit={item.time_limit}
                 onSelectedChange={(selected) => handleSelectedChange(item.id, selected)}
                 changedSelection={selectedIds.length > 0}
-                image={goalImage}  // TODO: item.image
+                image={item.image}
             />
         );
     }
