@@ -26,6 +26,7 @@ import InitialScreen from "../screens/InitialScreen";
 import {useEffect, useState} from "react";
 import { UserService } from "../services/userService";
 import UserDataContext from "../contexts/userDataContext";
+import PrivateChatScreen from "../screens/PrivateChatScreen";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -273,51 +274,59 @@ const MainStackNavigator = () => {
     return (
         <Stack.Navigator initialRouteName={"Initial"}>
             <Stack.Screen name="Initial" component={InitialScreen}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: theme.colors.primary
-                          }}/>
+                options={{
+                    headerShown: false,
+                    statusBarColor: theme.colors.primary
+                }}/>
             <Stack.Screen name="Login" component={LoginScreen}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: theme.colors.primary
-                          }}/>
+                options={{
+                    headerShown: false,
+                    statusBarColor: theme.colors.primary
+                }}/>
             <Stack.Screen name="Registration" component={RegistrationStackNavigator}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: theme.colors.primary
-                          }}/>
+                options={{
+                    headerShown: false,
+                    statusBarColor: theme.colors.primary
+                }}/>
             <Stack.Screen name="Search" component={TabsNavigation}
-                          options={{
-                              headerStyle: {
-                                  backgroundColor: theme.colors.background,
-                              },
-                              headerTintColor: theme.colors.tertiary,
-                              statusBarColor: theme.colors.background,
-                          }}/>
+                options={{
+                    headerStyle: {
+                        backgroundColor: theme.colors.background,
+                    },
+                    headerTintColor: theme.colors.tertiary,
+                    statusBarColor: theme.colors.background,
+                }}/>
             <Stack.Screen name="FollowTabs" component={FollowTabsNavigation}
-                          options={{
-                              headerStyle: {
-                                  backgroundColor: theme.colors.background,
-                              },
-                              headerTintColor: theme.colors.tertiary,
-                              statusBarColor: theme.colors.background,
-                          }}/>
+                options={{
+                    headerStyle: {
+                        backgroundColor: theme.colors.background,
+                    },
+                    headerTintColor: theme.colors.tertiary,
+                    statusBarColor: theme.colors.background,
+                }}/>
             <Stack.Screen name="Trainings" component={AuthStack}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: theme.colors.background,
-                          }}/>
+                options={{
+                    headerShown: false,
+                    statusBarColor: theme.colors.background,
+                }}/>
             <Stack.Screen name="CreateTraining" component={CreateTrainingScreen}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: theme.colors.background,
-                          }}/>
+                options={{
+                    headerShown: false,
+                    statusBarColor: theme.colors.background,
+                }}/>
             <Stack.Screen name="ProfilePublic" component={ProfilePublicScreen}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: theme.colors.background,
-                          }}/>
+                options={{
+                    headerShown: false,
+                    statusBarColor: theme.colors.background,
+                }}/>
+            <Stack.Screen name="PrivateChat" component={PrivateChatScreen} 
+                options={{
+                    headerStyle: {
+                        backgroundColor: theme.colors.background,
+                    },
+                    headerTintColor: theme.colors.tertiary,
+                    statusBarColor: theme.colors.background,
+                }}/>
         </Stack.Navigator>
     );
 }
