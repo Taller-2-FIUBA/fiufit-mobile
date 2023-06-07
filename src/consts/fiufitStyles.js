@@ -303,5 +303,15 @@ export const fiufitStyles = StyleSheet.create({
         alignSelf: "flex-end",
         alignItems: 'flex-end',
         display: 'flex',
+    },
+    chatMessageIntro: {
+        display: 'flex',
+        flexDirection: 'row',
+        width: '100%',
+        flexWrap: 'wrap',
+        height: 50,
+        padding: 10,
+        marginBottom: 10,
+        alignItems: 'center',
     }
 })

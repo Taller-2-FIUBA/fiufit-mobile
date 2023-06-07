@@ -8,7 +8,7 @@ import UserDataScreen from "../screens/UserDataScreen";
 import SearchUsersScreen from "../screens/SearchUsersScreen";
 import SearchTrainingsScreen from "../screens/SearchTrainingsScreen";
 import UserBiologicsScreen from "../screens/UserBiologicsScreen";
-import {Avatar, BottomNavigation, useTheme} from 'react-native-paper';
+import {Avatar, BottomNavigation, useTheme, Searchbar} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CreateTrainingScreen from '../screens/CreateTrainingScreen';
 import {CommonActions, DrawerActions, useNavigation} from "@react-navigation/native";
@@ -105,7 +105,7 @@ const AuthStack = () => {
                 drawerInactiveTintColor: theme.colors.tertiary,
             }}/>
             <Drawer.Screen name="Chat" component={ChatScreen} options={{
-                title: 'Chat',
+                title: 'Chats',
                 headerStyle: {
                     backgroundColor: theme.colors.background,
                 },
