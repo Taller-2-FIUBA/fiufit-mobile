@@ -23,7 +23,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {UserService} from "../services/userService";
 import {decode} from "base-64";
 
-const TrainingItem = ({value, editable, onChange}) => {
+const TrainingItem = ({value, editable, onChange, rating}) => {
     return (
         <View style={fiufitStyles.trainingItemContainer}>
             <TextInput
@@ -32,6 +32,16 @@ const TrainingItem = ({value, editable, onChange}) => {
                 onChangeText={onChange}
                 editable={editable}
             />
+            {rating >= 0 && (
+                <View style={fiufitStyles.ratingContainer}>
+                <Icon name="star" size={20} color={rating >= 0 ? primaryColor : greyColor} />
+                <Icon name="star" size={20} color={rating >= 2 ? primaryColor : greyColor} />
+                <Icon name="star" size={20} color={rating >= 3 ? primaryColor : greyColor} />
+                <Icon name="star" size={20} color={rating >= 4 ? primaryColor : greyColor} />
+                <Icon name="star" size={20} color={rating >= 5 ? primaryColor : greyColor} />
+                <Text style={fiufitStyles.ratingText}>{rating}</Text>
+                </View>
+            )}
         </View>
     )
 }
@@ -159,7 +169,8 @@ const TrainingsScreen = () => {
             try {
                 const profile = await UserService.getUser();
                 console.log('@is_trainer', profile.is_athlete.toString());
-                await AsyncStorage.setItem('@is_trainer', !profile.is_athlete.toString());
+                const isTrainerResult = !profile.is_athlete;
+                await AsyncStorage.setItem('@is_trainer', isTrainerResult.toString());
                 setIsTrainer(!profile.is_athlete);
             } catch(error) {
                 console.log("Something went wrong while fetching user data. Please try again later.");
@@ -294,10 +305,12 @@ const TrainingsScreen = () => {
                             expanded={expandedList[index]}
                             onPress={() => handlePress(index)}
                         >
+                            {training.rating > 0 ?<Text style={{ color: greyColor }}>{training.rating}</Text> : null}
                             <TrainingItem
                                 value={training.title}
                                 editable={editable}
                                 onChange={(text) => handleInputChange(index, "title", text)}
+                                rating={training.rating}
                             />
                             <TrainingItem
                                 value={training.description}
@@ -308,7 +321,7 @@ const TrainingsScreen = () => {
                                 value={trainings[index].type}
                                 editable={false}
                             />
-                            {!isTrainer && editable && 
+                            {isTrainer && editable && 
                                 <Picker
                                     selectedValue={training.difficulty}
                                     style={fiufitStyles.trainingPickerSelect}
@@ -352,7 +365,7 @@ const TrainingsScreen = () => {
                                                 borderRadius: 5,
                                             }}/>
                                 }
-                            {!isTrainer && editable && training.media &&
+                            {isTrainer && editable && training.media &&
                                     <Image source={{uri: training.media}}
                                             style={{
                                                 width: 120,
@@ -361,7 +374,7 @@ const TrainingsScreen = () => {
                                                 borderRadius: 5,
                                             }}/>
                                 }
-                            {!isTrainer && editable && <View>
+                            {isTrainer && editable && <View>
                                     <Text style={{
                                         color: tertiaryColor,
                                         marginBottom: -7,
@@ -377,7 +390,7 @@ const TrainingsScreen = () => {
                                     </PapperButton>
                                 </View>
                             }
-                            {!isTrainer && !editable && 
+                            {isTrainer && !editable && 
                                 <TouchableOpacity
                                     style={fiufitStyles.editButton}
                                     onPress={handleEditAction}
@@ -390,7 +403,7 @@ const TrainingsScreen = () => {
                                     />
                                 </TouchableOpacity>
                             }   
-                            {!isTrainer && editable && 
+                            {isTrainer && editable && 
                                 <View style={fiufitStyles.trainingButtonContainer}>
                                     <TouchableOpacity style={{...fiufitStyles.trainingActionButton, marginRight: 5}} onPress={() => handleSaveAction(index)}>
                                         <Text style={fiufitStyles.trainingActionButtonText}>{'Save'}</Text>
@@ -403,7 +416,7 @@ const TrainingsScreen = () => {
                         </List.Accordion>
                     ))}
             
-                    {isTrainer && <FAB
+                    {isTrainer ? <FAB
                         icon="plus"
                         type="contained-tonal"
                         style={fiufitStyles.addTrainingButton}
@@ -411,6 +424,7 @@ const TrainingsScreen = () => {
                         onPress={handleNext}
                         color={tertiaryColor}
                     />
+                    : null
                     }
                     
                 </ScrollView>

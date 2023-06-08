@@ -108,4 +108,25 @@ export const UserService = {
             throw new Error(error.response.status.toString());
         }
     },
+
+    async rateTraining(trainingId, rate) {
+        let userId = await AsyncStorage.getItem('@fiufit_userId');
+        const body = { 'rate': rate }
+    
+        const token = await AsyncStorage.getItem('@fiufit_token');
+    
+        try {
+            const response = await axios.post(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}/${trainingId}`, JSON.stringify(body),
+            {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                }
+              });
+            console.log("Training rated successfully", response.data);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+        }
+    },
 }
