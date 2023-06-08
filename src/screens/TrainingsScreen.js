@@ -12,14 +12,16 @@ import React, {useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor, redColor, greyColor} from "../consts/colors";
-import { FAB, IconButton, List } from 'react-native-paper';
+import { ActivityIndicator, FAB, IconButton, List, useTheme } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 import {
-    getTrainingsTypes, getExercises, getTrainingsByTrainerId, validateForm, trimUserData
+    getTrainingsTypes, getTrainingsByTrainerId, validateForm, trimUserData
 } from "../services/TrainingsService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import {UserService} from "../services/userService";
+import {decode} from "base-64";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -35,10 +37,13 @@ const TrainingItem = ({value, editable, onChange}) => {
 }
 
 const TrainingsScreen = () => {
+    const theme = useTheme();
     const navigation = useNavigation();
     const [editable, setEditable] = useState(false);
     const [errors, setErrors] = useState({});
     const [trainingTypes, setTrainingTypes] = useState({});
+    const [isTrainer, setIsTrainer] = useState(true);
+    const [loading, setLoading] = useState(true);
 
     const handleError = (error, input) => {
         setErrors(prevState => ({...prevState, [input]: error}));
@@ -124,25 +129,66 @@ const TrainingsScreen = () => {
         }
     ]); */
 
+    // Hook to fetch training types and user trainings
     useEffect(() => {
-        const fetchTrainingTypes = async () => {
-            const response = await getTrainingsTypes();
-            setTrainingTypes(response);
-        };
-    
-        fetchTrainingTypes();
+        fetchTrainingTypes()
+            .catch(error => {
+                setLoading(false);
+                console.log(error);
+                setDialog(false);
+            });
+        fetchGetTrainingsById()
+            .catch(error => {
+                setLoading(false);
+                console.log(error);
+                setDialog(false);
+            });
     }, []);
 
-    useEffect(() => {
-        const fetchGetTrainingsByTrainerId = async () => {
+    const fetchTrainingTypes = async () => {
+        const response = await getTrainingsTypes();
+        setTrainingTypes(response);
+    };
+
+    const fetchGetTrainingsById = async () => {
+        try {
+            setLoading(true);
             let userId = await AsyncStorage.getItem('@fiufit_userId');
-            const trainer_id = userId;
-            const response = await getTrainingsByTrainerId(trainer_id);
+            let response = null;
+
+            try {
+                const profile = await UserService.getUser();
+                console.log('@is_trainer', profile.is_athlete.toString());
+                await AsyncStorage.setItem('@is_trainer', !profile.is_athlete.toString());
+                setIsTrainer(!profile.is_athlete);
+            } catch(error) {
+                console.log("Something went wrong while fetching user data. Please try again later.");
+            }
+
+            console.log('is_trainer: ', isTrainer)
+
+            if(!isTrainer) {
+                console.log('soy un atleta: ');
+
+                response = await UserService.getTrainingsByUserId(userId);
+                console.log('response: ', response)
+                console.log('is_trainer now: ', isTrainer)
+
+            } else {
+                console.log('Soy un trainer: ');
+
+                const trainer_id = userId;
+                response = await getTrainingsByTrainerId(trainer_id);
+                console.log('response for trainer: ', response)
+                console.log('is_trainer now for trainer: ', isTrainer)
+
+            }
             setTrainings(response);
-        };
-    
-        fetchGetTrainingsByTrainerId();
-    }, []);
+            setLoading(false)
+        } catch (error) {
+            console.log('Error while fetching trainings: ', error);
+        }
+    };
 
     const [expandedList, setExpandedList] = useState(trainings && trainings.map(() => false));
 
@@ -217,189 +263,158 @@ const TrainingsScreen = () => {
 
     return (
         <View style={fiufitStyles.container}>
-            <ScrollView contentContainerStyle={{flexGrow: 1}}>
-            <Text style={{...fiufitStyles.titleText,
-                alignSelf: 'center',
-                marginTop: 10,
-            }}>
-                Trainings
-            </Text>
-            {trainings?.length === 0 && (
-                <Text style={{
-                    alignSelf: 'center',
-                    marginTop: 10,
-                    color: tertiaryColor,
-                    fontSize: 20,
-                }}>
-                    You have no trainings yet, add one!
-                </Text>
-            )}
-    
-            {trainings && trainings.map((training, index) => (
-                <List.Accordion
-                    key={index}
-                    style={fiufitStyles.trainingsList}
-                    left={(props) => <List.Icon {...props} icon="bike" />}
-                    title={training.title}
-                    titleStyle={{ color: primaryColor }}
-                    expanded={expandedList[index]}
-                    onPress={() => handlePress(index)}
-                >
-                    <TrainingItem
-                        value={training.title}
-                        editable={editable}
-                        onChange={(text) => handleInputChange(index, "title", text)}
-                    />
-                    <TrainingItem
-                        value={training.description}
-                        editable={editable}
-                        onChange={(text) => handleInputChange(index, "description", text)}
-                    />
-                    {/* {editable && 
-                        <Picker
-                                selectedValue={trainings[index].type}
-                                style={fiufitStyles.trainingPickerSelect}
-                                onValueChange={(index) => handleInputChange(index, "type", text)}
-                            >
-                                {trainingTypes && trainingTypes.length > 0 && trainingTypes.map(trainingType => (
-                                    <Picker.Item key={trainingType} label={trainingType} value={trainingType} />
-                                ))}
-                            </Picker>
-                    }
-                    {!editable && <TrainingItem
-                        value={trainings[index].type}
-                        editable={editable}
-                        onChange={(text) => handleInputChange(index, "type", text)}
-                    />
-                    } */}
-                    <TrainingItem
-                        value={trainings[index].type}
-                        editable={false}
-                    />
-                    {editable && 
-                        <Picker
-                            selectedValue={training.difficulty}
-                            style={fiufitStyles.trainingPickerSelect}
-                            onValueChange={(itemValue) => handleInputChange(index, 'difficulty', itemValue)}
-                        >
-                            <Picker.Item label="Easy" value="Easy" />
-                            <Picker.Item label="Medium" value="Medium" />
-                            <Picker.Item label="Hard" value="Hard" />
-                        </Picker>
-                    }
-                    {!editable && <TrainingItem
-                        value={trainings[index].difficulty}
-                        editable={editable}
-                        onChange={(text) => handleInputChange(index, "difficulty", text)}
-                    />
-                    }
-                    {/* <TrainingItem
-                        value={trainings[index].media}
-                        editable={editable}
-                        onChange={(text) => handleInputChange(index, "media", text)}
-                    />
-                    {errors.media &&
-                        <Text style={{color: redColor, fontSize: 14, paddingBottom: 10, textAlign: 'left'}}>{errors.media}</Text>
-                    } */}
-                    
-                    {/* {editable && 
-                        <Picker
-                            selectedValue={trainings[index].exercises}
-                            style={fiufitStyles.trainingPickerSelect}
-                            onValueChange={(text) => handleInputChange(index, 'exercise', text)}
-                        >
-                            {exercises.map(([exercise, measure], index) => {
-                                const label = `${exercise} ${measure}`;
-                                return (
-                                    <Picker.Item key={index} label={label} value={`${exercise},${measure}`}/>
-                                );
-                            })}
-                        </Picker>
-                    }
-                    {!editable && <TrainingItem
-                        value={trainings[index].exercises}
-                        editable={editable}
-                        onChange={(text) => handleInputChange(index, "exercises", text)}
-                    />
-                    } */}
-                    <View key={training.id}>
-                        <Text style={{color: greyColor,
-                            fontSize: 18,
-                            marginVertical: 10,
-                            marginRight: 1,
+            {loading ? (
+                    <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
+                )
+                : <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                    <Text style={{...fiufitStyles.titleText,
+                        alignSelf: 'center',
+                        marginTop: 10,
+                    }}>
+                        Trainings
+                    </Text>
+                    {trainings?.length === 0 && (
+                        <Text style={{
+                            alignSelf: 'center',
+                            marginTop: 10,
+                            color: tertiaryColor,
+                            fontSize: 20,
                         }}>
-                            Exercises:
+                            You have no trainings yet, add one!
                         </Text>
-                        {training.exercises.map((exercise, index) => (
-                        <View key={index} style={{paddingBottom: 10}}>
-                            <Text style={{ color: greyColor }}>{exercise.name} {exercise.unit ? `[${exercise.unit}]` : ''}</Text>
-                            <View style={fiufitStyles.exerciseDetails}>
-                                <Text style={{ color: greyColor }}>{`Count: ${exercise.count}`}</Text>
-                                <Text style={{ color: greyColor }}>{`Series: ${exercise.series}`}</Text>
-                            </View>
-                        </View>
-                        ))}
-                    </View>
-                    {editable && training.media &&
-                            <Image source={{uri: training.media}}
-                                    style={{
-                                        width: 120,
-                                        height: 120,
-                                        marginTop: 10,
-                                        borderRadius: 5,
-                                    }}/>
-                        }
-                    {editable && <View>
-                            <Text style={{
-                                color: tertiaryColor,
-                                marginBottom: -7,
-                                marginTop: 10,
-                            }}>Image (optional)</Text>
-                            <PapperButton onPress={() => pickImage(index)}
-                                    style={fiufitStyles.imagePickerButton}>
-                                <Icon name={"camera"} style={{
-                                    fontSize: 22,
-                                    color: secondaryColor,
-                                    marginRight: 10,
-                                }}/>
-                            </PapperButton>
-                        </View>
-                    }
-                    {!editable && 
-                        <TouchableOpacity
-                            style={fiufitStyles.editButton}
-                            onPress={handleEditAction}
+                    )}
+            
+                    {trainings && trainings.map((training, index) => (
+                        <List.Accordion
+                            key={index}
+                            style={fiufitStyles.trainingsList}
+                            left={(props) => <List.Icon {...props} icon="bike" />}
+                            title={training.title}
+                            titleStyle={{ color: primaryColor }}
+                            expanded={expandedList[index]}
+                            onPress={() => handlePress(index)}
                         >
-                            <IconButton
-                                icon="pencil"
-                                iconColor={tertiaryColor}
-                                style={{backgroundColor: secondaryColor}}
-                                size={30}
+                            <TrainingItem
+                                value={training.title}
+                                editable={editable}
+                                onChange={(text) => handleInputChange(index, "title", text)}
                             />
-                        </TouchableOpacity>
-                    }   
-                    {editable && 
-                        <View style={fiufitStyles.trainingButtonContainer}>
-                            <TouchableOpacity style={{...fiufitStyles.trainingActionButton, marginRight: 5}} onPress={() => handleSaveAction(index)}>
-                                <Text style={fiufitStyles.trainingActionButtonText}>{'Save'}</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={fiufitStyles.trainingActionButton} onPress={handleCancelAction}>
-                                <Text style={fiufitStyles.trainingActionButtonText}>{'Cancel'}</Text>
-                            </TouchableOpacity>
-                        </View>
+                            <TrainingItem
+                                value={training.description}
+                                editable={editable}
+                                onChange={(text) => handleInputChange(index, "description", text)}
+                            />
+                            <TrainingItem
+                                value={trainings[index].type}
+                                editable={false}
+                            />
+                            {!isTrainer && editable && 
+                                <Picker
+                                    selectedValue={training.difficulty}
+                                    style={fiufitStyles.trainingPickerSelect}
+                                    onValueChange={(itemValue) => handleInputChange(index, 'difficulty', itemValue)}
+                                >
+                                    <Picker.Item label="Easy" value="Easy" />
+                                    <Picker.Item label="Medium" value="Medium" />
+                                    <Picker.Item label="Hard" value="Hard" />
+                                </Picker>
+                            }
+                            {!editable && <TrainingItem
+                                value={trainings[index].difficulty}
+                                editable={editable}
+                                onChange={(text) => handleInputChange(index, "difficulty", text)}
+                            />
+                            }
+                            <View key={training.id}>
+                                <Text style={{color: greyColor,
+                                    fontSize: 18,
+                                    marginVertical: 10,
+                                    marginRight: 1,
+                                }}>
+                                    Exercises:
+                                </Text>
+                                {training.exercises.map((exercise, index) => (
+                                <View key={index} style={{paddingBottom: 10}}>
+                                    <Text style={{ color: greyColor }}>{exercise.name} {exercise.unit ? `[${exercise.unit}]` : ''}</Text>
+                                    <View style={fiufitStyles.exerciseDetails}>
+                                        <Text style={{ color: greyColor }}>{`Count: ${exercise.count}`}</Text>
+                                        <Text style={{ color: greyColor }}>{`Series: ${exercise.series}`}</Text>
+                                    </View>
+                                </View>
+                                ))}
+                            </View>
+                            {training.media &&
+                                    <Image source={{uri: decode(training.media)}}
+                                            style={{
+                                                width: 120,
+                                                height: 120,
+                                                marginTop: 10,
+                                                borderRadius: 5,
+                                            }}/>
+                                }
+                            {!isTrainer && editable && training.media &&
+                                    <Image source={{uri: training.media}}
+                                            style={{
+                                                width: 120,
+                                                height: 120,
+                                                marginTop: 10,
+                                                borderRadius: 5,
+                                            }}/>
+                                }
+                            {!isTrainer && editable && <View>
+                                    <Text style={{
+                                        color: tertiaryColor,
+                                        marginBottom: -7,
+                                        marginTop: 10,
+                                    }}>Image (optional)</Text>
+                                    <PapperButton onPress={() => pickImage(index)}
+                                            style={fiufitStyles.imagePickerButton}>
+                                        <Icon name={"camera"} style={{
+                                            fontSize: 22,
+                                            color: secondaryColor,
+                                            marginRight: 10,
+                                        }}/>
+                                    </PapperButton>
+                                </View>
+                            }
+                            {!isTrainer && !editable && 
+                                <TouchableOpacity
+                                    style={fiufitStyles.editButton}
+                                    onPress={handleEditAction}
+                                >
+                                    <IconButton
+                                        icon="pencil"
+                                        iconColor={tertiaryColor}
+                                        style={{backgroundColor: secondaryColor}}
+                                        size={30}
+                                    />
+                                </TouchableOpacity>
+                            }   
+                            {!isTrainer && editable && 
+                                <View style={fiufitStyles.trainingButtonContainer}>
+                                    <TouchableOpacity style={{...fiufitStyles.trainingActionButton, marginRight: 5}} onPress={() => handleSaveAction(index)}>
+                                        <Text style={fiufitStyles.trainingActionButtonText}>{'Save'}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={fiufitStyles.trainingActionButton} onPress={handleCancelAction}>
+                                        <Text style={fiufitStyles.trainingActionButtonText}>{'Cancel'}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            }
+                        </List.Accordion>
+                    ))}
+            
+                    {isTrainer && <FAB
+                        icon="plus"
+                        type="contained-tonal"
+                        style={fiufitStyles.addTrainingButton}
+                        size={45}
+                        onPress={handleNext}
+                        color={tertiaryColor}
+                    />
                     }
-                </List.Accordion>
-            ))}
-    
-            <FAB
-                icon="plus"
-                type="contained-tonal"
-                style={fiufitStyles.addTrainingButton}
-                size={45}
-                onPress={handleNext}
-                color={tertiaryColor}
-            />
-        </ScrollView>
+                    
+                </ScrollView>
+        }
         </View>
     );
   };

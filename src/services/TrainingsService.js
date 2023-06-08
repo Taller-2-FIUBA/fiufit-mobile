@@ -5,8 +5,6 @@ import {
 } from "../utils/validations";
 import requests from "../consts/requests";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {StatusCodes} from "http-status-codes";
-import {UserService} from "../services/userService";
 import {axiosInstance} from "./config/axiosConfig";
 import {
     ToastAndroid
@@ -17,15 +15,14 @@ const createTraining = async (training) => {
     training.exercises = training.exercises.filter(exercise => Object.keys(exercise).length !== 0);
     let userId = await AsyncStorage.getItem('@fiufit_userId');
 
-    //training['trainer_id'] = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
     training['trainer_id'] = userId;
 
     const token = await AsyncStorage.getItem('@fiufit_token');
-
-    //training.media = training.media ? encode(training.media) : null;
+    console.log(training.media);
+    training.media = encode(training.media);
 
     console.log(JSON.stringify(training));
-      
+
     try {
         const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
         {
@@ -41,15 +38,6 @@ const createTraining = async (training) => {
     }
 }
 
-
-const getTrainingsByUserId = async (userId) => {
-    try {
-        const response = await axios.get(`${requests.BASE_URL}${userURI}/${userId}${requests.TRAINING}`);
-        return response.data;
-    } catch (error) {
-        console.log(error);
-    }
-}
 
 const getTrainingsByTrainerId = async (trainer_id) => {
     try {
@@ -124,4 +112,4 @@ const trimUserData = (training) => {
     }
 }
 
-export {createTraining, getTrainingsByUserId, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData, getTrainingByTypeAndDifficulty}
+export {createTraining, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData, getTrainingByTypeAndDifficulty}

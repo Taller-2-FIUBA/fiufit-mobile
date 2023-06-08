@@ -1,6 +1,7 @@
 import {axiosInstance} from "./config/axiosConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
+import axios from "axios";
 
 export const UserService = {
     async getUser() {
@@ -29,6 +30,42 @@ export const UserService = {
             return response.data;
         } catch (error) {
             return {};
+        }
+    },
+
+    async getTrainingsByUserId(userId) {
+        try {
+            const response = await axios.get(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}`);
+            const trainings = response.data.items;
+            console.log('TRAININGS: ', trainings);
+            if(trainings.length > 0) {
+                return trainings;
+            } else {
+                return [];
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+    async addFavouriteTraining(trainingId) {
+        let userId = await AsyncStorage.getItem('@fiufit_userId');
+        const body = { 'training_id': trainingId }
+    
+        const token = await AsyncStorage.getItem('@fiufit_token');
+    
+        try {
+            const response = await axios.post(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}`, JSON.stringify(body),
+            {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                }
+              });
+            console.log("Training save in favourites successfully", response.data);
+            return response.data;
+        } catch (error) {
+            console.log(error);
         }
     },
 
