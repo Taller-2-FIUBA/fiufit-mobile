@@ -5,13 +5,15 @@ import {primaryColor, secondaryColor} from "../consts/colors";
 import { Searchbar, Avatar, useTheme} from 'react-native-paper';
 import {useNavigation} from "@react-navigation/native";
 import { UserService } from "../services/userService";
-import { color } from "react-native-reanimated";
+import { doc, getDoc} from "firebase/firestore";
+import { db } from "../utils/firebase"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const ChatScreen = () => {
     const theme = useTheme();
     const [searchQuery, setSearchQuery] = React.useState('');
-    const [userChats, setUserChats] = React.useState([]);
+    const [chatsInfo, setChatsInfo] = React.useState([]);
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -19,33 +21,38 @@ const ChatScreen = () => {
         getUserChats();
     }, []);
 
-    const ChatMessageIntro = ({user}) => {
+    const ChatMessageIntro = ({chatInfo}) => {
+        const {user, conversationId} = chatInfo;
+
         return (
-            <View >
-                <TouchableOpacity style={fiufitStyles.chatMessageIntro} onPress={user => handleGoToChat(user)}>
-                    <Avatar.Icon size={60} icon="account-circle"
-                        color={theme.colors.primary}
-                        style={{
-                            marginLeft: 2,
-                            backgroundColor: primaryColor,
-                        }}
-                    />
-                    <Text style={{color: theme.colors.tertiary, fontSize: 18}}>{user.username}</Text>
-                </TouchableOpacity>   
-            </View>
+            <TouchableOpacity style={fiufitStyles.chatMessageIntro} onPress={event => handleGoToChat(event, chatInfo)}>
+                <Avatar.Icon size={60} icon="account-circle"
+                    color={theme.colors.primary}
+                    style={{
+                        marginLeft: 2,
+                        backgroundColor: primaryColor,
+                    }}
+                />
+                <Text style={{color: theme.colors.tertiary, fontSize: 18}}>{user.username}</Text>
+            </TouchableOpacity>   
         )
     }
 
     const getUserChats = async () => {
         console.log("Buscar chats del usuario");
-        const usersIds = [6, 4];
-        let users = [];
-        for (const userId of usersIds) {
-            const user = await getUserInfoFromId(userId)
-            users.push(user);
+        const userId =  await AsyncStorage.getItem('@fiufit_userId');
+        console.log("UserId --> ", userId);
+        const userChatsDoc = await getDoc(doc(db, "usersChats", userId));
+        console.log("UserChatsDoc --> ", userChatsDoc.data());
+        
+        let chatsDocInfo = [];
+        for (const chat of userChatsDoc.data().chats) {
+            console.log("Chat --> ", chat);
+            const user = await getUserInfoFromId(chat.userId);
+            chatsDocInfo.push({user: user, conversationId: chat.conversationId});
         }
-        console.log("Users --> ", users);
-        setUserChats(users);
+        console.log("ChatsDocInfo --> ", chatsDocInfo);
+        setChatsInfo(chatsDocInfo);
     }
 
     const getUserInfoFromId = async (userId) => {
@@ -64,8 +71,9 @@ const ChatScreen = () => {
         }
     };
 
-    const handleGoToChat = async (user) => {
-        navigation.navigate("PrivateChat", {user: user});
+    const handleGoToChat = async (event, chatInfo) => {
+        event.preventDefault();
+        navigation.navigate("PrivateChat", { chatInfo });
     }
 
     return (
@@ -78,8 +86,8 @@ const ChatScreen = () => {
                 value={searchQuery}
                 style={{backgroundColor: secondaryColor, marginTop: 5, color: theme.colors.tertiary, marginBottom: 5}}
             />
-            {userChats && userChats.length > 0 && userChats.map((userChat, index) => (
-              <ChatMessageIntro key={index}  user={userChat} />
+            {chatsInfo && chatsInfo.length > 0 && chatsInfo.map((chatInfo, index) => (
+              <ChatMessageIntro key={index}  chatInfo={chatInfo} />
             ))}
         </ScrollView>
     )

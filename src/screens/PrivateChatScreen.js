@@ -2,57 +2,67 @@ import {Text, TextInput, View, ScrollView, TouchableOpacity} from "react-native"
 import React, { useEffect } from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { doc, getDoc, addDoc, updateDoc, onSnapshot} from "firebase/firestore";
+import { db } from "../utils/firebase"
 
 const PrivateChatScreen = ({route}) => {
-  const {user} = route.params;
+  const {chatInfo} = route.params;
   const [actualMessage, setActualMessage] = React.useState(null);
   const [actualUserId, setActualUserId] = React.useState(null);
 
-  const [messages, setMessages] = React.useState([
-    {message: "Hola soy Okteto", direction: "left"},
-    {message: "Hola como estas, Okteto?", direction: "right"},
-    {message: "Adios me cai", direction: "left"},
-  ]);
+  const [messages, setMessages] = React.useState([]);
 
   const handleMessageChange = (text) => {
     setActualMessage(text);
   };
 
   const handleSend = () => {
-    //TODO enviar mensaje a firebase
-    setMessages([...messages, {message: actualMessage, direction: "right"}]);
+    updateDoc(doc(db, "conversations", chatInfo.conversationId), {
+      messages: [...messages, {message: actualMessage, userId: actualUserId}]
+    });
     setActualMessage(null);
   }
 
-  const MessageItem = ({message, direction}) => {
-    const messageStyle = direction == "right"
-      ? fiufitStyles.messageChatItemRight 
+  const MessageItem = ({message}) => {
+    const messageStyle = message.userId == actualUserId
+      ? fiufitStyles.messageChatItemRight
       : fiufitStyles.messageChatItemLeft;
 
     return (
       <View style={messageStyle}>
         <Text style={fiufitStyles.buttonText}>
-          {message}
+          {message.message}
         </Text>
       </View>
     );
   }
 
   const getActualUser = async () => {
-    setActualUserId(await AsyncStorage.getItem('@fiufit_userId'));
+    const userId =  await AsyncStorage.getItem('@fiufit_userId');
+    setActualUserId(userId);
+  }
+
+  const getConversationMessages = async () => {
+    //TODO buscar mensajes del usuario en firebase
+    console.log("Buscar mensajes de la conversacion");
+    await getActualUser();
+    if (!chatInfo.conversationId) {
+      console.log("No hay conversacion");
+      chatInfo.conversationId = "1";
+    }
+    onSnapshot(doc(db, "conversations", chatInfo.conversationId), (doc) => {
+      setMessages(doc.data().messages);
+    });
   }
 
   useEffect(() => {
-    //TODO buscar mensajes del usuario en firebase
-    console.log("Iniciar chat con: " + user.name + " " + user.surname);
-    getActualUser().then(() => console.log("Actual user: " + actualUserId));
-  }, [actualUserId]);
+    getConversationMessages();
+  }, []);
 
   return (
     <ScrollView contentContainerStyle={fiufitStyles.messageChatContainer}>
-      {messages && messages.map((message) => (
-        <MessageItem message={message.message} direction={message.direction} />
+      {messages && messages.map((message, index) => (
+        <MessageItem key={index} message={message} />
       ))}
       <View style={fiufitStyles.messageChatInputContainer}>
         <TextInput style={fiufitStyles.messageChatInput}
@@ -66,7 +76,6 @@ const PrivateChatScreen = ({route}) => {
           </Text>
         </TouchableOpacity>
       </View>
-      
     </ScrollView>
   );
 };

@@ -8,7 +8,7 @@ import UserDataScreen from "../screens/UserDataScreen";
 import SearchUsersScreen from "../screens/SearchUsersScreen";
 import SearchTrainingsScreen from "../screens/SearchTrainingsScreen";
 import UserBiologicsScreen from "../screens/UserBiologicsScreen";
-import {Avatar, BottomNavigation, useTheme, Searchbar} from 'react-native-paper';
+import {Avatar, BottomNavigation, useTheme} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CreateTrainingScreen from '../screens/CreateTrainingScreen';
 import {CommonActions, DrawerActions, useNavigation} from "@react-navigation/native";
@@ -319,7 +319,7 @@ const MainStackNavigator = () => {
                     headerShown: false,
                     statusBarColor: theme.colors.background,
                 }}/>
-            <Stack.Screen name="PrivateChat" component={PrivateChatScreen} 
+            <Stack.Screen name="PrivateChat" component={PrivateChatScreen}
                 options={{
                     headerStyle: {
                         backgroundColor: theme.colors.background,
