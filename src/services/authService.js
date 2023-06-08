@@ -8,14 +8,16 @@ const authService = {
         const token = response.data.token;
         const userId = response.data.id;
         await AsyncStorage.setItem('@fiufit_token', token);
-        await AsyncStorage.setItem('@fiufit_userId', userId);
+        await AsyncStorage.setItem('@fiufit_userId', userId.toString());
     },
 
     _handleError: function (error) {
         if (error.response?.data.detail) {
             throw new Error(error.response.data.detail);
-        } else {
+        } else if (error.response?.status) {
             throw new Error(error.response.status + " " + error.response.statusText);
+        } else {
+            throw new Error(error);
         }
     },
 
@@ -58,7 +60,6 @@ const authService = {
 
     async registerWithGoogle(user) {
         try {
-            console.log(JSON.stringify(user, null, 2))
             let google_token = user.google_token;
             delete user.token;
             const response = await axios.post(`${requests.BASE_URL}${requests.GOOGLE_SIGNUP}`,
@@ -66,8 +67,17 @@ const authService = {
                 {
                     headers: {Authorization: google_token}
                 });
-            await this._storeSensitiveData(response);
-            return response?.data;
+            if (response.data) {
+                console.log("Logging in with Google: ", user.email, google_token);
+                await this.loginWithGoogle(user.email, google_token)
+                    .then(r => {
+                        console.log("Logged in with Google: ", r);
+                        return r;
+                    }
+                );
+            } else {
+                throw new Error("Error registering with Google");
+            }
         } catch (error) {
             this._handleError(error);
         }

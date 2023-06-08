@@ -52,16 +52,15 @@ const GoogleLoginButton = ({navigation}) => {
     const handleLogin = async () => {
         if (userInfo) {
             authService.loginWithGoogle(userInfo.email, token)
-                .then(r => {
-                    console.log("Logged in with Google: ", r);
+                .then(() => {
                     navigation.replace('Trainings');
                 })
                 .catch(error => {
                     if (error?.message === "Should register IDP user") {
                         handleRegister();
                     } else {
-                        console.log(error.message);
-                        Alert.alert("Error logging in", "Something went wrong. Please try again.");
+                        console.log(error);
+                        Alert.alert("Error logging in 1", "Something went wrong. Please try again.");
                     }
                 });
         }

@@ -83,15 +83,14 @@ const UserBiologicsScreen = ({navigation}) => {
 
     const signUpUser = (user) => {
         if (user.google_token) {
-            console.log("Signing up with Google")
             authService.registerWithGoogle(user)
                 .then(() => {
                     console.log("Registered with Google");
                     navigation.replace('Trainings');
                 })
-                .catch(error => {
-                    console.log(error.message);
+                .catch(() => {
                     Alert.alert("Error signing up", "Something went wrong. Please try again.");
+                    navigation.replace('Login');
                 });
         } else {
             authService.register(user).then(() => {

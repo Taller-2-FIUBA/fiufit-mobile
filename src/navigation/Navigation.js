@@ -201,8 +201,8 @@ const RegistrationStackNavigator = (props) => {
         username: '',
         location: '',
         is_athlete: true,
-        height: 0.0,
-        weight: 0,
+        height: '',
+        weight: '',
         birth_date: '',
         registration_date: new Date().toISOString().split('T')[0],
         google_token: props.route.params?.token
