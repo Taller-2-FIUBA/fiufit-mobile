@@ -2,7 +2,7 @@ import {ScrollView, Text, View, TouchableOpacity} from "react-native";
 import React, { useEffect } from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor} from "../consts/colors";
-import { Searchbar, Avatar, useTheme} from 'react-native-paper';
+import { ActivityIndicator, Searchbar, Avatar, useTheme} from 'react-native-paper';
 import {useNavigation} from "@react-navigation/native";
 import { UserService } from "../services/userService";
 import { doc, onSnapshot} from "firebase/firestore";
@@ -14,6 +14,7 @@ const ChatScreen = () => {
     const theme = useTheme();
     const [searchQuery, setSearchQuery] = React.useState('');
     const [chatsInfo, setChatsInfo] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(true);
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -38,6 +39,7 @@ const ChatScreen = () => {
     }
 
     const getUserChats = async () => {
+        setIsLoading(true);
         console.log("Buscar chats del usuario");
         const userId =  await AsyncStorage.getItem('@fiufit_userId');
         console.log("UserId --> ", userId);
@@ -51,6 +53,7 @@ const ChatScreen = () => {
                 }
             }
             setChatsInfo(chatsDocInfo);
+            setIsLoading(false);
         });
     }
 
@@ -95,9 +98,11 @@ const ChatScreen = () => {
                 value={searchQuery}
                 style={{backgroundColor: secondaryColor, marginTop: 5, color: theme.colors.tertiary, marginBottom: 5}}
             />
-            {chatsInfo && chatsInfo.length > 0 && chatsInfo.map((chatInfo, index) => (
-              <ChatMessageIntro key={index}  chatInfo={chatInfo} />
-            ))}
+            {isLoading 
+                ? <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1, marginTop: 15}}/> 
+                : chatsInfo && chatsInfo.length > 0 && chatsInfo.map((chatInfo, index) => (
+                    <ChatMessageIntro key={index}  chatInfo={chatInfo} />
+                  ))}
         </ScrollView>
     )
 }
