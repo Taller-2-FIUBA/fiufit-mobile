@@ -14,6 +14,15 @@ export const UserService = {
         }
     },
 
+    async getUserById(userId) {
+        try {
+            const response = await axiosInstance.get(`${requests.USER}/${userId}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.status.toString());
+        }
+    },
+
     async updateUser(user) {
         try {
             let userId = await AsyncStorage.getItem('@fiufit_userId');
