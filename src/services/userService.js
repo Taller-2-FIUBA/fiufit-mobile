@@ -82,7 +82,7 @@ export const UserService = {
         const token = await AsyncStorage.getItem('@fiufit_token');
     
         try {
-            const response = await axios.post(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}/${trainingId}`,
+            const response = await axios.delete(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}/${trainingId}`,
             {
                 headers: {
                   'Content-Type': 'application/json',
@@ -163,7 +163,6 @@ export const UserService = {
             const response = await axios.get(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}/${trainingId}/rating`);
             return response.data;
         } catch (error) {
-            console.log(error);
             return 0;
         }
     }

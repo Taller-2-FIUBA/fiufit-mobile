@@ -23,17 +23,18 @@ import requests from "../consts/requests";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {UserService} from "../services/userService";
 import {decode} from "base-64";
+import {useIsFocused} from "@react-navigation/core";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
-        <View style={fiufitStyles.trainingItemContainer}>
-            <TextInput
-                style={editable ? fiufitStyles.trainingInput : fiufitStyles.trainingNotEditableInpunt}
-                value={value}
-                onChangeText={onChange}
-                editable={editable}
-            />
-        </View>
+    <View style={fiufitStyles.trainingItemContainer}>
+        <TextInput
+            style={editable ? fiufitStyles.trainingInput : fiufitStyles.trainingNotEditableInpunt}
+            value={value}
+            onChangeText={onChange}
+            editable={editable}
+        />
+    </View>
     )
 }
 
@@ -46,6 +47,18 @@ const TrainingsScreen = () => {
     const [isTrainer, setIsTrainer] = useState(true);
     const [loading, setLoading] = useState(true);
     const [rating, setRating] = useState(0);
+    const isFocused = useIsFocused();
+
+    useEffect(() => {
+        if (isFocused) {
+            fetchGetTrainingsById()
+            .catch(error => {
+                setLoading(false);
+                console.log("An error in fetching: ", error);
+                setDialog(false);
+            });
+        }
+    }, [isFocused]);
 
     const handleError = (error, input) => {
         setErrors(prevState => ({...prevState, [input]: error}));
@@ -54,93 +67,9 @@ const TrainingsScreen = () => {
     const [trainings, setTrainings] = useState([]);
     const [expandedList, setExpandedList] = useState(trainings && trainings.map(() => false));
 
-    /* const [trainings, setTrainings] = useState([
-        {
-            trainer_id: "Ju6JXm1S8rVQf7C18mqL418JdgE2",
-            title: "Super arms",
-            description: "training for arms",
-            type: "Arm",
-            difficulty: "Easy",
-            media: "a_firebase_id",
-            exercises: [
-                {
-                    name: "Arnold press",
-                    type: "Arm",
-                    count: 1,
-                    series: 2
-                },
-                {
-                    name: "Hammer curl",
-                    type: "Arm",
-                    count: 5,
-                    series: 10
-                }
-            ],
-            id: 5,
-            rating: 0,
-            blocked: false
-        },
-        {
-            trainer_id: "Ju6JXm1S8rVQf7C18mqL418JdgE2",
-            title: "Super arms 2",
-            description: "training for arms",
-            type: "Arm",
-            difficulty: "Easy",
-            media: "a_firebase_id",
-            exercises: [
-                {
-                    name: "Arnold press",
-                    type: "Arm",
-                    count: 1,
-                    series: 2
-                },
-                {
-                    name: "Hammer curl",
-                    type: "Arm",
-                    count: 5,
-                    series: 10
-                }
-            ],
-            id: 5,
-            rating: 0,
-            blocked: false
-        },
-        {
-            trainer_id: "Ju6JXm1S8rVQf7C18mqL418JdgE2",
-            title: "Super arms 3",
-            description: "training for arms",
-            type: "Arm",
-            difficulty: "Easy",
-            media: "a_firebase_id",
-            exercises: [
-                {
-                    name: "Arnold press",
-                    type: "Arm",
-                    count: 1,
-                    series: 2
-                },
-                {
-                    name: "Hammer curl",
-                    type: "Arm",
-                    count: 5,
-                    series: 10
-                }
-            ],
-            id: 5,
-            rating: 0,
-            blocked: false
-        }
-    ]); */
-
     // Hook to fetch training types and user trainings
     useEffect(() => {
         fetchTrainingTypes()
-            .catch(error => {
-                setLoading(false);
-                console.log(error);
-                setDialog(false);
-            });
-        fetchGetTrainingsById()
             .catch(error => {
                 setLoading(false);
                 console.log(error);
@@ -153,28 +82,35 @@ const TrainingsScreen = () => {
         setTrainingTypes(response);
     };
 
+    const getUser = async () => {
+        let user = null;
+        try {
+            const userId = await AsyncStorage.getItem('@fiufit_userId');
+            user = await UserService.getUserById(userId);
+        } catch(error) {
+            console.log("Something went wrong while fetching user data. Please try again later.");
+        }
+        return user;
+    }
+
     const fetchGetTrainingsById = async () => {
+        console.log("Start fetching trainings by id");
         try {
             setLoading(true);
-            let userId = await AsyncStorage.getItem('@fiufit_userId');
+            let user = await getUser();
             let response = null;
-
-            try {
-                const profile = await UserService.getUser();
-                const isTrainerResult = !profile.is_athlete;
+            if (user) {
+                const isTrainerResult = !user.is_athlete;
                 await AsyncStorage.setItem('@is_trainer', isTrainerResult.toString());
-                setIsTrainer(!profile.is_athlete);
-            } catch(error) {
-                console.log("Something went wrong while fetching user data. Please try again later.");
+                setIsTrainer(isTrainerResult);
+                if(!isTrainerResult) {
+                    response = await UserService.getTrainingsByUserId(user.id);
+                } else {
+                    response = await getTrainingsByTrainerId(user.id);
+                }
+                const trainingsWithRating = await getMyRating(response);
+                setTrainings(trainingsWithRating);
             }
-            if(!isTrainer) {
-                response = await UserService.getTrainingsByUserId(userId);
-            } else {
-                const trainer_id = userId;
-                response = await getTrainingsByTrainerId(trainer_id);
-            }
-            const trainingsWithRating = await getMyRating(response);
-            setTrainings(trainingsWithRating);
             setLoading(false)
         } catch (error) {
             console.log('Error while fetching trainings: ', error);
@@ -206,7 +142,7 @@ const TrainingsScreen = () => {
         if (!validateForm(trainings[index])) {
             return;
         } */
-        updateTraining(index);   
+        updateTraining(index); 
         setEditable(false);
     };
 
@@ -255,7 +191,7 @@ const TrainingsScreen = () => {
         const newTrainings = [...trainingsList];
         for (let training of newTrainings) {
             const myRating = await UserService.getUserRaiting(training.id);
-            training.myRating = myRating;
+            training.myRating = myRating.rate;
           }
         return newTrainings;
     };
@@ -281,9 +217,8 @@ const TrainingsScreen = () => {
         setTrainings(newTrainings);
     };
 
-    const renderStar = (index, starNumber) => {
-        const training = trainings[index];
-        const isSelected = training.rating >= starNumber;
+    const renderStar = (index, training, starNumber) => {
+        const isSelected = training.myRating >= starNumber;
         const iconName = isSelected ? 'star' : 'star-outline';
         const color = isSelected ? tertiaryColor : greyColor;
       
@@ -292,7 +227,7 @@ const TrainingsScreen = () => {
             <Icon name={iconName} size={20} color={color} />
           </TouchableOpacity>
         );
-      };
+    };
 
     return (
         <View style={fiufitStyles.container}>
@@ -340,15 +275,17 @@ const TrainingsScreen = () => {
                                     />
                                 </TouchableOpacity>
                             }  
-                            {training.rating >= 0 ?<Text style={styles.ratingText}>Global training rating: {training.rating}</Text> : null}
+                            {training.rating >= 0 
+                                ? <Text style={styles.ratingText}>Global training rating: {training.rating}</Text> 
+                                : null}
                             <View style={fiufitStyles.ratingContainer}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Text style={styles.ratingText}>My rating: </Text> 
-                                    {renderStar(index, 1)}
-                                    {renderStar(index, 2)}
-                                    {renderStar(index, 3)}
-                                    {renderStar(index, 4)}
-                                    {renderStar(index, 5)}
+                                    {renderStar(index, training, 1)}
+                                    {renderStar(index, training, 2)}
+                                    {renderStar(index, training, 3)}
+                                    {renderStar(index, training, 4)}
+                                    {renderStar(index, training, 5)}
                                 </View>
                             </View>
                             <TrainingItem

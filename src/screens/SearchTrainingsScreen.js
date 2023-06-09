@@ -52,10 +52,10 @@ const SearchTrainingsScreen = () => {
     const response = await getTrainingByTypeDifficultyAndTitle(trainingType, trainingDifficulty, searchQuery);
     console.log('RESPONSE: ', response);
     if (isAthlete) {
-        const trainingsFavourites = await checkFavourites(response.items);
+      await checkFavourites(response);
     }
     setTrainings(response);
-    setNotFound(response?.items?.length === 0);
+    setNotFound(response?.length === 0);
     setLoading(false);
 
   };
@@ -68,7 +68,7 @@ const SearchTrainingsScreen = () => {
 
     const isTrainerCheck = async () => {
       const isTrainer = await AsyncStorage.getItem('@is_trainer');
-      setIsAthlete(!isTrainer);
+      setIsAthlete(isTrainer === 'false');
     };
 
     fetchTrainingTypes();
@@ -78,24 +78,21 @@ const SearchTrainingsScreen = () => {
   const checkFavourites = async (trainings) => {
     console.log('trainings: ', trainings);
 
-    let favourites = [];
+    let favouritesTrainings = [];
     try {
         const userId = await AsyncStorage.getItem('@fiufit_userId');
         console.log('userId: ', userId);
 
-        favourites = await UserService.getTrainingsByUserId(userId);
-        console.log('favourites: ', favourites);
+        favouritesTrainings = await UserService.getTrainingsByUserId(userId);
+        console.log('favourites: ', favouritesTrainings);
 
     } catch (error) {
-        console.log('Error while checking favourites training: ', error);
+      console.log('Error while checking favourites training: ', error);
     }
-    const newTrainings = trainings.map(training => {
-        if (favourites.includes(training.id)) {
-            training.favourite = true;
-        } else {
-            training.favourite = false;
-        }
-        return newTrainings;
+    const favouritesIds = favouritesTrainings.map(favourite => favourite.id);
+    trainings.map(training => {
+      training.favourite = favouritesIds.includes(training.id);
+      return training;
     });
   }
 
@@ -200,31 +197,31 @@ const SearchTrainingsScreen = () => {
                                     }}/>
                         }
                     {isAthlete === false && !training.favourite &&
-                          <TouchableOpacity
-                              style={fiufitStyles.editButton}
-                              onPress={() => handleFavouriteTraining(training.id)}
-                          >
-                              <IconButton
-                                  icon="heart-outline"
-                                  iconColor={tertiaryColor}
-                                  style={{backgroundColor: secondaryColor}}
-                                  size={30}
-                              />
-                          </TouchableOpacity>
-                      }
-                      {isAthlete && training.favourite &&
-                        <TouchableOpacity
-                            style={fiufitStyles.editButton}
-                            onPress={() => handleUnfavouriteTraining(training.id)}
-                        >
-                            <IconButton
-                            icon="heart"
-                            iconColor={redColor}
-                            style={{backgroundColor: secondaryColor}}
-                            size={30}
-                            />
-                        </TouchableOpacity>
-                        }
+                      <TouchableOpacity
+                        style={fiufitStyles.editButton}
+                        onPress={() => handleFavouriteTraining(training.id)}
+                      >
+                      <IconButton
+                          icon="heart-outline"
+                          iconColor={tertiaryColor}
+                          style={{backgroundColor: secondaryColor}}
+                          size={30}
+                      />
+                      </TouchableOpacity>
+                    }
+                    {isAthlete && training.favourite &&
+                      <TouchableOpacity
+                          style={fiufitStyles.editButton}
+                          onPress={() => handleUnfavouriteTraining(training.id)}
+                      >
+                          <IconButton
+                          icon="heart"
+                          iconColor={tertiaryColor}
+                          style={{backgroundColor: secondaryColor}}
+                          size={30}
+                          />
+                      </TouchableOpacity>
+                    }
                 </List.Accordion>
             ))}
             </View>
