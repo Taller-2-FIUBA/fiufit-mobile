@@ -7,6 +7,7 @@ import {
     View,
     ToastAndroid,
     TouchableOpacity,
+    StyleSheet,
 } from 'react-native'
 import React, {useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
@@ -23,7 +24,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {UserService} from "../services/userService";
 import {decode} from "base-64";
 
-const TrainingItem = ({value, editable, onChange, rating}) => {
+const TrainingItem = ({value, editable, onChange}) => {
     return (
         <View style={fiufitStyles.trainingItemContainer}>
             <TextInput
@@ -32,16 +33,6 @@ const TrainingItem = ({value, editable, onChange, rating}) => {
                 onChangeText={onChange}
                 editable={editable}
             />
-            {rating >= 0 && (
-                <View style={fiufitStyles.ratingContainer}>
-                <Icon name="star" size={20} color={rating >= 0 ? primaryColor : greyColor} />
-                <Icon name="star" size={20} color={rating >= 2 ? primaryColor : greyColor} />
-                <Icon name="star" size={20} color={rating >= 3 ? primaryColor : greyColor} />
-                <Icon name="star" size={20} color={rating >= 4 ? primaryColor : greyColor} />
-                <Icon name="star" size={20} color={rating >= 5 ? primaryColor : greyColor} />
-                <Text style={fiufitStyles.ratingText}>{rating}</Text>
-                </View>
-            )}
         </View>
     )
 }
@@ -54,12 +45,14 @@ const TrainingsScreen = () => {
     const [trainingTypes, setTrainingTypes] = useState({});
     const [isTrainer, setIsTrainer] = useState(true);
     const [loading, setLoading] = useState(true);
+    const [rating, setRating] = useState(0);
 
     const handleError = (error, input) => {
         setErrors(prevState => ({...prevState, [input]: error}));
     };
 
     const [trainings, setTrainings] = useState([]);
+    const [expandedList, setExpandedList] = useState(trainings && trainings.map(() => false));
 
     /* const [trainings, setTrainings] = useState([
         {
@@ -194,14 +187,16 @@ const TrainingsScreen = () => {
                 console.log('is_trainer now for trainer: ', isTrainer)
 
             }
-            setTrainings(response);
+            const trainingsWithRating = await getMyRating(response);
+            setTrainings(trainingsWithRating);
+            console.log('trainingsWithRating: ', trainingsWithRating);
             setLoading(false)
+            console.log('LOS TRAININGS: ', trainings);
         } catch (error) {
             console.log('Error while fetching trainings: ', error);
         }
     };
 
-    const [expandedList, setExpandedList] = useState(trainings && trainings.map(() => false));
 
     const handlePress = (index) => {
         const newList = [...expandedList];
@@ -272,6 +267,45 @@ const TrainingsScreen = () => {
         }
     }
 
+    const getMyRating = async (trainingsList) => {
+        const newTrainings = [...trainingsList];
+        for (let training of newTrainings) {
+            const myRating = await UserService.getUserRaiting(training.id);
+            training.myRating = myRating;
+          }
+        console.log('NEW_TRAININGS: ', newTrainings);
+        return newTrainings;
+    };
+
+    const handleStarPress = (index, starNumber) => {
+        setTrainings((prevTrainings) => {
+            const newTrainings = [...prevTrainings];
+            const updatedTraining = { ...newTrainings[index] };
+
+            if (updatedTraining.rating === starNumber) {
+                updatedTraining.rating = 0;
+            } else {
+                updatedTraining.rating = starNumber;
+            }
+
+            newTrainings[index] = updatedTraining;
+            return newTrainings;
+        });
+    };
+
+    const renderStar = (index, starNumber) => {
+        const training = trainings[index];
+        const isSelected = training.rating >= starNumber;
+        const iconName = isSelected ? 'star' : 'star-outline';
+        const color = isSelected ? tertiaryColor : greyColor;
+      
+        return (
+          <TouchableOpacity onPress={() => handleStarPress(index, starNumber)}>
+            <Icon name={iconName} size={20} color={color} />
+          </TouchableOpacity>
+        );
+      };
+
     return (
         <View style={fiufitStyles.container}>
             {loading ? (
@@ -305,7 +339,30 @@ const TrainingsScreen = () => {
                             expanded={expandedList[index]}
                             onPress={() => handlePress(index)}
                         >
-                            {training.rating > 0 ?<Text style={{ color: greyColor }}>{training.rating}</Text> : null}
+                            {isTrainer && !editable && 
+                                <TouchableOpacity
+                                    style={fiufitStyles.editButton}
+                                    onPress={handleEditAction}
+                                >
+                                    <IconButton
+                                        icon="pencil"
+                                        iconColor={tertiaryColor}
+                                        style={{backgroundColor: secondaryColor}}
+                                        size={30}
+                                    />
+                                </TouchableOpacity>
+                            }  
+                            {training.rating >= 0 ?<Text style={styles.ratingText}>Global training rating: {training.rating}</Text> : null}
+                            <View style={fiufitStyles.ratingContainer}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={styles.ratingText}>My rating: </Text> 
+                                    {renderStar(index, 1)}
+                                    {renderStar(index, 2)}
+                                    {renderStar(index, 3)}
+                                    {renderStar(index, 4)}
+                                    {renderStar(index, 5)}
+                                </View>
+                            </View>
                             <TrainingItem
                                 value={training.title}
                                 editable={editable}
@@ -389,20 +446,7 @@ const TrainingsScreen = () => {
                                         }}/>
                                     </PapperButton>
                                 </View>
-                            }
-                            {isTrainer && !editable && 
-                                <TouchableOpacity
-                                    style={fiufitStyles.editButton}
-                                    onPress={handleEditAction}
-                                >
-                                    <IconButton
-                                        icon="pencil"
-                                        iconColor={tertiaryColor}
-                                        style={{backgroundColor: secondaryColor}}
-                                        size={30}
-                                    />
-                                </TouchableOpacity>
-                            }   
+                            } 
                             {isTrainer && editable && 
                                 <View style={fiufitStyles.trainingButtonContainer}>
                                     <TouchableOpacity style={{...fiufitStyles.trainingActionButton, marginRight: 5}} onPress={() => handleSaveAction(index)}>
@@ -433,4 +477,16 @@ const TrainingsScreen = () => {
     );
   };
   
+  const styles = StyleSheet.create({
+    ratingContainer: {
+        paddingBottom: 10,
+    },
+    ratingText: {
+        color: greyColor,
+        justifyContent: 'flex-start',
+        paddingTop: 10,
+        paddingBottom: 10
+    },
+});
+
   export default TrainingsScreen;

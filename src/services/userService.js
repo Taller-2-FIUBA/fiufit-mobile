@@ -129,4 +129,15 @@ export const UserService = {
             console.log(error);
         }
     },
+
+    async getUserRaiting(trainingId) {
+        let userId = await AsyncStorage.getItem('@fiufit_userId');
+        try {
+            const response = await axios.get(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}/${trainingId}/rating`);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            return 0;
+        }
+    }
 }
