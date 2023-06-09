@@ -5,7 +5,7 @@ import {primaryColor, secondaryColor} from "../consts/colors";
 import { Searchbar, Avatar, useTheme} from 'react-native-paper';
 import {useNavigation} from "@react-navigation/native";
 import { UserService } from "../services/userService";
-import { doc, getDoc} from "firebase/firestore";
+import { doc, onSnapshot} from "firebase/firestore";
 import { db } from "../utils/firebase"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -17,12 +17,11 @@ const ChatScreen = () => {
     const navigation = useNavigation();
 
     useEffect(() => {
-        //TODO agregar buscar chats del usuario en firebase
         getUserChats();
     }, []);
 
     const ChatMessageIntro = ({chatInfo}) => {
-        const {user, conversationId} = chatInfo;
+        const {user} = chatInfo;
 
         return (
             <TouchableOpacity style={fiufitStyles.chatMessageIntro} onPress={event => handleGoToChat(event, chatInfo)}>
@@ -42,17 +41,17 @@ const ChatScreen = () => {
         console.log("Buscar chats del usuario");
         const userId =  await AsyncStorage.getItem('@fiufit_userId');
         console.log("UserId --> ", userId);
-        const userChatsDoc = await getDoc(doc(db, "usersChats", userId));
-        console.log("UserChatsDoc --> ", userChatsDoc.data());
-        
-        let chatsDocInfo = [];
-        for (const chat of userChatsDoc.data().chats) {
-            console.log("Chat --> ", chat);
-            const user = await getUserInfoFromId(chat.userId);
-            chatsDocInfo.push({user: user, conversationId: chat.conversationId});
-        }
-        console.log("ChatsDocInfo --> ", chatsDocInfo);
-        setChatsInfo(chatsDocInfo);
+        onSnapshot(doc(db, "usersChats", userId), async (doc) => {
+            let chatsDocInfo = [];
+            if (doc.exists()) {
+                for (const chat of doc.data().chats) {
+                    console.log("Chat --> ", chat);
+                    const user = await getUserInfoFromId(chat.userId);
+                    chatsDocInfo.push({user: user, conversationId: chat.conversationId});
+                }
+            }
+            setChatsInfo(chatsDocInfo);
+        });
     }
 
     const getUserInfoFromId = async (userId) => {
@@ -65,9 +64,19 @@ const ChatScreen = () => {
     const handleSearch= async () => {
         const response = await UserService.getUserByUsername(searchQuery);
         if (Object.keys(response).length === 0) {
-            setNotFound(true);
+            //TODO mostrar mensaje de que no se encontro el usuario
         } else {
-            navigation.navigate("PrivateChat", {user: response});
+            let conversationId = null;
+            console.log("Response --> ", response);
+            for (const chat of chatsInfo) {
+                console.log("Chat --> ", chat);
+                if (chat.userId == response.id) {
+                    conversationId = chat.conversationId;
+                }
+            }
+            const chatInfo = {user: response, conversationId: conversationId};
+            console.log("ChatInfo --> ", chatInfo);
+            navigation.navigate("PrivateChat", {chatInfo});
         }
     };
 

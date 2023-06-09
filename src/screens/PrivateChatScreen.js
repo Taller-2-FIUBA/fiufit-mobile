@@ -2,7 +2,7 @@ import {Text, TextInput, View, ScrollView, TouchableOpacity} from "react-native"
 import React, { useEffect } from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { doc, getDoc, addDoc, updateDoc, onSnapshot} from "firebase/firestore";
+import { doc, collection, addDoc, updateDoc, onSnapshot, setDoc, getDoc} from "firebase/firestore";
 import { db } from "../utils/firebase"
 
 const PrivateChatScreen = ({route}) => {
@@ -16,8 +16,8 @@ const PrivateChatScreen = ({route}) => {
     setActualMessage(text);
   };
 
-  const handleSend = () => {
-    updateDoc(doc(db, "conversations", chatInfo.conversationId), {
+  const handleSend = async () => {
+    await updateDoc(doc(db, "conversations", chatInfo.conversationId), {
       messages: [...messages, {message: actualMessage, userId: actualUserId}]
     });
     setActualMessage(null);
@@ -37,22 +37,40 @@ const PrivateChatScreen = ({route}) => {
     );
   }
 
-  const getActualUser = async () => {
-    const userId =  await AsyncStorage.getItem('@fiufit_userId');
-    setActualUserId(userId);
+  const createChat = async (userId, conversationId, otherUserId ) => {
+    try {
+      const userDocRef = doc(db, "usersChats", userId);
+      const userChat = await getDoc(userDocRef);
+      if (userChat.exists()) {
+        await updateDoc(userDocRef, {
+          chats: [...userChat.data().chats, {userId: otherUserId, conversationId: conversationId}]
+        });
+      } else { 
+        await setDoc(userDocRef, {
+          chats: [{userId: otherUserId, conversationId: conversationId}]
+        });
+      }
+    } catch (e) {
+      console.error("Error creating or updating chat: ", e);
+    }
   }
 
   const getConversationMessages = async () => {
-    //TODO buscar mensajes del usuario en firebase
     console.log("Buscar mensajes de la conversacion");
-    await getActualUser();
+    const userId =  await AsyncStorage.getItem('@fiufit_userId');
     if (!chatInfo.conversationId) {
       console.log("No hay conversacion");
-      chatInfo.conversationId = "1";
+      const docRef = await addDoc(collection(db, "conversations"), {
+        messages: []
+      });
+      chatInfo.conversationId = docRef.id;
+      await createChat(userId, chatInfo.conversationId, chatInfo.user.id.toString());
+      await createChat(chatInfo.user.id.toString(), chatInfo.conversationId, userId);
     }
     onSnapshot(doc(db, "conversations", chatInfo.conversationId), (doc) => {
       setMessages(doc.data().messages);
     });
+    setActualUserId(userId);
   }
 
   useEffect(() => {
