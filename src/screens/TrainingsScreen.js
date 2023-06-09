@@ -147,7 +147,7 @@ const TrainingsScreen = () => {
                 setDialog(false);
             });
     }, []);
-
+    
     const fetchTrainingTypes = async () => {
         const response = await getTrainingsTypes();
         setTrainingTypes(response);
@@ -161,37 +161,21 @@ const TrainingsScreen = () => {
 
             try {
                 const profile = await UserService.getUser();
-                console.log('@is_trainer', profile.is_athlete.toString());
                 const isTrainerResult = !profile.is_athlete;
                 await AsyncStorage.setItem('@is_trainer', isTrainerResult.toString());
                 setIsTrainer(!profile.is_athlete);
             } catch(error) {
                 console.log("Something went wrong while fetching user data. Please try again later.");
             }
-
-            console.log('is_trainer: ', isTrainer)
-
             if(!isTrainer) {
-                console.log('soy un atleta: ');
-
                 response = await UserService.getTrainingsByUserId(userId);
-                console.log('response: ', response)
-                console.log('is_trainer now: ', isTrainer)
-
             } else {
-                console.log('Soy un trainer: ');
-
                 const trainer_id = userId;
                 response = await getTrainingsByTrainerId(trainer_id);
-                console.log('response for trainer: ', response)
-                console.log('is_trainer now for trainer: ', isTrainer)
-
             }
             const trainingsWithRating = await getMyRating(response);
             setTrainings(trainingsWithRating);
-            console.log('trainingsWithRating: ', trainingsWithRating);
             setLoading(false)
-            console.log('LOS TRAININGS: ', trainings);
         } catch (error) {
             console.log('Error while fetching trainings: ', error);
         }
@@ -273,24 +257,28 @@ const TrainingsScreen = () => {
             const myRating = await UserService.getUserRaiting(training.id);
             training.myRating = myRating;
           }
-        console.log('NEW_TRAININGS: ', newTrainings);
         return newTrainings;
     };
 
-    const handleStarPress = (index, starNumber) => {
-        setTrainings((prevTrainings) => {
-            const newTrainings = [...prevTrainings];
-            const updatedTraining = { ...newTrainings[index] };
+    const handleStarPress = async (index, starNumber) => {
+        const newTrainings = [...trainings];
+        const updatedTraining = { ...newTrainings[index] };
 
-            if (updatedTraining.rating === starNumber) {
-                updatedTraining.rating = 0;
-            } else {
-                updatedTraining.rating = starNumber;
-            }
+        if (updatedTraining.rating === starNumber) {
+            updatedTraining.rating = 0;
+        } else {
+            updatedTraining.rating = starNumber;
+        }
 
-            newTrainings[index] = updatedTraining;
-            return newTrainings;
-        });
+        try {
+            await UserService.rateTraining(updatedTraining.id, updatedTraining.rating);
+        } catch (error) {
+            console.log(error);
+            updatedTraining.rating = starNumber;
+        }
+
+        newTrainings[index] = updatedTraining;
+        setTrainings(newTrainings);
     };
 
     const renderStar = (index, starNumber) => {

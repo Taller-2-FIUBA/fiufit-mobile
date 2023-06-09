@@ -18,11 +18,7 @@ const createTraining = async (training) => {
     training['trainer_id'] = userId;
 
     const token = await AsyncStorage.getItem('@fiufit_token');
-    console.log(training.media);
     training.media = encode(training.media);
-
-    console.log(JSON.stringify(training));
-
     try {
         const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
         {

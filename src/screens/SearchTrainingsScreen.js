@@ -46,7 +46,6 @@ const SearchTrainingsScreen = () => {
 
   const handleSearch= async () => {
     const response = await getTrainingByTypeAndDifficulty(trainingType, trainingDifficulty);
-    console.log('getTrainingByTypeAndDifficulty: ', response);
     const trainingsFavourites = checkFavourites(response.items);
     setTrainings(trainingsFavourites);
     setNotFound(response?.items?.length === 0);
@@ -64,8 +63,6 @@ const SearchTrainingsScreen = () => {
   useEffect(() => {
         const isAthleteCheck = async () => {
             const isAthlete = await AsyncStorage.getItem('@is_athlete');
-            console.log('IS_ATHLETE fetchTrainingTypes: ', isAthlete);
-
             setIsAthlete(isAthlete);
         };
     

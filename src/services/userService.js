@@ -37,7 +37,6 @@ export const UserService = {
         try {
             const response = await axios.get(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}`);
             const trainings = response.data.items;
-            console.log('TRAININGS: ', trainings);
             if(trainings.length > 0) {
                 return trainings;
             } else {
@@ -116,7 +115,7 @@ export const UserService = {
         const token = await AsyncStorage.getItem('@fiufit_token');
     
         try {
-            const response = await axios.post(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}/${trainingId}`, JSON.stringify(body),
+            const response = await axios.put(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}/${trainingId}`, JSON.stringify(body),
             {
                 headers: {
                   'Content-Type': 'application/json',
