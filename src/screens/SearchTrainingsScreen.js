@@ -117,27 +117,30 @@ const SearchTrainingsScreen = () => {
         onSubmitEditing={handleSearch}
         onChangeText={onChangeSearch}
         value={searchQuery}
+        style={{backgroundColor: tertiaryColor, marginTop: 5}}
       />
-      <Picker
-          label="Type"
-          selectedValue={trainingType}
-          style={fiufitStyles.trainingPickerSelect}
-          onValueChange={(itemValue) => setTrainingType(itemValue)}
-      >
-          {trainingTypes && trainingTypes.length > 0 && trainingTypes.map(trainingType => (
-              <Picker.Item key={trainingType} label={trainingType} value={trainingType} />
-          ))}
-      </Picker>
-      <Picker
-          label="difficulty"
-          selectedValue={trainingDifficulty}
-          style={fiufitStyles.trainingPickerSelect}
-          onValueChange={(itemValue) => setTrainingDifficulty(itemValue)}
-      >
-          <Picker.Item label="Easy" value="Easy" />
-          <Picker.Item label="Medium" value="Medium" />
-          <Picker.Item label="Hard" value="Hard" />
-      </Picker>
+      <View style={{flex: 1, justifyContent: 'space-evenly', flexDirection: 'row',  paddingTop: 10}}>
+        <Picker
+            label="Type"
+            selectedValue={trainingType}
+            style={fiufitStyles.trainingPickerSelect}
+            onValueChange={(itemValue) => setTrainingType(itemValue)}
+        >
+            {trainingTypes && trainingTypes.length > 0 && trainingTypes.map(trainingType => (
+                <Picker.Item key={trainingType} label={trainingType} value={trainingType} />
+            ))}
+        </Picker>
+        <Picker
+            label="difficulty"
+            selectedValue={trainingDifficulty}
+            style={fiufitStyles.trainingPickerSelect}
+            onValueChange={(itemValue) => setTrainingDifficulty(itemValue)}
+        >
+            <Picker.Item label="Easy" value="Easy" />
+            <Picker.Item label="Medium" value="Medium" />
+            <Picker.Item label="Hard" value="Hard" />
+        </Picker>
+      </View>
       <Button onPress={handleSearch} title="Search"/>
 
       {notFound && (
@@ -160,18 +163,10 @@ const SearchTrainingsScreen = () => {
                     onPress={() => handlePress(index)}
                 >
                     {training.rating >= 0 ?<Text style={styles.ratingText}>Global training rating: {training.rating}</Text> : null}
-                    <TrainingItem
-                        value={training.title}
-                    />
-                    <TrainingItem
-                        value={training.description}
-                    />
-                    <TrainingItem
-                        value={trainings[index].type}
-                    />
-                    <TrainingItem
-                        value={trainings[index].difficulty}
-                    />
+                    <TrainingItem value={training.title}/>
+                    <TrainingItem value={training.description}/>
+                    <TrainingItem value={trainings[index].type}/>
+                    <TrainingItem value={trainings[index].difficulty}/>
                     <View key={training.id}>
                         <Text style={{color: greyColor,
                             fontSize: 18,
@@ -235,13 +230,13 @@ const SearchTrainingsScreen = () => {
 
 const styles = StyleSheet.create({
     ratingContainer: {
-        paddingBottom: 10,
+      paddingBottom: 10,
     },
     ratingText: {
-        color: greyColor,
-        justifyContent: 'flex-start',
-        paddingTop: 10,
-        paddingBottom: 10
+      color: greyColor,
+      justifyContent: 'flex-start',
+      paddingTop: 10,
+      paddingBottom: 10
     },
 });
 

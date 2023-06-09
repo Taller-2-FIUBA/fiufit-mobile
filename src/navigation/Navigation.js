@@ -249,12 +249,23 @@ const RegistrationStackNavigator = () => {
 
 
 const TabsNavigation = () => {
-  return (
-    <TopTab.Navigator>
-      <TopTab.Screen name="Users" component={SearchUsersScreen} />
-      <TopTab.Screen name="Trainings" component={SearchTrainingsScreen} />
+    const theme = useTheme();
+    return (
+    <TopTab.Navigator
+        screenOptions={{
+            tabBarActiveTintColor: theme.colors.secondary,
+            tabBarIndicatorStyle: {
+                backgroundColor: theme.colors.secondary,
+                height: 2
+            },
+            tabBarStyle: {
+                backgroundColor: theme.colors.primary,
+            },
+        }}>
+        <TopTab.Screen name="Users" component={SearchUsersScreen}/>
+        <TopTab.Screen name="Trainings" component={SearchTrainingsScreen} />
     </TopTab.Navigator>
-  );
+    );
 };
 
 const FollowTabsNavigation = ({ route }) => {

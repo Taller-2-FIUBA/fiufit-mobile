@@ -31,7 +31,7 @@ const SearchUsersScreen = () => {
             onSubmitEditing={handleSearch}
             onChangeText={onChangeSearch}
             value={searchQuery}
-            style={{backgroundColor: secondaryColor, marginTop: 5}}
+            style={{backgroundColor: tertiaryColor, marginTop: 5}}
         />
         {usersSearch && (
             <TouchableOpacity
