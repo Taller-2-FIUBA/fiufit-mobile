@@ -68,13 +68,18 @@ const getExercises = async () => {
     }
 }
 
-const getTrainingByTypeAndDifficulty = async (type, difficulty) => {
+const getTrainingByTypeDifficultyAndTitle = async (type, difficulty, title) => {
     let url = `${requests.BASE_URL}${requests.TRAINING}`;
-    if (type) {
-        url += `?training_type=${type}`;
-    } 
-    if (difficulty) {
-        url += type ? `&difficulty=${difficulty}` : `?difficulty=${difficulty}`;
+    if (title) {
+        title = title.trim();
+        url += `?title=${title}`;
+    } else {
+        if (type) {
+            url += `?training_type=${type}`;
+        } 
+        if (difficulty) {
+            url += type ? `&difficulty=${difficulty}` : `?difficulty=${difficulty}`;
+        }
     }
     try {
         const response = await axios.get(url);
@@ -113,4 +118,4 @@ const trimUserData = (training) => {
     }
 }
 
-export {createTraining, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData, getTrainingByTypeAndDifficulty}
+export {createTraining, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData, getTrainingByTypeDifficultyAndTitle}

@@ -411,7 +411,7 @@ const TrainingsScreen = () => {
                                             }}/>
                                 }
                             {isTrainer && editable && training.media &&
-                                    <Image source={{uri: training.media}}
+                                    <Image source={{uri: decode(training.media)}}
                                             style={{
                                                 width: 120,
                                                 height: 120,

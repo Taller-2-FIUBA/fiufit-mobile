@@ -1,9 +1,8 @@
-import {View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet,
+import {View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image
 } from "react-native";
 import React, {useEffect, useState} from "react";
-/* import { Searchbar } from 'react-native-paper'; */
-import {useNavigation} from "@react-navigation/native";
-import { getTrainingsTypes, getTrainingByTypeAndDifficulty } from "../services/TrainingsService";
+import { Searchbar } from 'react-native-paper';
+import { getTrainingsTypes, getTrainingByTypeDifficultyAndTitle } from "../services/TrainingsService";
 import {Picker} from '@react-native-picker/picker';
 import Button from "../components/Button";
 import {fiufitStyles} from "../consts/fiufitStyles";
@@ -11,6 +10,7 @@ import {primaryColor, secondaryColor, tertiaryColor, redColor, greyColor} from "
 import { ActivityIndicator, FAB, IconButton, List, useTheme } from 'react-native-paper';
 import {UserService} from "../services/userService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {decode} from "base-64";
 
 const TrainingItem = ({value}) => {
   return (
@@ -25,7 +25,7 @@ const TrainingItem = ({value}) => {
 }
 
 const SearchTrainingsScreen = () => {
-  /* const [searchQuery, setSearchQuery] = React.useState(''); */
+  const [searchQuery, setSearchQuery] = React.useState('');
   const theme = useTheme();
 
   const [notFound, setNotFound] = React.useState(false);
@@ -44,14 +44,12 @@ const SearchTrainingsScreen = () => {
     setExpandedList(newList);
   }
 
- /*  const navigation = useNavigation(); */
-
-  /* const onChangeSearch = query => setSearchQuery(query); */
+  const onChangeSearch = query => setSearchQuery(query);
 
   const handleSearch= async () => {
     console.log('IS TRAINER: ', isTrainer);
     setLoading(true);
-    const response = await getTrainingByTypeAndDifficulty(trainingType, trainingDifficulty);
+    const response = await getTrainingByTypeDifficultyAndTitle(trainingType, trainingDifficulty, searchQuery);
     console.log('RESPONSE: ', response);
     if (!isTrainer) {
         const trainingsFavourites = await checkFavourites(response.items);
@@ -114,12 +112,12 @@ const SearchTrainingsScreen = () => {
 
   return (
     <ScrollView style={{backgroundColor: primaryColor}}>
-     {/*  <Searchbar
+      <Searchbar
         placeholder="Search"
         onSubmitEditing={handleSearch}
         onChangeText={onChangeSearch}
         value={searchQuery}
-      /> */}
+      />
       <Picker
           label="Type"
           selectedValue={trainingType}
@@ -147,14 +145,6 @@ const SearchTrainingsScreen = () => {
             <Text>There are no results for your search.</Text>
         </View>
       )}
-      {/* {trainings && trainings.length > 0 && trainings.map(training => (
-        <View key={training.id} style={{ alignItems: "center", marginTop: 20 }}>
-            <Text style={{padding: 10, backgroundColor: secondaryColor, color: tertiaryColor}}>{
-              training.title}
-            </Text>
-        </View>
-      ))
-      } */}
       {loading ? (
                     <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
                 )
@@ -201,7 +191,7 @@ const SearchTrainingsScreen = () => {
                         ))}
                     </View>
                     {training.media &&
-                            <Image source={{uri: training.media}}
+                            <Image source={{uri: decode(training.media)}}
                                     style={{
                                         width: 120,
                                         height: 120,
