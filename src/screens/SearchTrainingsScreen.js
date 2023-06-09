@@ -52,6 +52,7 @@ const SearchTrainingsScreen = () => {
     console.log('IS TRAINER: ', isTrainer);
     setLoading(true);
     const response = await getTrainingByTypeAndDifficulty(trainingType, trainingDifficulty);
+    console.log('RESPONSE: ', response);
     if (!isTrainer) {
         const trainingsFavourites = await checkFavourites(response.items);
     }

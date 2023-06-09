@@ -78,7 +78,12 @@ const getTrainingByTypeAndDifficulty = async (type, difficulty) => {
     }
     try {
         const response = await axios.get(url);
-        return response.data;
+        const trainings = response.data.items;
+        if(trainings.length > 0) {
+            return trainings;
+        } else {
+            return [];
+        }
     } catch (error) {
         console.log(error);
     }
