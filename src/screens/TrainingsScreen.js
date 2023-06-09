@@ -214,7 +214,8 @@ const TrainingsScreen = () => {
         }
 
         newTrainings[index] = updatedTraining;
-        setTrainings(newTrainings);
+        const trainingsWithRating = await getMyRating(newTrainings);
+        setTrainings(trainingsWithRating);
     };
 
     const renderStar = (index, training, starNumber) => {
