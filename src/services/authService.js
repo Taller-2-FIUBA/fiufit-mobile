@@ -75,8 +75,6 @@ const authService = {
                         return r;
                     }
                 );
-            } else {
-                throw new Error("Error registering with Google");
             }
         } catch (error) {
             this._handleError(error);

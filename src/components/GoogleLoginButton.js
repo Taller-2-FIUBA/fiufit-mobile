@@ -60,7 +60,7 @@ const GoogleLoginButton = ({navigation}) => {
                         handleRegister();
                     } else {
                         console.log(error);
-                        Alert.alert("Error logging in 1", "Something went wrong. Please try again.");
+                        Alert.alert("Error logging in", "Something went wrong. Please try again.");
                     }
                 });
         }
