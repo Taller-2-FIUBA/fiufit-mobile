@@ -27,6 +27,7 @@ import {useEffect, useState} from "react";
 import { UserService } from "../services/userService";
 import UserDataContext from "../contexts/userDataContext";
 import PrivateChatScreen from "../screens/PrivateChatScreen";
+import { isSupported, requestForToken } from '../utils/firebase';
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -43,9 +44,28 @@ const AuthStack = () => {
         surname: '',
     });
 
+    const onMessage = async (remoteMessage) => {
+        Alert.alert("New message", remoteMessage.notification.body);
+    }
+
+    const initMessaging = async () => {
+        const hasFirebaseMessagingSupport = await isSupported();
+        if (hasFirebaseMessagingSupport) {
+            await requestForToken();
+            const onFocusSubscribe = messaging().onMessage(onMessage);
+            const onBackgroudSubscribe = messaging().setBackgroundMessageHandler(onMessage);
+
+            return () => {
+                onFocusSubscribe();
+                onBackgroudSubscribe();
+            }
+        }
+    }
+
     useEffect(() => {
         UserService.getUser().then((profile) => {
             setUserData(profile);
+            initMessaging();
         }).catch((error) => {
             console.log(error);
             Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");

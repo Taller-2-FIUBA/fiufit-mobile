@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from "firebase/firestore";
+import { getMessaging } from "firebase/messaging";
 
 
 const firebaseConfig = {
@@ -12,5 +13,30 @@ const firebaseConfig = {
 }
 
 const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+const getFirebaseToken = async () => {
+  try {
+    const currentToken = await getToken(messaging, { vapidKey: process.env.FIREBASE_VAPID_KEY });
+    if (!currentToken) {
+      console.log("No registration token available. Request permission to generate one.");
+    }
+  } catch (error) {
+    console.log("An error occurred while retrieving token. ", error);
+  }
+};
+
+export const requestForToken = async () => {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      await getFirebaseToken();
+    }
+  } catch (error) {
+    console.log("An error occurred while getting user permission. ", error);
+  }
+};
 
 export const db = getFirestore(app);
+export const isSupported = messaging.isSupported();
+
