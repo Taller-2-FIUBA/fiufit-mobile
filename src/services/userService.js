@@ -77,6 +77,25 @@ export const UserService = {
         }
     },
 
+    async deleteFavouriteTraining(trainingId) {
+        let userId = await AsyncStorage.getItem('@fiufit_userId');    
+        const token = await AsyncStorage.getItem('@fiufit_token');
+    
+        try {
+            const response = await axios.post(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}/${trainingId}`,
+            {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                }
+              });
+            console.log("Training delete from favourites successfully", response.data);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
     async getFolloweds(userId) {
         try {
             console.log('Fetching followeds for user: ', userId);

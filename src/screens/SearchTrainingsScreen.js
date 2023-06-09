@@ -35,7 +35,7 @@ const SearchTrainingsScreen = () => {
   const [trainings, setTrainings] = React.useState([]);
   const [expandedList, setExpandedList] = useState(trainings && trainings.map(() => false));
   const [favourite, setFavourite] = useState(false);
-  const [isTrainer, setIsTrainer] = useState(true);
+  const [isAthlete, setIsAthlete] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const handlePress = (index) => {
@@ -47,11 +47,11 @@ const SearchTrainingsScreen = () => {
   const onChangeSearch = query => setSearchQuery(query);
 
   const handleSearch= async () => {
-    console.log('IS TRAINER: ', isTrainer);
+    console.log('IS Athlete: ', isAthlete);
     setLoading(true);
     const response = await getTrainingByTypeDifficultyAndTitle(trainingType, trainingDifficulty, searchQuery);
     console.log('RESPONSE: ', response);
-    if (!isTrainer) {
+    if (isAthlete) {
         const trainingsFavourites = await checkFavourites(response.items);
     }
     setTrainings(response);
@@ -61,21 +61,18 @@ const SearchTrainingsScreen = () => {
   };
 
   useEffect(() => {
-        const fetchTrainingTypes = async () => {
-            const response = await getTrainingsTypes();
-            setTrainingTypes(response);
+    const fetchTrainingTypes = async () => {
+      const response = await getTrainingsTypes();
+      setTrainingTypes(response);
+    };
+
+    const isTrainerCheck = async () => {
+      const isTrainer = await AsyncStorage.getItem('@is_trainer');
+      setIsAthlete(!isTrainer);
     };
 
     fetchTrainingTypes();
-  }, []);
-
-  useEffect(() => {
-        const isTrainerCheck = async () => {
-            const isTrainer = await AsyncStorage.getItem('@is_trainer');
-            setIsTrainer(isTrainer);
-        };
-    
-        isTrainerCheck();
+    isTrainerCheck();
   }, []);
 
   const checkFavourites = async (trainings) => {
@@ -106,7 +103,15 @@ const SearchTrainingsScreen = () => {
     try {
         await UserService.addFavouriteTraining(trainingId);
     } catch (error) {
-        console.log('Error while fetching trainings: ', error);
+        console.log('Error while adding favourites trainings: ', error);
+    }
+  }
+
+  const handleUnfavouriteTraining = async (trainingId) => {
+    try {
+        await UserService.deleteFavouriteTraining(trainingId);
+    } catch (error) {
+        console.log('Error while deleting favourite trainings: ', error);
     }
   }
 
@@ -194,7 +199,7 @@ const SearchTrainingsScreen = () => {
                                         borderRadius: 5,
                                     }}/>
                         }
-                    {!isTrainer && !training.favourite &&
+                    {isAthlete === false && !training.favourite &&
                           <TouchableOpacity
                               style={fiufitStyles.editButton}
                               onPress={() => handleFavouriteTraining(training.id)}
@@ -207,7 +212,7 @@ const SearchTrainingsScreen = () => {
                               />
                           </TouchableOpacity>
                       }
-                      {!isTrainer && training.favourite &&
+                      {isAthlete && training.favourite &&
                         <TouchableOpacity
                             style={fiufitStyles.editButton}
                             onPress={() => handleUnfavouriteTraining(training.id)}
