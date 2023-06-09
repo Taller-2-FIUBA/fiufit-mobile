@@ -44,7 +44,7 @@ const getTrainingsByTrainerId = async (trainer_id) => {
               'Authorization': `Bearer ${token}`,
             }
           });        
-        return response.data.items;
+        return response.data.items.filter(training => !training.blocked);
     } catch (error) {
         console.log(error);
     }
@@ -83,7 +83,7 @@ const getTrainingByTypeDifficultyAndTitle = async (type, difficulty, title) => {
     }
     try {
         const response = await axios.get(url);
-        const trainings = response.data.items;
+        const trainings = response.data.items.filter(training => !training.blocked);
         if(trainings.length > 0) {
             return trainings;
         } else {

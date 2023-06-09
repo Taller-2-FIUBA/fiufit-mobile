@@ -45,7 +45,7 @@ export const UserService = {
     async getTrainingsByUserId(userId) {
         try {
             const response = await axios.get(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}`);
-            const trainings = response.data.items;
+            const trainings = response.data.items.filter(training => !training.blocked);
             if(trainings.length > 0) {
                 return trainings;
             } else {
