@@ -12,7 +12,7 @@ import {
 import React, {useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {primaryColor, secondaryColor, tertiaryColor, redColor, greyColor} from "../consts/colors";
+import {primaryColor, secondaryColor, tertiaryColor, greyColor} from "../consts/colors";
 import { ActivityIndicator, FAB, IconButton, List, useTheme } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 import {
@@ -22,6 +22,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {UserService} from "../services/userService";
+import {getTrainingById} from "../services/TrainingsService";
 import {decode} from "base-64";
 import {useIsFocused} from "@react-navigation/core";
 
@@ -88,7 +89,7 @@ const TrainingsScreen = () => {
             const userId = await AsyncStorage.getItem('@fiufit_userId');
             user = await UserService.getUserById(userId);
         } catch(error) {
-            console.log("Something went wrong while fetching user data. Please try again later.");
+            console.error("Something went wrong while fetching user data. Please try again later.");
         }
         return user;
     }
@@ -119,6 +120,10 @@ const TrainingsScreen = () => {
 
 
     const handlePress = (index) => {
+       toogleExpanded(index);
+    }
+
+    const toogleExpanded = (index) => {
         const newList = [...expandedList];
         newList[index] = !newList[index];
         setExpandedList(newList);
@@ -196,26 +201,27 @@ const TrainingsScreen = () => {
         return newTrainings;
     };
 
-    const handleStarPress = async (index, starNumber) => {
-        const newTrainings = [...trainings];
-        const updatedTraining = { ...newTrainings[index] };
-
-        if (updatedTraining.rating === starNumber) {
-            updatedTraining.rating = 0;
+    const handleStarPress = async (index, training, starNumber) => {
+        let myRating = training.myRating;
+        let newTraining = null;
+        if (myRating === starNumber) {
+            myRating = 0;
         } else {
-            updatedTraining.rating = starNumber;
+            myRating = starNumber;
         }
 
         try {
-            await UserService.rateTraining(updatedTraining.id, updatedTraining.rating);
+            await UserService.rateTraining(training.id, myRating);
+            newTraining = await getTrainingById(training.id)
+            newTraining.myRating = myRating; 
         } catch (error) {
-            console.log(error);
-            updatedTraining.rating = starNumber;
+            console.error("Error on chaning training rating: ", error);
         }
-
-        newTrainings[index] = updatedTraining;
-        const trainingsWithRating = await getMyRating(newTrainings);
-        setTrainings(trainingsWithRating);
+        console.log("New training: ", newTraining);
+        trainings[index] = newTraining;
+        console.log("Trainings: ", trainings);
+        toogleExpanded(index);
+        setTrainings(trainings);
     };
 
     const renderStar = (index, training, starNumber) => {
@@ -224,7 +230,7 @@ const TrainingsScreen = () => {
         const color = isSelected ? tertiaryColor : greyColor;
       
         return (
-          <TouchableOpacity onPress={() => handleStarPress(index, starNumber)}>
+          <TouchableOpacity onPress={() => handleStarPress(index, training, starNumber)}>
             <Icon name={iconName} size={20} color={color} />
           </TouchableOpacity>
         );
@@ -266,8 +272,7 @@ const TrainingsScreen = () => {
                             {isTrainer && !editable && 
                                 <TouchableOpacity
                                     style={fiufitStyles.editButton}
-                                    onPress={handleEditAction}
-                                >
+                                    onPress={handleEditAction}>
                                     <IconButton
                                         icon="pencil"
                                         iconColor={tertiaryColor}
@@ -281,7 +286,7 @@ const TrainingsScreen = () => {
                                 : null}
                             <View style={fiufitStyles.ratingContainer}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Text style={styles.ratingText}>My rating: </Text> 
+                                    <Text style={styles.ratingText}>My rating: </Text>
                                     {renderStar(index, training, 1)}
                                     {renderStar(index, training, 2)}
                                     {renderStar(index, training, 3)}

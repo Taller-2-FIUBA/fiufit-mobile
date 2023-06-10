@@ -34,6 +34,15 @@ const createTraining = async (training) => {
     }
 }
 
+const getTrainingById = async (trainingId) => {
+    try {
+        const response = await axiosInstance.get(`${requests.BASE_URL}${requests.TRAINING}/${trainingId}`);
+        console.log("Training by id: ", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error in getTrainingById: ", error);
+    }
+}
 
 const getTrainingsByTrainerId = async (trainer_id) => {
     try {
@@ -118,4 +127,4 @@ const trimUserData = (training) => {
     }
 }
 
-export {createTraining, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData, getTrainingByTypeDifficultyAndTitle}
+export {createTraining, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData, getTrainingByTypeDifficultyAndTitle, getTrainingById}
