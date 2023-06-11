@@ -12,17 +12,7 @@ import {UserService} from "../services/userService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {decode} from "base-64";
 
-const TrainingItem = ({value}) => {
-  return (
-      <View style={fiufitStyles.trainingItemContainer}>
-          <TextInput
-              style={fiufitStyles.trainingNotEditableInpunt}
-              value={value}
-              editable={false}
-          />
-      </View>
-  )
-}
+
 
 const SearchTrainingsScreen = () => {
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -34,15 +24,10 @@ const SearchTrainingsScreen = () => {
   const [trainingDifficulty, setTrainingDifficulty] = React.useState('Easy');
   const [trainings, setTrainings] = React.useState([]);
   const [expandedList, setExpandedList] = useState(trainings && trainings.map(() => false));
-  const [favourite, setFavourite] = useState(false);
   const [isAthlete, setIsAthlete] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const handlePress = (index) => {
-    changeExpandedList(index);
-  }
-
-  const changeExpandedList = (index) => {
+  const toogleExpanded = (index) => {
     const newList = [...expandedList];
     newList[index] = !newList[index];
     setExpandedList(newList);
@@ -53,19 +38,17 @@ const SearchTrainingsScreen = () => {
   const handleSearch= async () => {
     setLoading(true);
     const response = await getTrainingByTypeDifficultyAndTitle(trainingType, trainingDifficulty, searchQuery);
-    console.log('RESPONSE: ', response);
     await transformTrainings(response);
     setNotFound(response?.length === 0);
     setLoading(false);
-
   };
 
   const transformTrainings = async (trainings) => {
-    let trainingsWithFavorite = trainings;
+    let trainingsWithFavourite = trainings;
     if (isAthlete) {
-      trainingsWithFavorite = await checkFavourites(trainings);
+      trainingsWithFavourite = await checkFavourites(trainings);
     }
-    setTrainings(trainingsWithFavorite);
+    setTrainings(trainingsWithFavourite);
   }
 
   useEffect(() => {
@@ -115,8 +98,7 @@ const SearchTrainingsScreen = () => {
           break;
       }
     }
-    changeExpandedList(index);
-    setTrainings(trainings);
+    setTrainings([...trainings]);
   }
 
   const handleFavouriteTraining = async (trainingId, index) => {
@@ -135,6 +117,36 @@ const SearchTrainingsScreen = () => {
     } catch (error) {
         console.log('Error while deleting favourite trainings: ', error);
     }
+  }
+
+  const TrainingItem = ({value}) => {
+    return (
+      <View style={fiufitStyles.trainingItemContainer}>
+          <TextInput
+            style={fiufitStyles.trainingNotEditableInpunt}
+            value={value}
+            editable={false}
+          />
+      </View>
+    )
+  }
+
+  const FavouriteIcon = ({training, index}) => {
+    const isFavourite = training.favourite;
+    return (
+      <TouchableOpacity
+        onPress={() => isFavourite
+          ? handleUnfavouriteTraining(training.id, index) 
+          : handleFavouriteTraining(training.id, index)}
+      >
+        <IconButton
+          icon= {isFavourite ? "heart" : "heart-outline"}  
+          iconColor={tertiaryColor}
+          style={{backgroundColor: secondaryColor}}
+          size={20}
+        />
+      </TouchableOpacity>
+    );
   }
 
   return (
@@ -187,9 +199,15 @@ const SearchTrainingsScreen = () => {
                     title={training.title}
                     titleStyle={{ color: primaryColor }}
                     expanded={expandedList[index]}
-                    onPress={() => handlePress(index)}
+                    onPress={() => toogleExpanded(index)}
                 >
-                    {training.rating >= 0 ?<Text style={styles.ratingText}>Global training rating: {training.rating}</Text> : null}
+                    <View style={styles.ratingAndFavContainer}>
+                      {training.rating >= 0 ?<Text style={styles.ratingText}>Global training rating: {training.rating}</Text> : null}
+                      {isAthlete && 
+                        <FavouriteIcon training={training} index={index}/>
+                      }
+                    </View>
+                    
                     <TrainingItem value={training.title}/>
                     <TrainingItem value={training.description}/>
                     <TrainingItem value={trainings[index].type}/>
@@ -221,32 +239,6 @@ const SearchTrainingsScreen = () => {
                                         borderRadius: 5,
                                     }}/>
                         }
-                    {isAthlete && !training.favourite &&
-                      <TouchableOpacity
-                        style={fiufitStyles.editButton}
-                        onPress={() => handleFavouriteTraining(training.id, index)}
-                      >
-                      <IconButton
-                          icon="heart-outline"
-                          iconColor={tertiaryColor}
-                          style={{backgroundColor: secondaryColor}}
-                          size={30}
-                      />
-                      </TouchableOpacity>
-                    }
-                    {isAthlete && training.favourite &&
-                      <TouchableOpacity
-                          style={fiufitStyles.editButton}
-                          onPress={() => handleUnfavouriteTraining(training.id, index)}
-                      >
-                          <IconButton
-                          icon="heart"
-                          iconColor={tertiaryColor}
-                          style={{backgroundColor: secondaryColor}}
-                          size={30}
-                          />
-                      </TouchableOpacity>
-                    }
                 </List.Accordion>
             ))}
             </View>
@@ -256,8 +248,12 @@ const SearchTrainingsScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    ratingContainer: {
-      paddingBottom: 10,
+    ratingAndFavContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      maxWidth: 350,
+      minHeight: 60,
     },
     ratingText: {
       color: greyColor,

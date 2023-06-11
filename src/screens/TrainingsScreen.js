@@ -25,6 +25,7 @@ import {UserService} from "../services/userService";
 import {getTrainingById} from "../services/TrainingsService";
 import {decode} from "base-64";
 import {useIsFocused} from "@react-navigation/core";
+import { set } from "react-native-reanimated";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -48,6 +49,7 @@ const TrainingsScreen = () => {
     const [isTrainer, setIsTrainer] = useState(true);
     const [loading, setLoading] = useState(true);
     const [rating, setRating] = useState(0);
+    const [trainingsRating, setTrainingsRating] = useState([]);
     const isFocused = useIsFocused();
 
     useEffect(() => {
@@ -99,29 +101,26 @@ const TrainingsScreen = () => {
         try {
             setLoading(true);
             let user = await getUser();
-            let response = null;
+            let trainingResponse = null;
             if (user) {
                 const isTrainerResult = !user.is_athlete;
                 await AsyncStorage.setItem('@is_trainer', isTrainerResult.toString());
-                setIsTrainer(isTrainerResult);
+                
                 if(!isTrainerResult) {
-                    response = await UserService.getTrainingsByUserId(user.id);
+                    trainingResponse = await UserService.getTrainingsByUserId(user.id);
                 } else {
-                    response = await getTrainingsByTrainerId(user.id);
+                    trainingResponse = await getTrainingsByTrainerId(user.id);
                 }
-                const trainingsWithRating = await getMyRating(response);
-                setTrainings(trainingsWithRating);
+                const trainingsRating = await getMyRating(trainingResponse);
+                setIsTrainer(isTrainerResult);
+                setTrainingsRating(trainingsRating)
+                setTrainings(trainingResponse);
             }
             setLoading(false)
         } catch (error) {
             console.log('Error while fetching trainings: ', error);
         }
     };
-
-
-    const handlePress = (index) => {
-       toogleExpanded(index);
-    }
 
     const toogleExpanded = (index) => {
         const newList = [...expandedList];
@@ -192,18 +191,17 @@ const TrainingsScreen = () => {
         }
     }
 
-    const getMyRating = async (trainingsList) => {
-        const newTrainings = [...trainingsList];
-        for (let training of newTrainings) {
+    const getMyRating = async (trainings) => {
+        const trainingsRatings = [];
+        for (let training of trainings) {
             const myRating = await UserService.getUserRaiting(training.id);
-            training.myRating = myRating.rate;
+            trainingsRatings.push(myRating.rate);
           }
-        return newTrainings;
+        return trainingsRatings;
     };
 
-    const handleStarPress = async (index, training, starNumber) => {
-        let myRating = training.myRating;
-        let newTraining = null;
+    const handleStarPress = async (index, myRating, starNumber) => { 
+        let training = trainings[index];
         if (myRating === starNumber) {
             myRating = 0;
         } else {
@@ -212,29 +210,56 @@ const TrainingsScreen = () => {
 
         try {
             await UserService.rateTraining(training.id, myRating);
-            newTraining = await getTrainingById(training.id)
-            newTraining.myRating = myRating; 
+            training = await getTrainingById(training.id)
         } catch (error) {
             console.error("Error on chaning training rating: ", error);
         }
-        console.log("New training: ", newTraining);
-        trainings[index] = newTraining;
-        console.log("Trainings: ", trainings);
-        toogleExpanded(index);
-        setTrainings(trainings);
+        trainingsRating[index] = myRating;
+        trainings[index] = training;
+        setTrainingsRating([...trainingsRating]);
+        setTrainings([...trainings]);
     };
 
-    const renderStar = (index, training, starNumber) => {
-        const isSelected = training.myRating >= starNumber;
+    const Star = ({index, rating, starNumber}) => {
+        const isSelected = rating >= starNumber;
         const iconName = isSelected ? 'star' : 'star-outline';
         const color = isSelected ? tertiaryColor : greyColor;
       
         return (
-          <TouchableOpacity onPress={() => handleStarPress(index, training, starNumber)}>
+          <TouchableOpacity onPress={() => handleStarPress(index, rating, starNumber)}>
             <Icon name={iconName} size={20} color={color} />
           </TouchableOpacity>
         );
     };
+
+    const RenderRating = ({index, training}) => {
+        const rating = trainingsRating[index];
+        const stars = [1, 2, 3, 4, 5];
+
+        return (
+            <View style={{alignItems: 'center'}}>
+                {training.rating >= 0 && 
+                    <View style={{flexDirection: 'row'}}>
+                        <Text style={styles.ratingText}>Global training rating: </Text>
+                        <Text style={
+                            {backgroundColor: theme.colors.secondary, 
+                            paddingRight: 5, 
+                            borderRadius: 50,
+                            paddingLeft: 5,
+                        }}>
+                            {training.rating}
+                        </Text>
+                    </View>
+                }
+                <View style={styles.ratingContainer}>
+                    <Text style={styles.ratingText}>My rating</Text>
+                    {stars.map((starNumber) => (
+                        <Star key={starNumber} index={index} rating={rating} starNumber={starNumber} />
+                    ))}
+                </View>
+            </View>
+        );
+    }
 
     return (
         <View style={fiufitStyles.container}>
@@ -267,7 +292,7 @@ const TrainingsScreen = () => {
                             title={training.title}
                             titleStyle={{ color: primaryColor }}
                             expanded={expandedList[index]}
-                            onPress={() => handlePress(index)}
+                            onPress={() => toogleExpanded(index)}
                         >
                             {isTrainer && !editable && 
                                 <TouchableOpacity
@@ -281,19 +306,7 @@ const TrainingsScreen = () => {
                                     />
                                 </TouchableOpacity>
                             }  
-                            {training.rating >= 0 
-                                ? <Text style={styles.ratingText}>Global training rating: {training.rating}</Text> 
-                                : null}
-                            <View style={fiufitStyles.ratingContainer}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Text style={styles.ratingText}>My rating: </Text>
-                                    {renderStar(index, training, 1)}
-                                    {renderStar(index, training, 2)}
-                                    {renderStar(index, training, 3)}
-                                    {renderStar(index, training, 4)}
-                                    {renderStar(index, training, 5)}
-                                </View>
-                            </View>
+                            <RenderRating index={index} training={training}/>
                             <TrainingItem
                                 value={training.title}
                                 editable={editable}
@@ -411,6 +424,8 @@ const TrainingsScreen = () => {
   const styles = StyleSheet.create({
     ratingContainer: {
         paddingBottom: 10,
+        alignItems: 'center',
+        flexDirection: 'row',
     },
     ratingText: {
         color: greyColor,
