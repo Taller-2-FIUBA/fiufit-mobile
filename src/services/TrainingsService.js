@@ -5,8 +5,6 @@ import {
 } from "../utils/validations";
 import requests from "../consts/requests";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {StatusCodes} from "http-status-codes";
-import {UserService} from "../services/userService";
 import {axiosInstance} from "./config/axiosConfig";
 import {
     ToastAndroid
@@ -17,12 +15,10 @@ const createTraining = async (training) => {
     training.exercises = training.exercises.filter(exercise => Object.keys(exercise).length !== 0);
     let userId = await AsyncStorage.getItem('@fiufit_userId');
 
-    training['trainer_id'] = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
-    const user = UserService.getUser();
+    training['trainer_id'] = userId;
+
     const token = await AsyncStorage.getItem('@fiufit_token');
-
-    training.media = training.media ? encode(training.media) : null;
-
+    training.media = encode(training.media);
     try {
         const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
         {
@@ -38,13 +34,13 @@ const createTraining = async (training) => {
     }
 }
 
-
-const getTrainingsByUserId = async (userId) => {
+const getTrainingById = async (trainingId) => {
     try {
-        const response = await axios.get(`${requests.BASE_URL}${userURI}/${userId}${requests.TRAINING}`);
+        const response = await axiosInstance.get(`${requests.BASE_URL}${requests.TRAINING}/${trainingId}`);
+        console.log("Training by id: ", response.data);
         return response.data;
     } catch (error) {
-        console.log(error);
+        console.error("Error in getTrainingById: ", error);
     }
 }
 
@@ -57,7 +53,7 @@ const getTrainingsByTrainerId = async (trainer_id) => {
               'Authorization': `Bearer ${token}`,
             }
           });        
-        return response.data.items;
+        return response.data.items.filter(training => !training.blocked);
     } catch (error) {
         console.log(error);
     }
@@ -81,17 +77,27 @@ const getExercises = async () => {
     }
 }
 
-const getTrainingByTypeAndDifficulty = async (type, difficulty) => {
+const getTrainingByTypeDifficultyAndTitle = async (type, difficulty, title) => {
     let url = `${requests.BASE_URL}${requests.TRAINING}`;
-    if (type) {
-        url += `?training_type=${type}`;
-    } 
-    if (difficulty) {
-        url += type ? `&difficulty=${difficulty}` : `?difficulty=${difficulty}`;
+    if (title) {
+        title = title.trim();
+        url += `?title=${title}`;
+    } else {
+        if (type) {
+            url += `?training_type=${type}`;
+        } 
+        if (difficulty) {
+            url += type ? `&difficulty=${difficulty}` : `?difficulty=${difficulty}`;
+        }
     }
     try {
         const response = await axios.get(url);
-        return response.data;
+        const trainings = response.data.items.filter(training => !training.blocked);
+        if(trainings.length > 0) {
+            return trainings;
+        } else {
+            return [];
+        }
     } catch (error) {
         console.log(error);
     }
@@ -121,4 +127,4 @@ const trimUserData = (training) => {
     }
 }
 
-export {createTraining, getTrainingsByUserId, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData, getTrainingByTypeAndDifficulty}
+export {createTraining, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData, getTrainingByTypeDifficultyAndTitle, getTrainingById}
