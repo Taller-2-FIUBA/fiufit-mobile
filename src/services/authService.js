@@ -23,6 +23,7 @@ const authService = {
 
     async login(user) {
         try {
+            await this.logout();
             const response = await axiosInstance.post(requests.LOGIN, user);
             await this._storeSensitiveData(response);
             return response.data;
@@ -33,6 +34,7 @@ const authService = {
 
     async register(user) {
         try {
+            await this.logout();
             const response = await axiosInstance.post(requests.SIGNUP, user);
             return response.data;
         } catch (error) {
