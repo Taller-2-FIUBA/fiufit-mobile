@@ -4,7 +4,7 @@ import {Avatar, useTheme} from "react-native-paper";
 import React, {useEffect, useState} from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import authService from "../services/authService";
-import userService from "../services/userService";
+import { UserService } from "../services/userService";
 
 const FiufitDrawer = (props) => {
     const theme = useTheme();
@@ -15,7 +15,7 @@ const FiufitDrawer = (props) => {
     });
 
     useEffect(() => {
-        userService.getUser().then((profile) => {
+        UserService.getUser().then((profile) => {
             setUserData(profile);
         }).catch(() => {
             Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
@@ -26,7 +26,6 @@ const FiufitDrawer = (props) => {
         authService.logout().then(() => {
             props.navigation.replace('Login');
         }).catch(error => {
-            console.log(error);
             Alert.alert("Error", "Something went wrong while logging out. Please try again later.");
         });
     }

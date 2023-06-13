@@ -4,19 +4,37 @@ import {
     validateMediaUrl
 } from "../utils/validations";
 import requests from "../consts/requests";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {StatusCodes} from "http-status-codes";
+import {UserService} from "../services/userService";
+import {axiosInstance} from "./config/axiosConfig";
+import {
+    ToastAndroid
+} from "react-native";
+import { encode } from 'base-64';
 
 const createTraining = async (training) => {
+    training.exercises = training.exercises.filter(exercise => Object.keys(exercise).length !== 0);
+    let userId = await AsyncStorage.getItem('@fiufit_userId');
+
+    training['trainer_id'] = "Ju6JXm1S8rVQf7C18mqL418JdgE5";
+    const user = UserService.getUser();
+    const token = await AsyncStorage.getItem('@fiufit_token');
+
+    training.media = training.media ? encode(training.media) : null;
+
     try {
-        const response = await axios.post(baseURL + trainings, JSON.stringify(user));
-        if (response.data.error) {
-            Alert.alert(data.error);
-        }
+        const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
+        {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            }
+          });
         ToastAndroid.show("Training created successfully", ToastAndroid.SHORT);
-        navigation.navigate('Trainings');
+        return response.data;
     } catch (error) {
         console.log(error);
-        Alert.alert(error.message);
-        navigation.navigate('Login');
     }
 }
 
@@ -30,10 +48,25 @@ const getTrainingsByUserId = async (userId) => {
     }
 }
 
+const getTrainingsByTrainerId = async (trainer_id) => {
+    try {
+        const token = await AsyncStorage.getItem('@fiufit_token');
+        const response = await axios.get(`${requests.BASE_URL}${requests.TRAINING}?trainer_id=${trainer_id}`,
+        {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            }
+          });        
+        return response.data.items;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 const getTrainingsTypes = async () => {
     try {
-        const response = await axios.get(`${requests.BASE_URL}${requests.TRAINING}/types`);
-        return response.data;
+        const response = await axios.get(`${requests.BASE_URL}${requests.TRAINING}/types/`);
+        return response.data.items;
     } catch (error) {
         console.log(error);
     }
@@ -41,7 +74,23 @@ const getTrainingsTypes = async () => {
 
 const getExercises = async () => {
     try {
-        const response = await axios.get(`${requests.BASE_URL}${requests.TRAINING}/exercises`);
+        const response = await axios.get(`${requests.BASE_URL}${requests.TRAINING}/exercises/`);
+        return response.data.items;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const getTrainingByTypeAndDifficulty = async (type, difficulty) => {
+    let url = `${requests.BASE_URL}${requests.TRAINING}`;
+    if (type) {
+        url += `?training_type=${type}`;
+    } 
+    if (difficulty) {
+        url += type ? `&difficulty=${difficulty}` : `?difficulty=${difficulty}`;
+    }
+    try {
+        const response = await axios.get(url);
         return response.data;
     } catch (error) {
         console.log(error);
@@ -72,4 +121,4 @@ const trimUserData = (training) => {
     }
 }
 
-export {createTraining, getTrainingsByUserId, getTrainingsTypes, getExercises, validateForm, trimUserData}
+export {createTraining, getTrainingsByUserId, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData, getTrainingByTypeAndDifficulty}

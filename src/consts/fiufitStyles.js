@@ -161,12 +161,13 @@ export const fiufitStyles = StyleSheet.create({
     },
     addTrainingButton: {
         position: 'absolute',
-        margin: 16,
+        marginBottom: 16,
         right: 0,
         bottom: 0,
         borderRadius: 30,
         backgroundColor: secondaryColor,
-        color: tertiaryColor
+        color: tertiaryColor,
+        alignSelf: 'flex-end',
     },
     editButton: {
         position: 'absolute',
@@ -224,6 +225,29 @@ export const fiufitStyles = StyleSheet.create({
         backgroundColor: tertiaryColor,
         borderRadius: 10
     },
+    exerciseInput: {
+        height: 50,
+        backgroundColor: secondaryColor,
+        color: tertiaryColor,
+        borderWidth: 1,
+        borderRadius: 10,
+        width: '80%',
+        marginRight: 50,
+    },
+    exerciseDetails: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+    },
+    userContainer: {
+        backgroundColor: '#eaeaea',
+        padding: 10,
+        marginVertical: 10,
+        borderRadius: 5,
+      },
+      userName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+      },
     imagePickerButton: {
         backgroundColor: primaryColor,
         borderWidth: 1,

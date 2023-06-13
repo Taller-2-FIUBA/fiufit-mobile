@@ -21,7 +21,7 @@ const GoogleLoginButton = ({navigation}) => {
     useEffect(() => {
         handleLogin()
             .catch(error => {
-                console.log(error.message);
+                console.log(error);
                 Alert.alert("Error logging in", "Something went wrong. Please try again.");
             })
     }, [userInfo]);
@@ -31,7 +31,7 @@ const GoogleLoginButton = ({navigation}) => {
             setToken(response.authentication.accessToken);
             getUserInfo(token)
                 .catch(error => {
-                    console.log(error.message);
+                    console.log(error);
                     Alert.alert("Error logging in", "Something went wrong. Please try again.");
                 });
         }

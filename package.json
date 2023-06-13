@@ -26,6 +26,7 @@
     "@react-navigation/native-stack": "^6.9.12",
     "@testing-library/react": "^14.0.0",
     "axios": "^1.4.0",
+    "base-64": "^1.0.0",
     "dotenv": "^16.0.3",
     "expo": "~48.0.9",
     "expo-auth-session": "^4.0.3",

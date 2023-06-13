@@ -2,7 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert} from 'react-native';
 import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from "../consts/colors";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import userService from "../services/userService";
+import {UserService} from "../services/userService";
+import {useNavigation} from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const ProfileItem = ({iconName, value, editable, onChange}) => {
@@ -36,13 +38,20 @@ const ProfileAvatar = ({userName, onChange}) => {
 
 
 const ProfileScreen = () => {
+    const navigation = useNavigation();
+
     const [userProfile, setUserProfile] = useState({
+        id: 0,
         name: '',
         surname: '',
+        username: '',
         email: '',
+        birth_date: '',
         location: '',
         height: undefined,
-        weight: undefined
+        weight: undefined,
+        is_athlete: false,
+        is_blocked: false,
     });
     const [loading, setLoading] = useState(true);
     const [editable, setEditable] = useState(false);
@@ -51,7 +60,8 @@ const ProfileScreen = () => {
     useEffect(() => {
         console.log("Fetching user profile...");
         setLoading(true);
-        userService.getUser().then((profile) => {
+        UserService.getUser().then(async (profile) => {
+            const token = await AsyncStorage.getItem('@fiufit_token');
             setLoading(false);
             setUserProfile(profile);
         }).catch((error) => {
@@ -63,10 +73,9 @@ const ProfileScreen = () => {
 
 
     const updateProfile = () => {
-        console.log("Update profile: ", userProfile);
         let copyProfile = {...userProfile};
         delete copyProfile.email
-        userService.updateUser(copyProfile).then((profile) => {
+        UserService.updateUser(copyProfile).then((profile) => {
             setUserProfile(profile);
         }).catch((error) => {
             console.log(error);
@@ -109,6 +118,12 @@ const ProfileScreen = () => {
                 onChange={(text) => handleInputChange("surname", text)}
             />
             <ProfileItem
+                iconName="account"
+                value={userProfile.username}
+                editable={editable}
+                onChange={(text) => handleInputChange("username", text)}
+            />
+            <ProfileItem
                 iconName="email"
                 value={userProfile.email}
                 editable={false}
@@ -148,6 +163,21 @@ const ProfileScreen = () => {
                     </TouchableOpacity>
                 </View>
             }
+            <View style={styles.followersContainer}>
+                <TouchableOpacity
+                    style={[styles.button, styles.followingButton]}
+                    onPress={() => navigation.navigate('FollowTabs', { user: userProfile })}
+                >
+                    <Text style={styles.buttonText}>Following</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('FollowTabs', { user: userProfile })}
+                >
+                    <Text style={styles.buttonText}>Followers</Text>
+                </TouchableOpacity>
+            </View>
         </ScrollView>
     );
 }
@@ -208,7 +238,14 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
-    }
+    },
+    followersContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    followingButton: {
+        marginRight: 5,
+    },
 });
 
 export default ProfileScreen;
