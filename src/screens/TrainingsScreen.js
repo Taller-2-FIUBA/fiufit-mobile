@@ -13,7 +13,7 @@ import React, {useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor, greyColor} from "../consts/colors";
-import { ActivityIndicator, FAB, IconButton, List, useTheme } from 'react-native-paper';
+import { ActivityIndicator, FAB, IconButton, List, useTheme, Button as PapperButton, } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 import {
     getTrainingsTypes, getTrainingsByTrainerId, validateForm, trimUserData
@@ -25,6 +25,7 @@ import {UserService} from "../services/userService";
 import {getTrainingById} from "../services/TrainingsService";
 import {decode} from "base-64";
 import {useIsFocused} from "@react-navigation/core";
+import { is } from "@babel/types";
 import { set } from "react-native-reanimated";
 
 const TrainingItem = ({value, editable, onChange}) => {
@@ -44,77 +45,64 @@ const TrainingsScreen = () => {
     const theme = useTheme();
     const navigation = useNavigation();
     const [editable, setEditable] = useState(false);
-    const [errors, setErrors] = useState({});
-    const [trainingTypes, setTrainingTypes] = useState({});
     const [isTrainer, setIsTrainer] = useState(true);
     const [loading, setLoading] = useState(true);
-    const [rating, setRating] = useState(0);
-    const [trainingsRating, setTrainingsRating] = useState([]);
+    const [actualUser, setActualUser] = useState(null);
     const isFocused = useIsFocused();
-
-    useEffect(() => {
-        if (isFocused) {
-            fetchGetTrainingsById()
-            .catch(error => {
-                setLoading(false);
-                console.log("An error in fetching: ", error);
-                setDialog(false);
-            });
-        }
-    }, [isFocused]);
-
-    const handleError = (error, input) => {
-        setErrors(prevState => ({...prevState, [input]: error}));
-    };
-
     const [trainings, setTrainings] = useState([]);
     const [expandedList, setExpandedList] = useState(trainings && trainings.map(() => false));
 
-    // Hook to fetch training types and user trainings
     useEffect(() => {
-        fetchTrainingTypes()
-            .catch(error => {
-                setLoading(false);
-                console.log(error);
-                setDialog(false);
-            });
+        initTrainings();
     }, []);
-    
-    const fetchTrainingTypes = async () => {
-        const response = await getTrainingsTypes();
-        setTrainingTypes(response);
-    };
+
+    useEffect(() => {
+        if (isFocused && actualUser) {
+            setLoading(true);
+            console.log("Start fetching trainings by id");
+            fetchGetTrainingsById(isTrainer, actualUser.id)
+            .catch(error => {  
+                console.log("An error in fetching: ", error);
+                setDialog(false);
+            }).finally(() => {
+                setLoading(false);
+            })
+        }
+    }, [isFocused]);
 
     const getUser = async () => {
-        let user = null;
-        try {
-            const userId = await AsyncStorage.getItem('@fiufit_userId');
-            user = await UserService.getUserById(userId);
-        } catch(error) {
-            console.error("Something went wrong while fetching user data. Please try again later.");
+        let user = actualUser;
+        if (!user) {
+            try {
+                const userId = await AsyncStorage.getItem('@fiufit_userId');
+                user = await UserService.getUserById(userId);
+                setActualUser(user);
+            } catch(error) {
+                console.error("Something went wrong while fetching user data. Please try again later.");
+            }
         }
         return user;
     }
 
-    const fetchGetTrainingsById = async () => {
-        console.log("Start fetching trainings by id");
+    const fetchGetTrainingsById = async (isTrainerResult, userId) => {
+        const trainingResponse = isTrainerResult
+            ? await getTrainingsByTrainerId(userId)
+            : await UserService.getTrainingsByUserId(userId);
+        
+        await enhanceRatings(trainingResponse);
+        setTrainings(trainingResponse);
+    }
+
+    const initTrainings = async () => {
+        console.log("Init Trainings");
         try {
             setLoading(true);
             let user = await getUser();
-            let trainingResponse = null;
             if (user) {
                 const isTrainerResult = !user.is_athlete;
                 await AsyncStorage.setItem('@is_trainer', isTrainerResult.toString());
-                
-                if(!isTrainerResult) {
-                    trainingResponse = await UserService.getTrainingsByUserId(user.id);
-                } else {
-                    trainingResponse = await getTrainingsByTrainerId(user.id);
-                }
-                const trainingsRating = await getMyRating(trainingResponse);
+                await fetchGetTrainingsById(isTrainerResult, user.id);
                 setIsTrainer(isTrainerResult);
-                setTrainingsRating(trainingsRating)
-                setTrainings(trainingResponse);
             }
             setLoading(false)
         } catch (error) {
@@ -134,8 +122,24 @@ const TrainingsScreen = () => {
         setTrainings(newTrainings);
       };
 
-    const handleEditAction = (index) => {
+    const handleEditAction = (event, index) => {
         setEditable(true);
+    }
+
+    const handleDeleteTrainingAction = async (event, index) => {
+        event.stopPropagation();
+        console.log("Delete training action")
+        const trainingId = trainings[index]?.id;
+        console.log("Training id: ", trainingId);
+        try {
+            setLoading(true);
+            await UserService.deleteFavouriteTraining(trainingId);
+            await fetchGetTrainingsById(isTrainer, actualUser.id);
+        } catch (error) {
+            console.log('Error while deleting favourite trainings: ', error);
+        } finally {
+            setLoading(false);
+        }
     }
 
     const handleSaveAction = (index) => {
@@ -191,13 +195,11 @@ const TrainingsScreen = () => {
         }
     }
 
-    const getMyRating = async (trainings) => {
-        const trainingsRatings = [];
+    const enhanceRatings = async (trainings) => {
         for (let training of trainings) {
             const myRating = await UserService.getUserRaiting(training.id);
-            trainingsRatings.push(myRating.rate);
-          }
-        return trainingsRatings;
+            training.myRating = myRating.rate;
+        }
     };
 
     const handleStarPress = async (index, myRating, starNumber) => { 
@@ -214,9 +216,8 @@ const TrainingsScreen = () => {
         } catch (error) {
             console.error("Error on chaning training rating: ", error);
         }
-        trainingsRating[index] = myRating;
+        training.myRating = myRating;
         trainings[index] = training;
-        setTrainingsRating([...trainingsRating]);
         setTrainings([...trainings]);
     };
 
@@ -233,30 +234,50 @@ const TrainingsScreen = () => {
     };
 
     const RenderRating = ({index, training}) => {
-        const rating = trainingsRating[index];
         const stars = [1, 2, 3, 4, 5];
 
         return (
-            <View style={{alignItems: 'center'}}>
-                {training.rating >= 0 && 
-                    <View style={{flexDirection: 'row'}}>
+            <View style={{alignItems: 'flex-start'}}>
+                {training.rating >= 0 &&
+                    <View style={{flexDirection: 'row', marginBottom: 10, marginTop: 10}}>
                         <Text style={styles.ratingText}>Global training rating: </Text>
-                        <Text style={
-                            {backgroundColor: theme.colors.secondary, 
-                            paddingRight: 5, 
+                        <Text style={{
+                            backgroundColor: theme.colors.secondary, 
+                            paddingHorizontal: 5, 
                             borderRadius: 50,
-                            paddingLeft: 5,
                         }}>
                             {training.rating}
                         </Text>
                     </View>
                 }
                 <View style={styles.ratingContainer}>
-                    <Text style={styles.ratingText}>My rating</Text>
+                    <Text style={styles.ratingText}>My rating: </Text>
                     {stars.map((starNumber) => (
-                        <Star key={starNumber} index={index} rating={rating} starNumber={starNumber} />
+                        <Star key={starNumber} index={index} 
+                            rating={training.myRating} starNumber={starNumber} />
                     ))}
                 </View>
+            </View>
+        );
+    }
+
+    const TrainingItemHeader = ({index, training}) => {
+        const showEdit = isTrainer && !editable;
+        const showDelete = !isTrainer;
+        const handlePressAction = showEdit ? handleEditAction : handleDeleteTrainingAction;
+        return (
+            <View style={styles.trainingItemHeader}>
+                <RenderRating index={index} training={training}/>
+                {(showEdit || showDelete) &&
+                    <TouchableOpacity onPress={event => handlePressAction(event, index)}>
+                        <IconButton
+                            icon={showEdit ? "pencil" : "delete"}
+                            iconColor={tertiaryColor}
+                            style={{backgroundColor: secondaryColor}}
+                            size={20}
+                        />
+                    </TouchableOpacity>
+                }  
             </View>
         );
     }
@@ -294,19 +315,8 @@ const TrainingsScreen = () => {
                             expanded={expandedList[index]}
                             onPress={() => toogleExpanded(index)}
                         >
-                            {isTrainer && !editable && 
-                                <TouchableOpacity
-                                    style={fiufitStyles.editButton}
-                                    onPress={handleEditAction}>
-                                    <IconButton
-                                        icon="pencil"
-                                        iconColor={tertiaryColor}
-                                        style={{backgroundColor: secondaryColor}}
-                                        size={30}
-                                    />
-                                </TouchableOpacity>
-                            }  
-                            <RenderRating index={index} training={training}/>
+                            
+                            <TrainingItemHeader index={index} training={training}/>
                             <TrainingItem
                                 value={training.title}
                                 editable={editable}
@@ -404,7 +414,7 @@ const TrainingsScreen = () => {
                         </List.Accordion>
                     ))}
             
-                    {isTrainer ? <FAB
+                    {isTrainer && !editable ? <FAB
                         icon="plus"
                         type="contained-tonal"
                         style={fiufitStyles.addTrainingButton}
@@ -426,13 +436,17 @@ const TrainingsScreen = () => {
         paddingBottom: 10,
         alignItems: 'center',
         flexDirection: 'row',
+        marginVertical: 5
     },
     ratingText: {
         color: greyColor,
         justifyContent: 'flex-start',
-        paddingTop: 10,
-        paddingBottom: 10
     },
+    trainingItemHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+    }
 });
 
   export default TrainingsScreen;
