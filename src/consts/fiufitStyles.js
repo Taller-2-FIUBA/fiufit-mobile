@@ -157,7 +157,10 @@ export const fiufitStyles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 15,
         borderRadius: 10,
-        marginBottom: 5
+        marginBottom: 5,
+        width: 345,
+        alignSelf: 'center',
+        justifyContent: 'flex-start'
     },
     addTrainingButton: {
         position: 'absolute',
@@ -259,5 +262,59 @@ export const fiufitStyles = StyleSheet.create({
         marginTop: 12,
         borderRadius: 50,
         marginRight: 15,
+    },
+    messageChatContainer: {
+        backgroundColor: primaryColor, 
+        display: "flex", 
+        flexDirection: "column", 
+        justifyContent: "flex-end",
+        height: '100%'
+    },
+    messageChatInputContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        width: '100%',
+        height: 50,
+    },
+    messageChatInput: {
+        backgroundColor: secondaryColor,
+        flexGrow: 4,
+        color: whiteColor
+    },
+    messageChatButton: {
+        backgroundColor: tertiaryColor,
+        flexGrow: 0.5,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    messageChatItemLeft: {
+        backgroundColor: secondaryColor,
+        borderRadius: 10,
+        padding: 10,
+        marginLeft: 10,
+        marginBottom: 10,
+        justifyContent: 'flex-start',
+        alignSelf: "flex-start",
+    },
+    messageChatItemRight: {
+        backgroundColor: tertiaryColor,
+        borderRadius: 10,
+        padding: 10,
+        marginRight: 10,
+        marginLeft: 40,
+        marginBottom: 10,
+        alignSelf: "flex-end",
+        alignItems: 'flex-end',
+        display: 'flex',
+    },
+    chatMessageIntro: {
+        display: 'flex',
+        flexDirection: 'row',
+        width: '100%',
+        flexWrap: 'wrap',
+        height: 50,
+        padding: 10,
+        marginBottom: 10,
+        alignItems: 'center',
     }
 })
