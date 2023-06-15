@@ -18,7 +18,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import goalsService from "../services/goalsService";
 import FiufitDialog from "../components/FiufitDialog";
 import * as ImagePicker from "expo-image-picker";
-import { encode } from 'base-64';
+import {encode} from 'base-64';
 
 const GoalsScreen = () => {
     const theme = useTheme();
@@ -349,25 +349,30 @@ const GoalsScreen = () => {
                                     </Text>
                                 )}
                                 {completedGoals && completedGoals.length > 0 && (
-                                    <Text style={{
-                                        alignSelf: 'center',
-                                        marginTop: 10,
-                                        color: theme.colors.tertiary,
-                                    }}>
-                                        Completed goals
-                                    </Text>
+                                    <View>
+                                        <Text style={{
+                                            alignSelf: 'center',
+                                            marginTop: 10,
+                                            color: theme.colors.tertiary,
+                                        }}>
+                                            Completed goals
+                                        </Text>
+                                        <FlatList data={completedGoals} renderItem={renderGoals}
+                                                  keyExtractor={item => item.id}/>
+                                    </View>
                                 )}
-                                <FlatList data={completedGoals} renderItem={renderGoals} keyExtractor={item => item.id}/>
                                 {goals && goals.length > 0 && (
-                                    <Text style={{
-                                        alignSelf: 'center',
-                                        marginTop: 10,
-                                        color: theme.colors.tertiary,
-                                    }}>
-                                        Active goals
-                                    </Text>
+                                    <View>
+                                        <Text style={{
+                                            alignSelf: 'center',
+                                            marginTop: 10,
+                                            color: theme.colors.tertiary,
+                                        }}>
+                                            Active goals
+                                        </Text>
+                                        <FlatList data={goals} renderItem={renderGoals} keyExtractor={item => item.id}/>
+                                    </View>
                                 )}
-                                <FlatList data={goals} renderItem={renderGoals} keyExtractor={item => item.id}/>
                             </View>
                         )}
                         <FAB

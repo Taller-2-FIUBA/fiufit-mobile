@@ -1,5 +1,5 @@
-import {Alert, Image, Keyboard, SafeAreaView, ScrollView, Text, View} from "react-native";
-import {primaryColor, tertiaryColor} from "../consts/colors";
+import {Alert, Keyboard, SafeAreaView, ScrollView, Text, View} from "react-native";
+import {primaryColor} from "../consts/colors";
 import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
 import {validateEmail} from "../utils/validations";
@@ -7,6 +7,7 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import authService from "../services/authService";
+// import GoogleLoginButton from "../components/GoogleLoginButton";
 
 const LoginScreen = () => {
     const navigation = useNavigation();
@@ -47,6 +48,7 @@ const LoginScreen = () => {
             authService.login(inputs).then(() => {
                 navigation.navigate('Trainings');
             }).catch(error => {
+                console.log(error.message);
                 Alert.alert("Error logging in", "Something went wrong. Please try again.");
             });
         }
@@ -60,15 +62,7 @@ const LoginScreen = () => {
             <ScrollView contentContainerStyle={{
                 paddingTop: 50, paddingHorizontal: 20,
             }}>
-                <Image
-                    source={require('../../resources/logo.png')}
-                    style={[fiufitStyles.logo, {alignSelf: 'center', marginBottom: 20}]}
-                />
-                <Text style={{
-                    color: tertiaryColor,
-                    fontSize: 20,
-                    fontWeight: 'bold',
-                }}>
+                <Text style={fiufitStyles.titleText}>
                     Login
                 </Text>
                 <Text style={fiufitStyles.detailsText}>
@@ -92,6 +86,7 @@ const LoginScreen = () => {
                         error={errors.password}
                     />
                     <Button onPress={handleLogin} title="Login"/>
+                    {/*<GoogleLoginButton navigation={navigation}/>*/}
                     <Text
                         onPress={() => navigation.navigate('Registration')}
                         style={fiufitStyles.haveAccount}>Do not have an account? Sign up</Text>

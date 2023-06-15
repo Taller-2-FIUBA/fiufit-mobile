@@ -82,14 +82,26 @@ const UserBiologicsScreen = ({navigation}) => {
     }
 
     const signUpUser = (user) => {
-        authService.register(user).then(() => {
-            ToastAndroid.show("User created successfully", ToastAndroid.SHORT);
-            navigation.navigate('Login');
-        }).catch(error => {
-            console.log(error);
-            Alert.alert("Error signing up", "Something went wrong. Please try again later.");
-            navigation.replace('Login');
-        });
+        if (user.google_token) {
+            authService.registerWithGoogle(user)
+                .then(() => {
+                    console.log("Registered with Google");
+                    navigation.replace('Trainings');
+                })
+                .catch(() => {
+                    Alert.alert("Error signing up", "Something went wrong. Please try again.");
+                    navigation.replace('Login');
+                });
+        } else {
+            authService.register(user).then(() => {
+                ToastAndroid.show("User created successfully", ToastAndroid.SHORT);
+                navigation.navigate('Login');
+            }).catch(error => {
+                console.log(error);
+                Alert.alert("Error signing up", "Something went wrong. Please try again later.");
+                navigation.replace('Login');
+            });
+        }
     }
 
     const validateForm = () => {
