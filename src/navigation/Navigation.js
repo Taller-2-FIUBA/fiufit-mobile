@@ -26,6 +26,7 @@ import InitialScreen from "../screens/InitialScreen";
 import {useEffect, useState} from "react";
 import { UserService } from "../services/userService";
 import UserDataContext from "../contexts/userDataContext";
+import PrivateChatScreen from "../screens/PrivateChatScreen";
 import PaymentsScreen from "../screens/PaymentsScreen";
 
 const Stack = createNativeStackNavigator();
@@ -105,7 +106,7 @@ const AuthStack = () => {
                 drawerInactiveTintColor: theme.colors.tertiary,
             }}/>
             <Drawer.Screen name="Chat" component={ChatScreen} options={{
-                title: 'Chat',
+                title: 'Chats',
                 headerStyle: {
                     backgroundColor: theme.colors.background,
                 },
@@ -218,25 +219,26 @@ const BottomTabNavigator = () => {
     );
 };
 
-const RegistrationStackNavigator = () => {
+const RegistrationStackNavigator = (props) => {
     const theme = useTheme();
     const [userData, setUserData] = useState({
-        email: '',
+        email: props.route.params?.email,
         password: '',
         name: '',
         surname: '',
         username: '',
         location: '',
         is_athlete: true,
-        height: 0.0,
-        weight: 0,
+        height: '',
+        weight: '',
         birth_date: '',
         registration_date: new Date().toISOString().split('T')[0],
+        google_token: props.route.params?.token
     });
 
     return (
         <UserDataContext.Provider value={{userData: userData, setUserData: setUserData}}>
-            <Stack.Navigator>
+            <Stack.Navigator initialRouteName={(userData.email && userData.google_token) ? "UserData" : "SignUp"}>
                 <Stack.Screen name={"SignUp"} component={SignUpScreen}
                               options={{
                                   headerShown: false,
@@ -267,12 +269,23 @@ const RegistrationStackNavigator = () => {
 
 
 const TabsNavigation = () => {
-  return (
-    <TopTab.Navigator>
-      <TopTab.Screen name="Users" component={SearchUsersScreen} />
-      <TopTab.Screen name="Trainings" component={SearchTrainingsScreen} />
+    const theme = useTheme();
+    return (
+    <TopTab.Navigator
+        screenOptions={{
+            tabBarActiveTintColor: theme.colors.secondary,
+            tabBarIndicatorStyle: {
+                backgroundColor: theme.colors.secondary,
+                height: 2
+            },
+            tabBarStyle: {
+                backgroundColor: theme.colors.primary,
+            },
+        }}>
+        <TopTab.Screen name="Users" component={SearchUsersScreen}/>
+        <TopTab.Screen name="Trainings" component={SearchTrainingsScreen} />
     </TopTab.Navigator>
-  );
+    );
 };
 
 const FollowTabsNavigation = ({ route }) => {
@@ -291,51 +304,59 @@ const MainStackNavigator = () => {
     return (
         <Stack.Navigator initialRouteName={"Initial"}>
             <Stack.Screen name="Initial" component={InitialScreen}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: theme.colors.primary
-                          }}/>
+                options={{
+                    headerShown: false,
+                    statusBarColor: theme.colors.primary
+                }}/>
             <Stack.Screen name="Login" component={LoginScreen}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: theme.colors.primary
-                          }}/>
+                options={{
+                    headerShown: false,
+                    statusBarColor: theme.colors.primary
+                }}/>
             <Stack.Screen name="Registration" component={RegistrationStackNavigator}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: theme.colors.primary
-                          }}/>
+                options={{
+                    headerShown: false,
+                    statusBarColor: theme.colors.primary
+                }}/>
             <Stack.Screen name="Search" component={TabsNavigation}
-                          options={{
-                              headerStyle: {
-                                  backgroundColor: theme.colors.background,
-                              },
-                              headerTintColor: theme.colors.tertiary,
-                              statusBarColor: theme.colors.background,
-                          }}/>
+                options={{
+                    headerStyle: {
+                        backgroundColor: theme.colors.background,
+                    },
+                    headerTintColor: theme.colors.tertiary,
+                    statusBarColor: theme.colors.background,
+                }}/>
             <Stack.Screen name="FollowTabs" component={FollowTabsNavigation}
-                          options={{
-                              headerStyle: {
-                                  backgroundColor: theme.colors.background,
-                              },
-                              headerTintColor: theme.colors.tertiary,
-                              statusBarColor: theme.colors.background,
-                          }}/>
+                options={{
+                    headerStyle: {
+                        backgroundColor: theme.colors.background,
+                    },
+                    headerTintColor: theme.colors.tertiary,
+                    statusBarColor: theme.colors.background,
+                }}/>
             <Stack.Screen name="Trainings" component={AuthStack}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: theme.colors.background,
-                          }}/>
+                options={{
+                    headerShown: false,
+                    statusBarColor: theme.colors.background,
+                }}/>
             <Stack.Screen name="CreateTraining" component={CreateTrainingScreen}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: theme.colors.background,
-                          }}/>
+                options={{
+                    headerShown: false,
+                    statusBarColor: theme.colors.background,
+                }}/>
             <Stack.Screen name="ProfilePublic" component={ProfilePublicScreen}
-                          options={{
-                              headerShown: false,
-                              statusBarColor: theme.colors.background,
-                          }}/>
+                options={{
+                    headerShown: false,
+                    statusBarColor: theme.colors.background,
+                }}/>
+            <Stack.Screen name="PrivateChat" component={PrivateChatScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: theme.colors.background,
+                    },
+                    headerTintColor: theme.colors.tertiary,
+                    statusBarColor: theme.colors.background,
+                }}/>
         </Stack.Navigator>
     );
 }

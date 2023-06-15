@@ -1,6 +1,6 @@
 import {Text, StyleSheet, View, Image} from 'react-native';
 import {Card, useTheme} from 'react-native-paper';
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import ProgressCircle from 'progress-circle-react-native'
 import {decode} from "base-64";
 

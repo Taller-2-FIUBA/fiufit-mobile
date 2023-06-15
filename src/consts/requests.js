@@ -3,7 +3,9 @@ import {BASE_URL} from "@env";
 const requests = {
     BASE_URL: process.env.BASE_URL,
     LOGIN: '/users/login',
+    GOOGLE_LOGIN: '/users/login/usersIDP',
     SIGNUP: '/users',
+    GOOGLE_SIGNUP: '/users/usersIDP',
     USER: '/users',
     TRAINING: '/trainings',
     GOALS: '/goals',

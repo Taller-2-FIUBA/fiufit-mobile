@@ -33,9 +33,10 @@ axiosInstance.interceptors.response.use(
         return response;
     },
     async (error) => {
-        console.error(StatusCodes[error.response.status] + " " + error.response.status);
+        console.log(`Intercepted: ${error.response.status} ${StatusCodes[error.response.status]}`);
         if (error.response.status === StatusCodes.UNAUTHORIZED) {
             await Utils.handleUnauthorized(navigation);
+            return;
         }
         return Promise.reject(error);
     }

@@ -32,11 +32,11 @@ const CreateTrainingScreen = () => {
     const [trainingExercises, setTrainingExercises] = useState([]);
     const [selectedExercises, setSelectedExercises] = useState([]);
     const [training, setTraining] = useState({
-        tittle: '',
+        title: '',
         description: '',
         type: '',
         difficulty: 'Easy',
-        media: null,
+        media: '',
         exercises: [],
     });
 
@@ -95,7 +95,7 @@ const CreateTrainingScreen = () => {
     };
 
     const handleCreate = () => {
-        handleError(null, 'tittle')
+        handleError(null, 'title')
         handleError(null, 'media')
 
         /* trimUserData(training);
@@ -125,9 +125,9 @@ const CreateTrainingScreen = () => {
                         <TrainingInput
                             label="Title"
                             placeholder="Enter a title"
-                            value={training.tittle}
-                            error={errors.tittle}
-                            onChangeText={text => handleInputChange('tittle', text)}
+                            value={training.title}
+                            error={errors.title}
+                            onChangeText={text => handleInputChange('title', text)}
                         />
                         <TrainingInput
                             label="Description"
@@ -155,11 +155,6 @@ const CreateTrainingScreen = () => {
                             <Picker.Item label="Medium" value="Medium" />
                             <Picker.Item label="Hard" value="Hard" />
                         </Picker>
-                        {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                            <Button tittle="Seleccionar imagen" onPress={pickImage} />
-                            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-                        </View> */}
-
                         {training.type && (
                             <View>
                                 <Text style={fiufitStyles.detailsText}>

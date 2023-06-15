@@ -72,7 +72,7 @@ const ProfilePublicScreen = ({ route }) => {
             });
         };
     
-        fetchGetFolloweds(user.id);
+        fetchGetFolloweds();
     }, []);
 
     const handleFollowPress = async () => {
