@@ -10,8 +10,9 @@ const requests = {
     TRAINING: '/trainings',
     GOALS: '/goals',
     METRICS: '/goals/metrics',
-    WALLET: '/wallet/',
+    WALLET: '/wallet',
     DEPOSIT: '/users/deposit',
+    BALANCE: '/balance',
 }
 
 export default requests;

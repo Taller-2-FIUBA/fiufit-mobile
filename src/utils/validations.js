@@ -89,3 +89,35 @@ export const validateMediaUrl = (url) => {
     const regex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w.-]*)*\/?$/;
     return regex.test(url);
 }
+
+export const validateAmount = (amount, isHelperText) => {
+    if (isHelperText && amount.length === 0) {
+        return true;
+    }
+
+    if (!/^(\d{1,3}(\.\d{1,3})?)?$/.test(amount)) {
+        return false;
+    }
+
+    const number = parseFloat(amount);
+
+    return !(isNaN(number) || number < 0 || number > 1000 || number.toString() !== amount || (amount.includes('.')
+        && amount.split('.')[1].length > 3));
+}
+
+export const validateWallet = (address, isHelperText) => {
+    if (isHelperText && address.length === 0) {
+        return true;
+    }
+
+    const regex = /^0x[A-Fa-f0-9]+$/;
+    return regex.test(address);
+}
+
+export const validateTransferUsername = (username, isHelperText) => {
+    if (isHelperText && username.length === 0) {
+        return true;
+    }
+
+    return validateUsername(username);
+}
