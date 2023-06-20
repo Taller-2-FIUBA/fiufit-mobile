@@ -157,7 +157,10 @@ export const fiufitStyles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 15,
         borderRadius: 10,
-        marginBottom: 5
+        marginBottom: 5,
+        width: 345,
+        alignSelf: 'center',
+        justifyContent: 'flex-start'
     },
     addTrainingButton: {
         position: 'absolute',
@@ -261,9 +264,9 @@ export const fiufitStyles = StyleSheet.create({
         marginRight: 15,
     },
     messageChatContainer: {
-        backgroundColor: primaryColor, 
-        display: "flex", 
-        flexDirection: "column", 
+        backgroundColor: primaryColor,
+        display: "flex",
+        flexDirection: "column",
         justifyContent: "flex-end",
         height: '100%'
     },
@@ -313,5 +316,14 @@ export const fiufitStyles = StyleSheet.create({
         padding: 10,
         marginBottom: 10,
         alignItems: 'center',
+    },
+    googleButton: {
+        backgroundColor: secondaryColor,
+        height: 55,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 5,
+        marginBottom: 10,
     }
 })

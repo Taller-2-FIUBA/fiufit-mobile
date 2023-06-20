@@ -1,6 +1,7 @@
 import {axiosInstance} from "./config/axiosConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
+import axios from "axios";
 
 export const UserService = {
     async getUser() {
@@ -38,6 +39,60 @@ export const UserService = {
             return response.data;
         } catch (error) {
             return {};
+        }
+    },
+
+    async getTrainingsByUserId(userId) {
+        try {
+            const response = await axios.get(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}`);
+            const trainings = response.data.items.filter(training => !training.blocked);
+            if(trainings.length > 0) {
+                return trainings;
+            } else {
+                return [];
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+    async addFavouriteTraining(trainingId) {
+        let userId = await AsyncStorage.getItem('@fiufit_userId');
+        const body = { 'training_id': trainingId }
+    
+        const token = await AsyncStorage.getItem('@fiufit_token');
+    
+        try {
+            const response = await axios.post(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}`, JSON.stringify(body),
+            {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                }
+              });
+            console.log("Training save in favourites successfully", response.data);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+    async deleteFavouriteTraining(trainingId) {
+        let userId = await AsyncStorage.getItem('@fiufit_userId');    
+        const token = await AsyncStorage.getItem('@fiufit_token');
+    
+        try {
+            const response = await axios.delete(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}/${trainingId}`,
+            {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                }
+              });
+            console.log("Training delete from favourites successfully", response.data);
+            return response.data;
+        } catch (error) {
+            console.log(error);
         }
     },
 
@@ -80,4 +135,35 @@ export const UserService = {
             throw new Error(error.response.status.toString());
         }
     },
+
+    async rateTraining(trainingId, rate) {
+        let userId = await AsyncStorage.getItem('@fiufit_userId');
+        const body = { 'rate': rate }
+    
+        const token = await AsyncStorage.getItem('@fiufit_token');
+    
+        try {
+            const response = await axios.put(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}/${trainingId}`, JSON.stringify(body),
+            {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                }
+              });
+            console.log("Training rated successfully", response.data);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+    async getUserRaiting(trainingId) {
+        let userId = await AsyncStorage.getItem('@fiufit_userId');
+        try {
+            const response = await axios.get(`${requests.BASE_URL}${requests.USER}/${userId}${requests.TRAINING}/${trainingId}/rating`);
+            return response.data;
+        } catch (error) {
+            return 0;
+        }
+    }
 }

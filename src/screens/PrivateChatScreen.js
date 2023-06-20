@@ -83,11 +83,13 @@ const PrivateChatScreen = ({route}) => {
         <MessageItem key={index} message={message} />
       ))}
       <View style={fiufitStyles.messageChatInputContainer}>
-        <TextInput style={fiufitStyles.messageChatInput}
-          placeholder="Message"
-          value={actualMessage}
-          onChangeText={text => handleMessageChange(text)}
-        />
+        <View style={fiufitStyles.messageChatInput}>
+          <TextInput style={{paddingLeft: 10, alignItems: 'center', justifyContent: 'center', flex: 1}}
+            placeholder="Message"
+            value={actualMessage}
+            onChangeText={text => handleMessageChange(text)}
+          />
+        </View>
         <TouchableOpacity onPress={handleSend} style={fiufitStyles.messageChatButton}>
           <Text style={fiufitStyles.buttonText}>
             Send
