@@ -23,17 +23,78 @@ import GoalsScreen from "../screens/GoalsScreen";
 import {Alert, TouchableOpacity} from "react-native";
 import ChatScreen from "../screens/ChatScreen";
 import InitialScreen from "../screens/InitialScreen";
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef} from "react";
 import { UserService } from "../services/userService";
 import UserDataContext from "../contexts/userDataContext";
 import PrivateChatScreen from "../screens/PrivateChatScreen";
-import { isSupported, requestForToken } from '../utils/firebase';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 const TopTab = createMaterialTopTabNavigator();
 const FollowsTopTab = createMaterialTopTabNavigator();
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+    }),
+});
+  
+// Can use this function below OR use Expo's Push Notification Tool from: https://expo.dev/notifications
+async function sendPushNotification(expoPushToken) {
+    const message = {
+      to: expoPushToken,
+      sound: 'default',
+      title: 'Original Title',
+      body: 'And here is the body!',
+      data: { someData: 'goes here' },
+    };
+  
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    });
+}
+  
+async function registerForPushNotificationsAsync() {
+    let token;
+    if (Device.isDevice) {
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+        }
+        if (finalStatus !== 'granted') {
+            alert('Failed to get push token for push notification!');
+            return;
+        }
+        token = (await Notifications.getExpoPushTokenAsync()).data;
+        console.log(token);
+    } else {
+        alert('Must use physical device for Push Notifications');
+    }
+  
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+  
+    return token;
+}
 
 
 const AuthStack = () => {
@@ -43,33 +104,33 @@ const AuthStack = () => {
         name: '',
         surname: '',
     });
-
-    const onMessage = async (remoteMessage) => {
-        Alert.alert("New message", remoteMessage.notification.body);
-    }
-
-    const initMessaging = async () => {
-        const hasFirebaseMessagingSupport = await isSupported();
-        if (hasFirebaseMessagingSupport) {
-            await requestForToken();
-            const onFocusSubscribe = messaging().onMessage(onMessage);
-            const onBackgroudSubscribe = messaging().setBackgroundMessageHandler(onMessage);
-
-            return () => {
-                onFocusSubscribe();
-                onBackgroudSubscribe();
-            }
-        }
-    }
+    const [expoPushToken, setExpoPushToken] = useState('');
+   /*  const [notification, setNotification] = useState(false); */
+    const notificationListener = useRef();
+    const responseListener = useRef();
 
     useEffect(() => {
         UserService.getUser().then((profile) => {
             setUserData(profile);
-            initMessaging();
+            
+            registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+            notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+                Alert.alert(notification.request.content.title, notification.request.content.body);
+            });
+          
+            responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+                console.log(response);
+            });
         }).catch((error) => {
             console.log(error);
             Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
         });
+
+        return () => {
+            Notifications.removeNotificationSubscription(notificationListener.current);
+            Notifications.removeNotificationSubscription(responseListener.current);
+        };
     }, []);
 
     return (
