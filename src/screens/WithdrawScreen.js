@@ -2,10 +2,10 @@ import {View, Text, TouchableWithoutFeedback} from "react-native";
 import PaymentInput from "../components/PaymentInput";
 import React, {useRef} from "react";
 import {Button, HelperText, useTheme} from "react-native-paper";
-import {validateAmount, validateTransferUsername} from "../utils/validations";
+import {validateAmount, validateWallet} from "../utils/validations";
 import {fiufitStyles} from "../consts/fiufitStyles";
 
-const TransferScreen = ({user, amount, setUser, setAmount, onConfirm, onCancel, ...props}) => {
+const WithdrawScreen = ({wallet, amount, setWallet, setAmount, onConfirm, onCancel, ...props}) => {
     const theme = useTheme();
     const textInputRef = useRef(null);
 
@@ -23,19 +23,19 @@ const TransferScreen = ({user, amount, setUser, setAmount, onConfirm, onCancel, 
                         fontWeight: 'bold',
                         marginBottom: 20,
                     }}>
-                    Transfer
+                    Withdraw
                 </Text>
                 <PaymentInput
-                    label={'Username'}
-                    value={user}
+                    label={'Address'}
+                    value={wallet}
                     onChangeText={text => {
-                        setUser(text)
+                        setWallet(text)
                     }}
                     textInputRef={textInputRef}
                     {...props}
                 />
-                <HelperText type={'error'} visible={!validateTransferUsername(user, true)}>
-                    Invalid username
+                <HelperText type={'error'} visible={!validateWallet(wallet, true)}>
+                    Invalid wallet
                 </HelperText>
                 <PaymentInput
                     label={'Amount'}
@@ -75,4 +75,4 @@ const TransferScreen = ({user, amount, setUser, setAmount, onConfirm, onCancel, 
     )
 }
 
-export default TransferScreen;
+export default WithdrawScreen;

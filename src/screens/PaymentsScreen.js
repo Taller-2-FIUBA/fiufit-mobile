@@ -7,8 +7,9 @@ import {fiufitStyles} from "../consts/fiufitStyles";
 import FiufitDialog from "../components/FiufitDialog";
 import PaymentsFAB from "../components/PaymentsFAB";
 import TransferScreen from "./TransferScreen";
-import {validateAmount, validateTransferUsername} from "../utils/validations";
+import {validateAmount, validateTransferUsername, validateWallet} from "../utils/validations";
 import {UserService as userService} from "../services/userService";
+import WithdrawScreen from "./WithdrawScreen";
 
 const PaymentsScreen = () => {
     const theme = useTheme();
@@ -18,7 +19,7 @@ const PaymentsScreen = () => {
     const [wallet, setWallet] = useState('');
 
     // Transfer data
-    const [transferReceiverUsername, setTransferReceiverUsername] = useState('');
+    const [transferReceiver, setTransferReceiver] = useState('');
     const [transferAmount, setTransferAmount] = useState('');
 
     // Dialog
@@ -30,6 +31,7 @@ const PaymentsScreen = () => {
 
     // Modal
     const [modalVisible, setModalVisible] = useState(false);
+    const [isWithdraw, setIsWithdraw] = useState(false);
     const showModal = () => setModalVisible(true);
     const hideModal = () => setModalVisible(false);
 
@@ -66,10 +68,18 @@ const PaymentsScreen = () => {
     }
 
     const validateTransfer = () => {
-        if (!validateTransferUsername(transferReceiverUsername, false)) {
-            setDialog('Invalid username', 'Please enter a valid username', true);
-            return false;
+        if (!isWithdraw) {
+            if (!validateTransferUsername(transferReceiver, false)) {
+                setDialog('Invalid username', 'Please enter a valid username', true);
+                return false;
+            }
+        } else {
+            if (!validateWallet(transferReceiver, false)) {
+                setDialog('Invalid wallet', 'Please enter a valid wallet', true);
+                return false;
+            }
         }
+
         if (!validateAmount(transferAmount, false)) {
             setDialog('Invalid amount', 'Please enter a valid amount', true);
             return false;
@@ -78,12 +88,13 @@ const PaymentsScreen = () => {
     }
 
     const resetForm = () => {
-        setTransferReceiverUsername('');
+        setTransferReceiver('');
         setTransferAmount('');
+        setIsWithdraw(false);
     }
 
     const getReceiverId = async () => {
-        let user = await userService.getUserByUsername(transferReceiverUsername);
+        let user = await userService.getUserByUsername(transferReceiver);
         return user?.id;
     }
 
@@ -112,6 +123,26 @@ const PaymentsScreen = () => {
         }
     }
 
+    const withdraw = async () => {
+        try {
+            if (loading) return;
+            if (!validateTransfer()) {
+                setVisible(true);
+                return;
+            }
+            setVisible(false);
+            hideModal();
+            console.log(`Withdrawing ${transferAmount} to ${transferReceiver}`);
+            await paymentsService.withdraw(transferReceiver, transferAmount);
+            resetForm();
+            recalculateBalance();
+        } catch (error) {
+            console.error(error);
+            resetDialog();
+            setVisible(true);
+        }
+    }
+
     const setDialog = (title, content, isOk) => {
         setDialogTitle(title);
         setDialogContent(content);
@@ -122,6 +153,7 @@ const PaymentsScreen = () => {
         setDialog('Error',
             'An error has occurred, please try again later',
             true);
+        resetForm();
     }
 
     return (
@@ -131,7 +163,10 @@ const PaymentsScreen = () => {
 
                 <View style={fiufitStyles.FABContainer}>
                     <PaymentsFAB label={'Withdraw'} iconName={'arrow-collapse-down'}
-                                 onPress={() => console.log("Not implemented")}/>
+                                 onPress={() => {
+                                     setIsWithdraw(true);
+                                     showModal();
+                                 }}/>
                     <PaymentsFAB label={'Transfer'} iconName={'arrow-top-right'}
                                  onPress={showModal}/>
                     <PaymentsFAB label={'Reload'} iconName={'refresh'}
@@ -144,23 +179,43 @@ const PaymentsScreen = () => {
             </ScrollView>
             <Portal>
                 <Modal visible={modalVisible} onDismiss={hideModal} contentContainerStyle={fiufitStyles.containerStyle}>
-                    <TransferScreen
-                        user={transferReceiverUsername}
-                        amount={transferAmount}
-                        setUser={setTransferReceiverUsername}
-                        setAmount={setTransferAmount}
-                        onConfirm={() => {
-                            setDialog('Transfer',
-                                'Are you sure you want to make the transfer?',
-                                false)
-                            setVisible(true)
-                        }}
-                        onCancel={() => {
-                            hideModal();
-                            resetForm();
-                            resetDialog();
-                        }}
-                    />
+                    {isWithdraw ? (
+                        <WithdrawScreen
+                            wallet={transferReceiver}
+                            amount={transferAmount}
+                            setWallet={setTransferReceiver}
+                            setAmount={setTransferAmount}
+                            onConfirm={() => {
+                                setDialog('Withdraw',
+                                    'Are you sure you want to withdraw?',
+                                    false);
+                                setVisible(true);
+                            }}
+                            onCancel={() => {
+                                hideModal();
+                                resetForm();
+                                resetDialog();
+                            }}
+                        />
+                    ) : (
+                        <TransferScreen
+                            user={transferReceiver}
+                            amount={transferAmount}
+                            setUser={setTransferReceiver}
+                            setAmount={setTransferAmount}
+                            onConfirm={() => {
+                                setDialog('Transfer',
+                                    'Are you sure you want to make the transfer?',
+                                    false);
+                                setVisible(true);
+                            }}
+                            onCancel={() => {
+                                hideModal();
+                                resetForm();
+                                resetDialog();
+                            }}
+                        />
+                    )}
                 </Modal>
                 <FiufitDialog
                     visible={visible}
@@ -168,7 +223,7 @@ const PaymentsScreen = () => {
                     title={dialogTitle}
                     content={dialogContent}
                     isOk={dialogIsOk}
-                    handleConfirm={dialogIsOk ? hideModal : transfer}
+                    handleConfirm={dialogIsOk ? hideModal : (isWithdraw ? withdraw : transfer)}
                     handleCancel={() => setVisible(false)}
                     handleOk={() => setVisible(false)}
                 />
