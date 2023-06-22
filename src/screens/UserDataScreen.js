@@ -15,6 +15,7 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import UserDataContext from "../contexts/userDataContext";
 import {Picker} from '@react-native-picker/picker';
+import {UserService} from "../services/userService";
 
 const UserDataScreen = ({navigation}) => {
 
@@ -22,15 +23,15 @@ const UserDataScreen = ({navigation}) => {
     const [errors, setErrors] = useState({});
     const [locations, setLocations] = useState([]);
 
-
     useEffect(() => {
         getLocations();
     }, []);
 
     const getLocations = async () => {
         try {
-            locations = await UserService.getLocations();
-            setLocations(locations);
+            const response = await UserService.getLocations();
+            console.log('LOcations: ', response);
+            setLocations(response);
         } catch(error) {
             console.error("Something went wrong while fetching locations. Please try again later.");
         }
@@ -41,7 +42,13 @@ const UserDataScreen = ({navigation}) => {
     };
 
     const handleInputChange = (key, value) => {
+        console.log('handleInputChange: ', key, value);
         setUserData({...userData, [key]: value});
+    };
+
+    const handleLocationInputChange = (value) => {
+        console.log('handleInputChange: ', key, value);
+        setUserData({...userData, ['location']: value.location, ['coordinates']: value.coordinates});
     };
 
     const validateForm = (userData) => {
@@ -134,12 +141,12 @@ const UserDataScreen = ({navigation}) => {
                         error={errors.username}
                     />
                     <Picker
-                        selectedValue={training.difficulty}
+                        selectedValue={'location'}
                         style={fiufitStyles.trainingPickerSelect}
-                        onValueChange={(itemValue) => handleInputChange(index, 'difficulty', itemValue)}
+                        onValueChange={(itemValue) => handleLocationInputChange(itemValue)}
                     >
                         {locations && locations.map((location, index) => {
-                            return <Picker.Item label={location.location} value={location.location} key={index}/>
+                            return <Picker.Item label={location.location} value={location} key={index}/>
                         }
                         )}
                     </Picker>

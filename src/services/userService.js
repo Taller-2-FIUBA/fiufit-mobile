@@ -178,10 +178,10 @@ export const UserService = {
 
     async getLocations() {
         try {
-            const url = "https://users-ingress-taller2-marianocinalli.cloud.okteto.net";
-            const locations = await axios.get(`${url}${requests.USER}/locations/`);
-            if(locations.length > 0) {
-                return locations;
+            const response = await axios.get(`${requests.BASE_URL}${requests.USER}/locations/`);
+            console.log(response.data);
+            if(response.data.length > 0) {
+                return response.data;
             } else {
                 return [];
             }
