@@ -14,11 +14,27 @@ import {primaryColor} from "../consts/colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import UserDataContext from "../contexts/userDataContext";
+import {Picker} from '@react-native-picker/picker';
 
 const UserDataScreen = ({navigation}) => {
 
     const {userData, setUserData} = useContext(UserDataContext);
     const [errors, setErrors] = useState({});
+    const [locations, setLocations] = useState([]);
+
+
+    useEffect(() => {
+        getLocations();
+    }, []);
+
+    const getLocations = async () => {
+        try {
+            locations = await UserService.getLocations();
+            setLocations(locations);
+        } catch(error) {
+            console.error("Something went wrong while fetching locations. Please try again later.");
+        }
+    }        
 
     const handleError = (error, input) => {
         setErrors(prevState => ({...prevState, [input]: error}));
@@ -117,7 +133,16 @@ const UserDataScreen = ({navigation}) => {
                         onChangeText={text => handleInputChange('username', text)}
                         error={errors.username}
                     />
-
+                    <Picker
+                        selectedValue={training.difficulty}
+                        style={fiufitStyles.trainingPickerSelect}
+                        onValueChange={(itemValue) => handleInputChange(index, 'difficulty', itemValue)}
+                    >
+                        {locations && locations.map((location, index) => {
+                            return <Picker.Item label={location.location} value={location.location} key={index}/>
+                        }
+                        )}
+                    </Picker>
                     <Input
                         label="Location (optional)"
                         iconName={"map-marker"}

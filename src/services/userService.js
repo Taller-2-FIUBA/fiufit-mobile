@@ -14,6 +14,15 @@ export const UserService = {
         }
     },
 
+    async getUsersByLocation(latitude, longitude, radius) {
+        try {
+            const response = await axiosInstance.get(`${requests.USER}?latitude=${latitude}&longitude=${longitude}&radius=${radius}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.status.toString());
+        }
+    },
+
     async getUserById(userId) {
         try {
             const response = await axiosInstance.get(`${requests.USER}/${userId}`);
@@ -165,5 +174,20 @@ export const UserService = {
         } catch (error) {
             return 0;
         }
-    }
+    },
+
+    async getLocations() {
+        try {
+            const url = "https://users-ingress-taller2-marianocinalli.cloud.okteto.net";
+            const locations = await axios.get(`${url}${requests.USER}/locations/`);
+            if(locations.length > 0) {
+                return locations;
+            } else {
+                return [];
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    
 }
