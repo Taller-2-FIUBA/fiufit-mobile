@@ -44,9 +44,15 @@ const PaymentsScreen = () => {
             );
     }, []);
 
-    const recalculateBalance = () => {
-        setLoading(true);
-        getBalance().then(() => setLoading(false));
+    const recalculateBalance = async () => {
+        let retries = 0;
+        let currentBalance = parseFloat(balance);
+        while (currentBalance === parseFloat(balance) && retries < 15) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await getBalance();
+            retries++;
+        }
+        setLoading(false);
     }
 
     const getBalance = async () => {
@@ -107,6 +113,7 @@ const PaymentsScreen = () => {
             }
             setVisible(false);
             hideModal();
+            setLoading(true);
             let receiverId = await getReceiverId();
             if (!receiverId) {
                 setDialog('User not found', 'Please enter a valid username', true);
@@ -114,9 +121,11 @@ const PaymentsScreen = () => {
                 setVisible(true);
                 return;
             }
-            await paymentsService.transfer(receiverId, transferAmount);
-            recalculateBalance();
-            resetForm();
+            Promise.all([paymentsService.transfer(receiverId, transferAmount), recalculateBalance()])
+                .then(() => {
+                    setLoading(false);
+                    resetForm();
+                });
         } catch (error) {
             console.error(error);
             resetDialog();
@@ -133,13 +142,16 @@ const PaymentsScreen = () => {
             }
             setVisible(false);
             hideModal();
-            console.log(`Withdrawing ${transferAmount} to ${transferReceiver}`);
-            await paymentsService.withdraw(transferReceiver, transferAmount);
-            resetForm();
-            recalculateBalance();
+            setLoading(true);
+            Promise.all([paymentsService.withdraw(transferReceiver, transferAmount), recalculateBalance()])
+                .then(() => {
+                    setLoading(false);
+                    resetForm();
+                });
         } catch (error) {
             console.error(error);
             resetDialog();
+            resetForm();
             setVisible(true);
         }
     }
@@ -165,13 +177,21 @@ const PaymentsScreen = () => {
                 <View style={fiufitStyles.FABContainer}>
                     <PaymentsFAB label={'Withdraw'} iconName={'arrow-collapse-down'}
                                  onPress={() => {
+                                     if (loading) return;
                                      setIsWithdraw(true);
                                      showModal();
                                  }}/>
                     <PaymentsFAB label={'Transfer'} iconName={'arrow-top-right'}
-                                 onPress={showModal}/>
+                                 onPress={() => {
+                                     if (loading) return;
+                                     showModal();
+                                 }}/>
                     <PaymentsFAB label={'Reload'} iconName={'refresh'}
-                                 onPress={recalculateBalance}/>
+                                 onPress={() => {
+                                     if (loading) return;
+                                     setLoading(true);
+                                     getBalance().then(() => setLoading(false));
+                                 }}/>
                 </View>
 
                 <Text style={fiufitStyles.hintStyle}>
