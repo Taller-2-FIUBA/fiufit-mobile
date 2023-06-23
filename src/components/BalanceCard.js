@@ -64,14 +64,23 @@ const BalanceCard = ({balance, wallet, loading}) => {
                         </TouchableOpacity>
                     </View>
                     <Card.Content>
-                        <Card.Title title={showBalance ? `$ ${balance}` : '********'}
-                                    titleStyle={{
-                                        marginTop: 5,
-                                        color: theme.colors.secondary,
-                                        fontSize: 24,
-                                        fontWeight: 'bold'
-                                    }}
-                        />
+                        <View style={{
+                            flexDirection: "row",
+                            alignItems: 'center',
+                            paddingHorizontal: 16,
+                        }}>
+                            <Icon name={'ethereum'} size={24} color={theme.colors.secondary}
+                                  style={{marginBottom: 7, marginRight: -5}}/>
+                            <Card.Title title={showBalance ? `${parseFloat(balance).toFixed(6)}` : '********'}
+                                        titleStyle={{
+                                            marginTop: 5,
+                                            color: theme.colors.secondary,
+                                            fontSize: 24,
+                                            fontWeight: 'bold'
+                                        }}
+                            />
+                        </View>
+
                     </Card.Content>
                     {
                         wallet &&
