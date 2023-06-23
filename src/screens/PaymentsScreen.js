@@ -116,6 +116,7 @@ const PaymentsScreen = () => {
             }
             await paymentsService.transfer(receiverId, transferAmount);
             recalculateBalance();
+            resetForm();
         } catch (error) {
             console.error(error);
             resetDialog();
