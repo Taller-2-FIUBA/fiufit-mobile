@@ -17,7 +17,6 @@ import FiufitDrawer from "../components/FiufitDrawer";
 import ProfileScreen from "../screens/ProfileScreen";
 import FollowedsScreen from "../screens/FollowedsScreen";
 import FollowersScreen from "../screens/FollowersScreen";
-import FollowsScreen from "../screens/FollowersScreen";
 import ProfilePublicScreen from "../screens/ProfilePublicScreen";
 import GoalsScreen from "../screens/GoalsScreen";
 import {Alert, TouchableOpacity} from "react-native";

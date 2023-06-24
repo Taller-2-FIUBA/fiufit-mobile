@@ -67,18 +67,12 @@ const SearchTrainingsScreen = () => {
   }, []);
 
   const checkFavourites = async (trainings) => {
-    console.log('trainings: ', trainings);
-
     let favouritesTrainings = [];
     try {
         const userId = await AsyncStorage.getItem('@fiufit_userId');
-        console.log('userId: ', userId);
-
         favouritesTrainings = await UserService.getTrainingsByUserId(userId);
-        console.log('favourites: ', favouritesTrainings);
-
     } catch (error) {
-      console.log('Error while checking favourites training: ', error);
+      console.error('Error while checking favourites training: ', error);
     }
     const favouritesIds = favouritesTrainings.map(favourite => favourite.id);
     const newTrainings = trainings.map(training => {
@@ -89,11 +83,8 @@ const SearchTrainingsScreen = () => {
   }
 
   const toggleFavourite = async (trainingId, index) => {
-    console.log('toggleFavourite Id --->: ', trainingId);
-
     for (let i = 0; i < trainings.length; i++) {
       if (trainings[i].id === trainingId) {
-          console.log('toggleFavourite: ', trainings[i].favourite);
           trainings[i].favourite = !trainings[i].favourite;
           break;
       }
@@ -106,7 +97,7 @@ const SearchTrainingsScreen = () => {
         await UserService.addFavouriteTraining(trainingId);
         toggleFavourite(trainingId, index);
     } catch (error) {
-        console.log('Error while adding favourites trainings: ', error);
+        console.error('Error while adding favourites trainings: ', error);
     }
   }
 
@@ -115,7 +106,7 @@ const SearchTrainingsScreen = () => {
         await UserService.deleteFavouriteTraining(trainingId);
         toggleFavourite(trainingId, index);
     } catch (error) {
-        console.log('Error while deleting favourite trainings: ', error);
+        console.error('Error while deleting favourite trainings: ', error);
     }
   }
 
@@ -187,59 +178,58 @@ const SearchTrainingsScreen = () => {
             <Text>There are no results for your search.</Text>
         </View>
       )}
-      {loading ? (
-                    <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
-                )
-                : <View>
-      {trainings && trainings.map((training, index) => (
-                <List.Accordion
-                    key={index}
-                    style={[fiufitStyles.trainingsList, {alignSelf: 'center'}]}
-                    left={(props) => <List.Icon {...props} icon="bike" />}
-                    title={training.title}
-                    titleStyle={{ color: primaryColor }}
-                    expanded={expandedList[index]}
-                    onPress={() => toogleExpanded(index)}
-                >
-                    <View style={styles.ratingAndFavContainer}>
-                      {training.rating >= 0 ?<Text style={styles.ratingText}>Global training rating: {training.rating}</Text> : null}
-                      {isAthlete && 
-                        <FavouriteIcon training={training} index={index}/>
-                      }
-                    </View>
-                    
-                    <TrainingItem value={training.title}/>
-                    <TrainingItem value={training.description}/>
-                    <TrainingItem value={trainings[index].type}/>
-                    <TrainingItem value={trainings[index].difficulty}/>
-                    <View key={training.id}>
-                        <Text style={{color: greyColor,
-                            fontSize: 18,
-                            marginVertical: 10,
-                            marginRight: 1,
-                        }}>
-                            Exercises:
-                        </Text>
-                        {training.exercises.map((exercise, index) => (
-                        <View key={index} style={{paddingBottom: 10}}>
-                            <Text style={{ color: greyColor }}>{exercise.name} {exercise.unit ? `[${exercise.unit}]` : ''}</Text>
-                            <View style={fiufitStyles.exerciseDetails}>
-                                <Text style={{ color: greyColor }}>{`Count: ${exercise.count}`}</Text>
-                                <Text style={{ color: greyColor }}>{`Series: ${exercise.series}`}</Text>
-                            </View>
-                        </View>
-                        ))}
-                    </View>
-                    {training.media &&
-                            <Image source={{uri: decode(training.media)}}
-                                    style={{
-                                        width: 120,
-                                        height: 120,
-                                        marginTop: 10,
-                                        borderRadius: 5,
-                                    }}/>
-                        }
-                </List.Accordion>
+      {loading 
+        ? <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
+        : <View>
+          {trainings && trainings.map((training, index) => (
+              <List.Accordion
+                  key={index}
+                  style={[fiufitStyles.trainingsList, {alignSelf: 'center'}]}
+                  left={(props) => <List.Icon {...props} icon="bike" />}
+                  title={training.title}
+                  titleStyle={{ color: primaryColor }}
+                  expanded={expandedList[index]}
+                  onPress={() => toogleExpanded(index)}
+              >
+                  <View style={styles.ratingAndFavContainer}>
+                    {training.rating >= 0 ?<Text style={styles.ratingText}>Global training rating: {training.rating}</Text> : null}
+                    {isAthlete && 
+                      <FavouriteIcon training={training} index={index}/>
+                    }
+                  </View>
+                  
+                  <TrainingItem value={training.title}/>
+                  <TrainingItem value={training.description}/>
+                  <TrainingItem value={trainings[index].type}/>
+                  <TrainingItem value={trainings[index].difficulty}/>
+                  <View key={training.id}>
+                      <Text style={{color: greyColor,
+                          fontSize: 18,
+                          marginVertical: 10,
+                          marginRight: 1,
+                      }}>
+                          Exercises:
+                      </Text>
+                      {training.exercises.map((exercise, index) => (
+                      <View key={index} style={{paddingBottom: 10}}>
+                          <Text style={{ color: greyColor }}>{exercise.name} {exercise.unit ? `[${exercise.unit}]` : ''}</Text>
+                          <View style={fiufitStyles.exerciseDetails}>
+                              <Text style={{ color: greyColor }}>{`Count: ${exercise.count}`}</Text>
+                              <Text style={{ color: greyColor }}>{`Series: ${exercise.series}`}</Text>
+                          </View>
+                      </View>
+                      ))}
+                  </View>
+                  {training.media &&
+                    <Image source={{uri: decode(training.media)}}
+                      style={{
+                          width: 120,
+                          height: 120,
+                          marginTop: 10,
+                          borderRadius: 5,
+                      }}/>
+                  }
+              </List.Accordion>
             ))}
             </View>
 }

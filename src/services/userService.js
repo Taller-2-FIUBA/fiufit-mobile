@@ -14,7 +14,7 @@ export const UserService = {
         }
     },
 
-    async getUsersByLocation(latitude, longitude, radius) {
+    async getUsersByLocation(latitude, longitude, radius = 1000) {
         try {
             const response = await axiosInstance.get(`${requests.USER}?latitude=${latitude}&longitude=${longitude}&radius=${radius}`);
             return response.data;
@@ -188,6 +188,5 @@ export const UserService = {
         } catch (error) {
             console.log(error);
         }
-    },
-    
+    }
 }
