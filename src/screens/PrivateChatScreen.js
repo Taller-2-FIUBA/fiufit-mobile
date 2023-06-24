@@ -23,7 +23,7 @@ const PrivateChatScreen = ({route}) => {
       await updateDoc(doc(db, "conversations", chatInfo.conversationId), {
         messages: [...messages, {message: actualMessage, userId: actualUserId}]
       });
-      await sendNotification(actualUserId, 
+      await sendNotification(chatInfo.user.id.toString(), 
         {title: actualUserName, message: actualMessage, body: {type: "PrivateChat", chatInfo: chatInfo}});
     } catch (e) {
       console.error("Error sending message: ", e);
