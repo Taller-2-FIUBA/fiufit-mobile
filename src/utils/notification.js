@@ -114,8 +114,25 @@ export const registerToken = async (user) => {
         } else {
             await setDoc(docRef, {tokens: [token]});
         }
+        await AsyncStorage.setItem('@actual_notification_token', token);
         await AsyncStorage.setItem('@notification_tokens', tokens.join(','));
     } else {
         Alert.alert("Error", "Something went wrong while registering for push notifications. Please try again later.");
     }
+}
+
+export const unregisterToken = async (user) => {
+    const token = await AsyncStorage.getItem('@actual_notification_token');
+    const docRef = doc(db, "notificationTokens", user.id.toString());
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        const tokens = docSnap.data().tokens;
+        if (tokens.includes(token)) {
+            const index = tokens.indexOf(token);
+            tokens.splice(index, 1);
+            await updateDoc(docRef, {tokens: tokens});
+        }
+    }
+    await AsyncStorage.removeItem('@actual_notification_token');
+    await AsyncStorage.removeItem('@notification_tokens');
 }

@@ -2,6 +2,7 @@ import {axiosInstance} from "./config/axiosConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
 import axios from "axios";
+import { unregisterToken } from "../utils/notification";
 
 const authService = {
     _storeSensitiveData: async function (response) {
@@ -87,6 +88,7 @@ const authService = {
         try {
             await AsyncStorage.removeItem('@fiufit_token');
             await AsyncStorage.removeItem('@fiufit_userId');
+            await unregisterToken();
         } catch (error) {
             throw new Error("Error deleting sensitive data from device");
         }
