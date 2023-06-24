@@ -22,6 +22,7 @@ const UserDataScreen = ({navigation}) => {
     const {userData, setUserData} = useContext(UserDataContext);
     const [errors, setErrors] = useState({});
     const [locations, setLocations] = useState([]);
+    const [location, setLocation] = useState("");
 
     useEffect(() => {
         getLocations();
@@ -47,8 +48,10 @@ const UserDataScreen = ({navigation}) => {
     };
 
     const handleLocationInputChange = (value) => {
-        console.log('handleInputChange: ', key, value);
-        setUserData({...userData, ['location']: value.location, ['coordinates']: value.coordinates});
+        console.log('change: ', value);
+        setLocation(value.location);
+        setUserData({...userData, location: location, ['coordinates']: value.coordinates});
+        console.log('handleInputChange: ', userData);
     };
 
     const validateForm = (userData) => {
@@ -140,23 +143,18 @@ const UserDataScreen = ({navigation}) => {
                         onChangeText={text => handleInputChange('username', text)}
                         error={errors.username}
                     />
+                    <Text style={fiufitStyles.optionalText}>Location (optional)</Text>
                     <Picker
-                        selectedValue={'location'}
-                        style={fiufitStyles.trainingPickerSelect}
+                        label="Location"
+                        selectedValue={userData.location}
+                        style={fiufitStyles.locationPickerSelect}
                         onValueChange={(itemValue) => handleLocationInputChange(itemValue)}
                     >
-                        {locations && locations.map((location, index) => {
-                            return <Picker.Item label={location.location} value={location} key={index}/>
+                        {locations && locations.map((locationInfo, index) => {
+                            return <Picker.Item label={locationInfo.location} value={locationInfo} key={index}/>
                         }
                         )}
                     </Picker>
-                    <Input
-                        label="Location (optional)"
-                        iconName={"map-marker"}
-                        placeholder="Enter your location"
-                        onChangeText={text => handleInputChange('location', text)}
-                        error={errors.location}
-                    />
                     <Button onPress={handleNext} title="Next"/>
                 </View>
             </ScrollView>
