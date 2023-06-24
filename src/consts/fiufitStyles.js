@@ -273,19 +273,20 @@ export const fiufitStyles = StyleSheet.create({
     messageChatInputContainer: {
         display: 'flex',
         flexDirection: 'row',
-        width: '100%',
-        height: 50,
+        flexGrow: 4,
+        minHeight: 50,
     },
     messageChatInput: {
         backgroundColor: secondaryColor,
-        flexGrow: 4,
-        color: whiteColor
+        color: whiteColor,
+        width: '90%',
     },
     messageChatButton: {
         backgroundColor: tertiaryColor,
-        flexGrow: 0.5,
         justifyContent: 'center',
         alignItems: 'center',
+        flexGrow: 1,
+        height: 50,
     },
     messageChatItemLeft: {
         backgroundColor: secondaryColor,

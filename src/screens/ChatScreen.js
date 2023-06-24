@@ -22,7 +22,7 @@ const ChatScreen = () => {
     }, []);
 
     const ChatMessageIntro = ({chatInfo}) => {
-        const {user} = chatInfo;
+        const {otherUsername} = chatInfo;
 
         return (
             <TouchableOpacity style={fiufitStyles.chatMessageIntro} onPress={event => handleGoToChat(event, chatInfo)}>
@@ -33,7 +33,7 @@ const ChatScreen = () => {
                         backgroundColor: primaryColor,
                     }}
                 />
-                <Text style={{color: theme.colors.tertiary, fontSize: 18}}>{user.username}</Text>
+                <Text style={{color: theme.colors.tertiary, fontSize: 18}}>{otherUsername}</Text>
             </TouchableOpacity>   
         )
     }
@@ -46,7 +46,7 @@ const ChatScreen = () => {
             if (doc.exists()) {
                 for (const chat of doc.data().chats) {
                     const user = await getUserInfoFromId(chat.userId);
-                    chatsDocInfo.push({user: user, conversationId: chat.conversationId});
+                    chatsDocInfo.push({otherUserId: user.id.toString(), otherUsername: user.username, conversationId: chat.conversationId});
                 }
             }
             setChatsInfo(chatsDocInfo);
@@ -72,7 +72,7 @@ const ChatScreen = () => {
                     conversationId = chat.conversationId;
                 }
             }
-            const chatInfo = {user: response, conversationId: conversationId};
+            const chatInfo = {otherUserId: response.id.toString(), otherUsername: response.username, conversationId: conversationId};
             navigation.navigate("PrivateChat", {chatInfo});
         }
     };

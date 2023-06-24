@@ -23,8 +23,11 @@ const PrivateChatScreen = ({route}) => {
       await updateDoc(doc(db, "conversations", chatInfo.conversationId), {
         messages: [...messages, {message: actualMessage, userId: actualUserId}]
       });
-      await sendNotification(chatInfo.user.id.toString(), 
-        {title: actualUserName, message: actualMessage, body: {type: "PrivateChat", chatInfo: chatInfo}});
+      await sendNotification(chatInfo.otherUserId, 
+        {title: actualUserName, message: actualMessage, 
+          body: {type: "PrivateChat", 
+          chatInfo: {otherUserId: actualUserId, otherUsername: actualUserName, conversationId: chatInfo.conversationId}}
+        });
     } catch (e) {
       console.error("Error sending message: ", e);
     }
@@ -71,8 +74,8 @@ const PrivateChatScreen = ({route}) => {
         messages: []
       });
       chatInfo.conversationId = docRef.id;
-      await createChat(userId, chatInfo.conversationId, chatInfo.user.id.toString());
-      await createChat(chatInfo.user.id.toString(), chatInfo.conversationId, userId);
+      await createChat(userId, chatInfo.conversationId, chatInfo.otherUserId);
+      await createChat(chatInfo.otherUserId, chatInfo.conversationId, userId);
     }
     onSnapshot(doc(db, "conversations", chatInfo.conversationId), (doc) => {
       setMessages(doc.data().messages);
@@ -86,10 +89,12 @@ const PrivateChatScreen = ({route}) => {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={fiufitStyles.messageChatContainer}>
-      {messages && messages.map((message, index) => (
-        <MessageItem key={index} message={message} />
-      ))}
+    <View style={fiufitStyles.messageChatContainer}>
+      <ScrollView contentContainerStyle={{flexGrow: 1}}>
+        {messages && messages.map((message, index) => (
+          <MessageItem key={index} message={message} />
+        ))}
+      </ScrollView>
       <View style={fiufitStyles.messageChatInputContainer}>
         <View style={fiufitStyles.messageChatInput}>
           <TextInput style={{paddingLeft: 10, alignItems: 'center', justifyContent: 'center', flex: 1}}
@@ -104,7 +109,9 @@ const PrivateChatScreen = ({route}) => {
           </Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+   
+    </View>
+    
   );
 };
 
