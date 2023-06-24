@@ -15,8 +15,7 @@ import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor, greyColor} from "../consts/colors";
 import { ActivityIndicator, FAB, IconButton, List, useTheme, Button as PapperButton, } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
-import {
-    getTrainingsTypes, getTrainingsByTrainerId, validateForm, trimUserData
+import {getTrainingsByTrainerId, validateForm, trimUserData
 } from "../services/TrainingsService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
@@ -25,8 +24,6 @@ import {UserService} from "../services/userService";
 import {getTrainingById} from "../services/TrainingsService";
 import {decode} from "base-64";
 import {useIsFocused} from "@react-navigation/core";
-import { is } from "@babel/types";
-import { set } from "react-native-reanimated";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -63,7 +60,6 @@ const TrainingsScreen = () => {
             fetchGetTrainingsById(isTrainer, actualUser.id)
             .catch(error => {  
                 console.log("An error in fetching: ", error);
-                setDialog(false);
             }).finally(() => {
                 setLoading(false);
             })
