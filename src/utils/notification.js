@@ -121,9 +121,9 @@ export const registerToken = async (user) => {
     }
 }
 
-export const unregisterToken = async (user) => {
+export const unregisterToken = async (userId) => {
     const token = await AsyncStorage.getItem('@actual_notification_token');
-    const docRef = doc(db, "notificationTokens", user.id.toString());
+    const docRef = doc(db, "notificationTokens", userId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
         const tokens = docSnap.data().tokens;

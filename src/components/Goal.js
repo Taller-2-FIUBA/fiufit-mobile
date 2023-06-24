@@ -1,6 +1,6 @@
 import {Text, StyleSheet, View, Image} from 'react-native';
 import {Card, useTheme} from 'react-native-paper';
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import ProgressCircle from 'progress-circle-react-native'
 import {decode} from "base-64";
 
@@ -87,7 +87,7 @@ const Goal = ({
                                         marginTop: 10,
                                     }}>Finishes on {timeLimit}</Text>
                                 )}
-                                {image &&
+                                {decodedImage &&
                                     <Image source={{uri: decodedImage}}
                                            style={{
                                                width: 120,
