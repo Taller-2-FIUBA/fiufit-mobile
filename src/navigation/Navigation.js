@@ -28,12 +28,10 @@ import { UserService } from "../services/userService";
 import UserDataContext from "../contexts/userDataContext";
 import PrivateChatScreen from "../screens/PrivateChatScreen";
 import { 
-    registerForPushNotificationsAsync, 
+    registerToken,
     removeNotificationSubscription, 
     notificationListenerSubscriber, 
     responseListenerSubscriber } from "../utils/notification";
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from "../utils/firebase"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Stack = createNativeStackNavigator();
@@ -51,28 +49,6 @@ const AuthStack = () => {
     });
     const notificationListener = useRef();
     const responseListener = useRef();
-
-    const registerToken = async (user) => {
-        const token = await registerForPushNotificationsAsync();
-        if (token) {
-            const docRef = doc(db, "notificationTokens", user.id.toString());
-            const docSnap = await getDoc(docRef);
-            let tokens = [];
-
-            if (docSnap.exists()) {
-                tokens = docSnap.data().tokens;
-                if (!tokens.includes(token)) {
-                    tokens.push(token);
-                }
-                await updateDoc(docRef, {tokens: tokens});
-            } else {
-                await setDoc(docRef, {tokens: [token]});
-            }
-            await AsyncStorage.setItem('@notification_tokens', tokens.join(','));
-        } else {
-            Alert.alert("Error", "Something went wrong while registering for push notifications. Please try again later.");
-        }
-    }
 
     useEffect(() => {
         UserService.getUser().then((user) => {
