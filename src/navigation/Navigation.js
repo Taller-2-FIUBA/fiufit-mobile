@@ -27,75 +27,20 @@ import {useEffect, useState, useRef} from "react";
 import { UserService } from "../services/userService";
 import UserDataContext from "../contexts/userDataContext";
 import PrivateChatScreen from "../screens/PrivateChatScreen";
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
+import { 
+    registerForPushNotificationsAsync, 
+    removeNotificationSubscription, 
+    notificationListenerSubscriber, 
+    responseListenerSubscriber } from "../utils/notification";
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from "../utils/firebase"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 const TopTab = createMaterialTopTabNavigator();
 const FollowsTopTab = createMaterialTopTabNavigator();
-
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: false,
-        shouldSetBadge: false,
-    }),
-});
-  
-// Can use this function below OR use Expo's Push Notification Tool from: https://expo.dev/notifications
-async function sendPushNotification(expoPushToken) {
-    const message = {
-      to: expoPushToken,
-      sound: 'default',
-      title: 'Original Title',
-      body: 'And here is the body!',
-      data: { someData: 'goes here' },
-    };
-  
-    await fetch('https://exp.host/--/api/v2/push/send', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Accept-encoding': 'gzip, deflate',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(message),
-    });
-}
-  
-async function registerForPushNotificationsAsync() {
-    let token;
-    if (Device.isDevice) {
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-        if (existingStatus !== 'granted') {
-            const { status } = await Notifications.requestPermissionsAsync();
-            finalStatus = status;
-        }
-        if (finalStatus !== 'granted') {
-            alert('Failed to get push token for push notification!');
-            return;
-        }
-        token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log(token);
-    } else {
-        alert('Must use physical device for Push Notifications');
-    }
-  
-    if (Platform.OS === 'android') {
-      Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
-      });
-    }
-  
-    return token;
-}
-
 
 const AuthStack = () => {
     const theme = useTheme();
@@ -104,32 +49,47 @@ const AuthStack = () => {
         name: '',
         surname: '',
     });
-    const [expoPushToken, setExpoPushToken] = useState('');
-   /*  const [notification, setNotification] = useState(false); */
     const notificationListener = useRef();
     const responseListener = useRef();
 
-    useEffect(() => {
-        UserService.getUser().then((profile) => {
-            setUserData(profile);
-            
-            registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+    const registerToken = async (user) => {
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+            const docRef = doc(db, "notificationTokens", user.id.toString());
+            const docSnap = await getDoc(docRef);
+            let tokens = [];
 
-            notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-                Alert.alert(notification.request.content.title, notification.request.content.body);
-            });
-          
-            responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-                console.log(response);
-            });
+            if (docSnap.exists()) {
+                tokens = docSnap.data().tokens;
+                if (!tokens.includes(token)) {
+                    tokens.push(token);
+                }
+                await updateDoc(docRef, {tokens: tokens});
+            } else {
+                await setDoc(docRef, {tokens: [token]});
+            }
+            await AsyncStorage.setItem('@notification_tokens', tokens.join(','));
+        } else {
+            Alert.alert("Error", "Something went wrong while registering for push notifications. Please try again later.");
+        }
+    }
+
+    useEffect(() => {
+        UserService.getUser().then((user) => {
+            AsyncStorage.setItem('@fiufit_username', user.username);
+            setUserData(user);
+            registerToken(user);
         }).catch((error) => {
-            console.log(error);
+            console.log("Something went wrong while fetching user data ", error);
             Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
         });
 
+        notificationListener.current = notificationListenerSubscriber();
+        responseListener.current = responseListenerSubscriber(navigation);
+
         return () => {
-            Notifications.removeNotificationSubscription(notificationListener.current);
-            Notifications.removeNotificationSubscription(responseListener.current);
+            removeNotificationSubscription(notificationListener.current);
+            removeNotificationSubscription(responseListener.current);
         };
     }, []);
 

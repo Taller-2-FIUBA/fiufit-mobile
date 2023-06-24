@@ -11,7 +11,8 @@ const GoogleLoginButton = ({navigation}) => {
     const [userInfo, setUserInfo] = useState(null);
     const [token, setToken] = useState(null);
     const [request, response, promptAsync] = Google.useAuthRequest({
-        androidClientId: process.env.ANDROID_CLIENT_ID
+        androidClientId: process.env.ANDROID_CLIENT_ID,
+        expoClientId: process.env.EXPO_CLIENT_ID,
     });
 
     useEffect(() => {

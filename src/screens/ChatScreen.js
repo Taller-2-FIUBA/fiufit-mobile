@@ -1,4 +1,4 @@
-import {ScrollView, Text, View, TouchableOpacity} from "react-native";
+import {ScrollView, Text, TouchableOpacity} from "react-native";
 import React, { useEffect } from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor} from "../consts/colors";
@@ -45,7 +45,6 @@ const ChatScreen = () => {
             let chatsDocInfo = [];
             if (doc.exists()) {
                 for (const chat of doc.data().chats) {
-                    console.log("Chat --> ", chat);
                     const user = await getUserInfoFromId(chat.userId);
                     chatsDocInfo.push({user: user, conversationId: chat.conversationId});
                 }
@@ -74,7 +73,6 @@ const ChatScreen = () => {
                 }
             }
             const chatInfo = {user: response, conversationId: conversationId};
-            console.log("ChatInfo --> ", chatInfo);
             navigation.navigate("PrivateChat", {chatInfo});
         }
     };
