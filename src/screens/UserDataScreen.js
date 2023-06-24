@@ -22,7 +22,7 @@ const UserDataScreen = ({navigation}) => {
     const {userData, setUserData} = useContext(UserDataContext);
     const [errors, setErrors] = useState({});
     const [locations, setLocations] = useState([]);
-    const [location, setLocation] = useState("");
+    const [locationIndex, setLocationIndex] = useState(0);
 
     useEffect(() => {
         getLocations();
@@ -31,7 +31,6 @@ const UserDataScreen = ({navigation}) => {
     const getLocations = async () => {
         try {
             const response = await UserService.getLocations();
-            console.log('LOcations: ', response);
             setLocations(response);
         } catch(error) {
             console.error("Something went wrong while fetching locations. Please try again later.");
@@ -48,10 +47,12 @@ const UserDataScreen = ({navigation}) => {
     };
 
     const handleLocationInputChange = (value) => {
-        console.log('change: ', value);
-        setLocation(value.location);
-        setUserData({...userData, location: location, ['coordinates']: value.coordinates});
-        console.log('handleInputChange: ', userData);
+        const locationInfo = locations[value];
+        console.log('Location Selected: ', locationInfo);
+        setLocationIndex(value);
+        const newUserData = {...userData, ['location']: locationInfo.location, ['coordinates']: locationInfo.coordinates};
+        setUserData(newUserData);
+        console.log('handleInputChange: ', newUserData);
     };
 
     const validateForm = (userData) => {
@@ -144,17 +145,19 @@ const UserDataScreen = ({navigation}) => {
                         error={errors.username}
                     />
                     <Text style={fiufitStyles.optionalText}>Location (optional)</Text>
-                    <Picker
-                        label="Location"
-                        selectedValue={userData.location}
-                        style={fiufitStyles.locationPickerSelect}
-                        onValueChange={(itemValue) => handleLocationInputChange(itemValue)}
-                    >
-                        {locations && locations.map((locationInfo, index) => {
-                            return <Picker.Item label={locationInfo.location} value={locationInfo} key={index}/>
-                        }
-                        )}
-                    </Picker>
+                    {locations && locations.length > 0 &&
+                        <Picker
+                            label="Location"
+                            selectedValue={locationIndex}
+                            style={fiufitStyles.locationPickerSelect}
+                            onValueChange={(itemValue) => handleLocationInputChange(itemValue)}
+                            prompt='Select your location'
+                        >
+                            {locations.map((locationInfo, index) => 
+                                <Picker.Item label={locationInfo.location} value={index} key={index}/>
+                            )}
+                        </Picker>
+                    }
                     <Button onPress={handleNext} title="Next"/>
                 </View>
             </ScrollView>
