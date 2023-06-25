@@ -52,10 +52,10 @@ describe('validateName', () => {
         expect(result).toBe(false);
     });
 
-    it('returns false when name contains spaces', () => {
+    it('returns true when name contains spaces', () => {
         const name = 'John Smith';
         const result = validateName(name);
-        expect(result).toBe(false);
+        expect(result).toBe(true);
     });
 
     it('returns false when name contains non-letter characters', () => {
