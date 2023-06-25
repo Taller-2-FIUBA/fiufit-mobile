@@ -6,7 +6,8 @@ import {
     Button,
     FAB,
     Card,
-    HelperText, ActivityIndicator
+    HelperText, 
+    ActivityIndicator
 } from "react-native-paper";
 import {validateGoalDescription, validateGoalObjective, validateGoalTitle} from "../utils/validations";
 import Input from "../components/Input";
@@ -19,6 +20,8 @@ import goalsService from "../services/goalsService";
 import FiufitDialog from "../components/FiufitDialog";
 import * as ImagePicker from "expo-image-picker";
 import {encode} from 'base-64';
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
 
 const GoalsScreen = () => {
     const theme = useTheme();
@@ -193,7 +196,7 @@ const GoalsScreen = () => {
     }
 
     // Saves the changes made to the selected goal
-    const editSelectedGoal = () => {
+    const editSelectedGoal = async () => {
         if (!validateGoalForm()) {
             setDialog(true);
             return;
@@ -211,18 +214,23 @@ const GoalsScreen = () => {
             setEditMode(false);
         }
         goalsService.update(card)
+        try {
+            await goalsService.update(card);
+            if (Number(goalObjective) <= Number(currentProgress)) {
+                
+            } else {
+                console.log("no entra");
+            }
+        } catch (error) {
+            console.log(error);
+            setDialog(false);
+        }
+        getGoals()
             .catch(error => {
                 console.log(error);
                 setDialog(false);
-            })
-            .finally(() => {
-                getGoals()
-                    .catch(error => {
-                        console.log(error);
-                        setDialog(false);
-                    });
-                resetNewGoalForm();
             });
+        resetNewGoalForm();
     }
 
     const validateGoalForm = () => {
@@ -318,6 +326,22 @@ const GoalsScreen = () => {
         );
     }
 
+    // Share content on social media
+    const shareContent = async () => {
+        const contentToShare = 'I have completed a new goal in the FiuFit app!';
+        try {
+            const fileUri = FileSystem.cacheDirectory + 'shared-twitter.txt'; // Ruta del archivo temporal
+
+            // Guardar el contenido en un archivo local
+            await FileSystem.writeAsStringAsync(fileUri, contentToShare);
+
+            // Compartir el archivo utilizando su URL local
+            await Sharing.shareAsync(fileUri, { mimeType: 'text/plain', dialogTitle: 'Compartir en Twitter', UTI: 'public.plain-text' });
+        } catch (error) {
+            console.log('Error while sharing content on social media:', error);
+        }
+      };
+
     return (
         <SafeAreaView style={{
             backgroundColor: theme.colors.background,
@@ -330,12 +354,12 @@ const GoalsScreen = () => {
             }}>
                 Goals
             </Text>
-            {loading ? (
-                    <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
-                )
+            {loading 
+                ?  <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
                 :
                 (
                     <View style={{flex: 1}}>
+                        <Button title="Compartir en redes sociales" onPress={shareContent}>"Compartir en redes sociales"</Button>
                         {!newGoalFormVisible && !editMode && (
                             <View>
                                 {goals && goals.length === 0 && completedGoals.length === 0 && (
