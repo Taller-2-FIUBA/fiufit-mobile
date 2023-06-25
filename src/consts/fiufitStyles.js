@@ -325,5 +325,25 @@ export const fiufitStyles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: 5,
         marginBottom: 10,
-    }
+    },
+    containerStyle: {
+        backgroundColor: primaryColor,
+        padding: 20,
+        marginHorizontal: 20,
+        borderRadius: 10,
+    },
+    hintStyle: {
+        marginTop: 16,
+        color: greyColor,
+        fontSize: 16,
+        paddingHorizontal: 20,
+        textAlign: 'center',
+    },
+    FABContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 60,
+        marginTop: 10,
+    },
 })

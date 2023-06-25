@@ -27,6 +27,7 @@ import {useEffect, useState} from "react";
 import { UserService } from "../services/userService";
 import UserDataContext from "../contexts/userDataContext";
 import PrivateChatScreen from "../screens/PrivateChatScreen";
+import PaymentsScreen from "../screens/PaymentsScreen";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -117,6 +118,23 @@ const AuthStack = () => {
                 ),
                 drawerIcon: ({focused, color, size}) => {
                     return <Icon name="forum" size={size} color={color}/>;
+                },
+                drawerActiveTintColor: theme.colors.secondary,
+                drawerInactiveTintColor: theme.colors.tertiary,
+            }}/>
+            <Drawer.Screen name="Wallet" component={PaymentsScreen} options={{
+                title: 'Wallet',
+                headerStyle: {
+                    backgroundColor: theme.colors.background,
+                },
+                headerTintColor: theme.colors.tertiary,
+                headerLeft: () => (
+                    <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}}/>
+                    </TouchableOpacity>
+                ),
+                drawerIcon: ({color, size}) => {
+                    return <Icon name="wallet" size={size} color={color}/>;
                 },
                 drawerActiveTintColor: theme.colors.secondary,
                 drawerInactiveTintColor: theme.colors.tertiary,
