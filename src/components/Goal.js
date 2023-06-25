@@ -2,7 +2,7 @@ import {Text, StyleSheet, View, Image} from 'react-native';
 import {Card, useTheme} from 'react-native-paper';
 import React, {useState} from "react";
 import ProgressCircle from 'progress-circle-react-native'
-import {decode} from "base-64";
+import {showImage} from "../services/imageService";
 
 const Goal = ({
                   title, description, activity, unit, objective, progress,
@@ -11,7 +11,6 @@ const Goal = ({
     const theme = useTheme();
     const [expanded, setExpanded] = useState(false);
     const [selected, setSelected] = useState(false);
-    const [decodedImage, setDecodedImage] = useState(decode(image.toString()));
 
     const cardStyle = selected ? {
         ...styles.card,
@@ -88,13 +87,13 @@ const Goal = ({
                                     }}>Finishes on {timeLimit}</Text>
                                 )}
                                 {image &&
-                                    <Image source={{uri: decodedImage}}
-                                           style={{
-                                               width: 120,
-                                               height: 120,
-                                               marginTop: 10,
-                                               borderRadius: 5,
-                                           }}
+                                    <Image source={{uri: showImage(image)}}
+                                        style={{
+                                            width: 120,
+                                            height: 120,
+                                            marginTop: 10,
+                                            borderRadius: 5,
+                                        }}
 
                                     />
                                 }

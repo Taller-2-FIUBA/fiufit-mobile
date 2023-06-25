@@ -1,4 +1,4 @@
-import {encode} from 'base-64';
+import {decode} from 'base-64';
 import * as ImagePicker from "expo-image-picker";
 
 export const pickImageFromGallery = async() => {
@@ -25,8 +25,22 @@ export const encodeImage = async(uri) => {
         fileReaderInstance.readAsDataURL(blob);
         await new Promise(resolve => fileReaderInstance.onload = () => resolve());
         const base64data = fileReaderInstance.result;
-        return base64data;
+        return base64data ? base64data.split(',')[1] : null;
     } catch(e) {
         throw new Error("Cannot encode Image: " + uri, e);
     }
+}
+
+export const showImage = (uri) => {
+    if (!uri) return null;
+    if (uri.startsWith('data:')) return uri;
+    try {
+        const oldImage = decode(uri);
+        return oldImage;
+    } catch(e) {
+        console.log("Cannot decode image: " + uri, e);
+    } finally {
+        return 'data:image/jpeg;base64,' + uri;
+    }
+   
 }

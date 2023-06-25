@@ -23,7 +23,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {UserService} from "../services/userService";
 import {getTrainingById} from "../services/TrainingsService";
 import {useIsFocused} from "@react-navigation/core";
-import {pickImageFromGallery} from "../services/imageService";
+import {pickImageFromGallery, showImage} from "../services/imageService";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -358,7 +358,7 @@ const TrainingsScreen = () => {
                                 ))}
                             </View>
                             {training.media &&
-                                    <Image source={{uri: training.media}}
+                                    <Image source={{uri: showImage(training.media)}}
                                             style={{
                                                 width: 120,
                                                 height: 120,
@@ -367,7 +367,7 @@ const TrainingsScreen = () => {
                                             }}/>
                                 }
                             {isTrainer && editable && training.media &&
-                                    <Image source={{uri: training.media}}
+                                    <Image source={{uri: showImage(training.media)}}
                                             style={{
                                                 width: 120,
                                                 height: 120,

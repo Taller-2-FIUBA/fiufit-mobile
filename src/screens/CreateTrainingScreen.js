@@ -21,7 +21,7 @@ import {
     validateForm, trimUserData
 } from "../services/TrainingsService";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { pickImageFromGallery } from '../services/imageService';
+import { pickImageFromGallery, showImage } from '../services/imageService';
 
 
 
@@ -177,7 +177,7 @@ const CreateTrainingScreen = () => {
                             </View>
                         )}
                         {training.media &&
-                            <Image source={{uri: training.media}}
+                            <Image source={{uri: showImage(training.media)}}
                                     style={{
                                         width: 120,
                                         height: 120,
