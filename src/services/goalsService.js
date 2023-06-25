@@ -32,6 +32,15 @@ const goalsService = {
         }
     },
 
+    async getMetricsProgress(userId, metric, days) {
+        try {
+            const response = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/${metric}?days=${days}`);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
     async update(goal) {
         try {
             const response = await axiosInstance.patch(`${requests.GOALS}/${goal.id}`, goal);

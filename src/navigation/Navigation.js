@@ -17,9 +17,9 @@ import FiufitDrawer from "../components/FiufitDrawer";
 import ProfileScreen from "../screens/ProfileScreen";
 import FollowedsScreen from "../screens/FollowedsScreen";
 import FollowersScreen from "../screens/FollowersScreen";
-import FollowsScreen from "../screens/FollowersScreen";
 import ProfilePublicScreen from "../screens/ProfilePublicScreen";
 import GoalsScreen from "../screens/GoalsScreen";
+import DashboardScreen from "../screens/DashboardScreen";
 import {Alert, TouchableOpacity} from "react-native";
 import ChatScreen from "../screens/ChatScreen";
 import InitialScreen from "../screens/InitialScreen";
@@ -192,6 +192,16 @@ const BottomTabNavigator = () => {
                 component={GoalsScreen}
                 options={{
                     tabBarLabel: 'Goals',
+                    tabBarIcon: ({color, size}) => {
+                        return <Icon name="flag-checkered" size={size} color={color}/>;
+                    },
+                }}
+            />
+            <BottomTab.Screen
+                name="Dashboard"
+                component={DashboardScreen}
+                options={{
+                    tabBarLabel: 'Dashboard',
                     tabBarIcon: ({color, size}) => {
                         return <Icon name="flag-checkered" size={size} color={color}/>;
                     },
