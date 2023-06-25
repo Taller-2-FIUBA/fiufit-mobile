@@ -1,4 +1,4 @@
-import {ScrollView, Text, View, TouchableOpacity} from "react-native";
+import {ScrollView, Text, TouchableOpacity} from "react-native";
 import React, { useEffect } from "react";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor} from "../consts/colors";
@@ -22,7 +22,7 @@ const ChatScreen = () => {
     }, []);
 
     const ChatMessageIntro = ({chatInfo}) => {
-        const {user} = chatInfo;
+        const {otherUsername} = chatInfo;
 
         return (
             <TouchableOpacity style={fiufitStyles.chatMessageIntro} onPress={event => handleGoToChat(event, chatInfo)}>
@@ -33,23 +33,20 @@ const ChatScreen = () => {
                         backgroundColor: primaryColor,
                     }}
                 />
-                <Text style={{color: theme.colors.tertiary, fontSize: 18}}>{user.username}</Text>
+                <Text style={{color: theme.colors.tertiary, fontSize: 18}}>{otherUsername}</Text>
             </TouchableOpacity>   
         )
     }
 
     const getUserChats = async () => {
         setIsLoading(true);
-        console.log("Buscar chats del usuario");
         const userId =  await AsyncStorage.getItem('@fiufit_userId');
-        console.log("UserId --> ", userId);
         onSnapshot(doc(db, "usersChats", userId), async (doc) => {
             let chatsDocInfo = [];
             if (doc.exists()) {
                 for (const chat of doc.data().chats) {
-                    console.log("Chat --> ", chat);
                     const user = await getUserInfoFromId(chat.userId);
-                    chatsDocInfo.push({user: user, conversationId: chat.conversationId});
+                    chatsDocInfo.push({otherUserId: user.id.toString(), otherUsername: user.username, conversationId: chat.conversationId});
                 }
             }
             setChatsInfo(chatsDocInfo);
@@ -70,15 +67,12 @@ const ChatScreen = () => {
             //TODO mostrar mensaje de que no se encontro el usuario
         } else {
             let conversationId = null;
-            console.log("Response --> ", response);
             for (const chat of chatsInfo) {
-                console.log("Chat --> ", chat);
                 if (chat.userId == response.id) {
                     conversationId = chat.conversationId;
                 }
             }
-            const chatInfo = {user: response, conversationId: conversationId};
-            console.log("ChatInfo --> ", chatInfo);
+            const chatInfo = {otherUserId: response.id.toString(), otherUsername: response.username, conversationId: conversationId};
             navigation.navigate("PrivateChat", {chatInfo});
         }
     };

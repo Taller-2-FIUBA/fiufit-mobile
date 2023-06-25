@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from "@react-navigation/native";
 import {UserService} from "../services/userService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { sendNotification } from '../utils/notification';
 
 
 const ProfileItem = ({iconName, value, editable, onChange}) => {
@@ -77,17 +78,25 @@ const ProfilePublicScreen = ({ route }) => {
 
     const handleFollowPress = async () => {
         let userId = await AsyncStorage.getItem('@fiufit_userId');
-        const id = user.id;
+        const username = await AsyncStorage.getItem('@fiufit_username');
+        const followedId = user.id;
     
         if(isFollowed) {
-            UserService.deleteFollowed(userId, id).then(async (followers) => {
+            UserService.deleteFollowed(userId, followedId).then(async (followers) => {
                 setIsFollowed(false);
             }).catch((error) => {
                 console.log(error);
             });
         } else {
-            UserService.followUser(userId, id).then(async (followers) => {
+            UserService.followUser(userId, followedId).then(async (followers) => {
                 setIsFollowed(true);
+                sendNotification(followedId, {
+                    title: "New Follower", 
+                    message: `${username} is now following you!`, 
+                    body: {
+                        type: "Follower"
+                    } 
+                });
             }).catch((error) => {
                 console.log(error);
             });
