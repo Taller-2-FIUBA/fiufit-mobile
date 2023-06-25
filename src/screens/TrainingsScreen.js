@@ -410,7 +410,7 @@ const TrainingsScreen = () => {
                                 ))}
                             </View>
                             {training.media &&
-                                    <Image source={{uri: decode(training.media)}}
+                                    <Image source={{uri: training.media}}
                                             style={{
                                                 width: 120,
                                                 height: 120,
@@ -419,7 +419,7 @@ const TrainingsScreen = () => {
                                             }}/>
                                 }
                             {isTrainer && editable && training.media &&
-                                    <Image source={{uri: decode(training.media)}}
+                                    <Image source={{uri: training.media}}
                                             style={{
                                                 width: 120,
                                                 height: 120,
