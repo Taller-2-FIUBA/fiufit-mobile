@@ -17,7 +17,6 @@ import FiufitDrawer from "../components/FiufitDrawer";
 import ProfileScreen from "../screens/ProfileScreen";
 import FollowedsScreen from "../screens/FollowedsScreen";
 import FollowersScreen from "../screens/FollowersScreen";
-import FollowsScreen from "../screens/FollowersScreen";
 import ProfilePublicScreen from "../screens/ProfilePublicScreen";
 import GoalsScreen from "../screens/GoalsScreen";
 import {Alert, TouchableOpacity} from "react-native";
@@ -27,6 +26,7 @@ import {useEffect, useState, useRef} from "react";
 import { UserService } from "../services/userService";
 import UserDataContext from "../contexts/userDataContext";
 import PrivateChatScreen from "../screens/PrivateChatScreen";
+import NotificationScreen from "../screens/NotificationScreen";
 import { 
     registerToken,
     removeNotificationSubscription, 
@@ -97,7 +97,7 @@ const AuthStack = () => {
                 headerStyle: {
                     backgroundColor: theme.colors.background,
                 },
-                drawerIcon: ({focused, color, size}) => {
+                drawerIcon: ({color, size}) => {
                     return <Icon name="weight-lifter" size={size} color={color}/>;
                 },
                 drawerActiveTintColor: theme.colors.secondary,
@@ -115,7 +115,7 @@ const AuthStack = () => {
                         <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}}/>
                     </TouchableOpacity>
                 ),
-                drawerIcon: ({focused, color, size}) => {
+                drawerIcon: ({color, size}) => {
                     return <Icon name="account" size={size} color={color}/>;
                 },
                 drawerActiveTintColor: theme.colors.secondary,
@@ -132,8 +132,25 @@ const AuthStack = () => {
                         <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}}/>
                     </TouchableOpacity>
                 ),
-                drawerIcon: ({focused, color, size}) => {
+                drawerIcon: ({color, size}) => {
                     return <Icon name="forum" size={size} color={color}/>;
+                },
+                drawerActiveTintColor: theme.colors.secondary,
+                drawerInactiveTintColor: theme.colors.tertiary,
+            }}/>
+            <Drawer.Screen name="Notification" component={NotificationScreen} options={{
+                title: 'Notifications',
+                headerStyle: {
+                    backgroundColor: theme.colors.background,
+                },
+                headerTintColor: theme.colors.tertiary,
+                headerLeft: () => (
+                    <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}}/>
+                    </TouchableOpacity>
+                ),
+                drawerIcon: ({color, size}) => {
+                    return <Icon name="bell-ring" size={size} color={color}/>;
                 },
                 drawerActiveTintColor: theme.colors.secondary,
                 drawerInactiveTintColor: theme.colors.tertiary,

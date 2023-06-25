@@ -64,10 +64,31 @@ const sendPushNotification = async (token, message) => {
     });
 }
 
+const storeNotification = async (userId, message) => {
+    const docRef = doc(db, "notifications", userId);
+    const docSnap = await getDoc(docRef);
+    const notificationContent = {
+        title: message.title,
+        message: message.message,
+        type: message.body?.type,
+        chatInfo: message.body?.chatInfo || "",
+        userId: message.body?.userId || ""
+    }
+    console.log("Notification to store: ", notificationContent);
+    if (docSnap.exists()) {
+        const notifications = docSnap.data().notifications;
+        notifications.push(notificationContent);
+        await updateDoc(docRef, {notifications: notifications});
+    } else {
+        await setDoc(docRef, {notifications: [notificationContent]});
+    }
+}
+
 export const sendNotification =  async (userId, message) => {
     const docRef = doc(db, "notificationTokens", userId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
+        await storeNotification(userId, message);
         const tokens = docSnap.data().tokens;
         tokens.forEach(token => {
             sendPushNotification(token, message);
@@ -82,18 +103,28 @@ export const removeNotificationSubscription = (ref) => {
 
 
 export const notificationListenerSubscriber = () => {
-    return Notifications.addNotificationReceivedListener(notification => {
+    return Notifications.addNotificationReceivedListener(async notification => {
         ToastAndroid.showWithGravity(notification.request.content.title + ": "+ notification.request.content.body , ToastAndroid.SHORT, ToastAndroid.TOP);
     });
 }
 
 export const responseListenerSubscriber = (navigation) => {
-    return Notifications.addNotificationResponseReceivedListener(response => {
-        if (response.notification.request.content.data?.type === 'PrivateChat') {
-            const chatInfo = response.notification.request.content.data?.chatInfo;
-            if (chatInfo) {
-                navigation.navigate("PrivateChat", {chatInfo});
-            }
+    return Notifications.addNotificationResponseReceivedListener(async response => {
+        const notificationContent = response.notification.request.content;
+        console.log(notificationContent.data);
+        switch (notificationContent.data?.type) {
+            case 'PrivateChat':
+                const chatInfo = notificationContent.data?.chatInfo;
+                if (chatInfo) {
+                    navigation.navigate("PrivateChat", {chatInfo});
+                }
+                break;
+            case 'CompletedGoal':
+                navigation.navigate("Goals");
+                break;
+            case 'Follower':
+                navigation.navigate("Profile", {userId: notificationContent.data?.userId});
+                break;
         }
     });
 }
@@ -104,7 +135,6 @@ export const registerToken = async (user) => {
         const docRef = doc(db, "notificationTokens", user.id.toString());
         const docSnap = await getDoc(docRef);
         let tokens = [];
-
         if (docSnap.exists()) {
             tokens = docSnap.data().tokens;
             if (!tokens.includes(token)) {

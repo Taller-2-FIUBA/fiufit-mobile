@@ -218,12 +218,11 @@ const GoalsScreen = () => {
             if (Number(goalObjective) <= Number(currentProgress)) {
                 console.log("entra");
                 const userToNotified = await utils.getUserId();
-                sendNotification(userToNotified,
-                    {
-                        title: "Completed Goal", 
-                        message: `You have completed the goal ${goalTitle}`, 
-                        body: {type: "CompletedGoal"}
-                    });
+                sendNotification(userToNotified, {
+                    title: "Completed Goal", 
+                    message: `You have completed the goal ${goalTitle}`, 
+                    body: {type: "CompletedGoal"}
+                });
             } else {
                 console.log("no entra");
             }
