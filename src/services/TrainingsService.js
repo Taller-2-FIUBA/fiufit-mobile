@@ -9,7 +9,7 @@ import {axiosInstance} from "./config/axiosConfig";
 import {
     ToastAndroid
 } from "react-native";
-import { encode } from 'base-64';
+import {encodeImage} from "./imageService";
 
 const createTraining = async (training) => {
     training.exercises = training.exercises.filter(exercise => Object.keys(exercise).length !== 0);
@@ -18,7 +18,7 @@ const createTraining = async (training) => {
     training['trainer_id'] = userId;
 
     const token = await AsyncStorage.getItem('@fiufit_token');
-    training.media = encode(training.media);
+    training.media = await encodeImage(training.media);
     try {
         const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
         {
