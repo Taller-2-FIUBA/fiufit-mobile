@@ -22,8 +22,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {UserService} from "../services/userService";
 import {getTrainingById} from "../services/TrainingsService";
-import {decode} from "base-64";
 import {useIsFocused} from "@react-navigation/core";
+import {pickImageFromGallery, showImage} from "../services/imageService";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -130,7 +130,6 @@ const TrainingsScreen = () => {
     const initTrainings = async () => {
         console.log("Init Trainings");
         try {
-            setLoading(true);
             let user = await getUser();
             if (user) {
                 const isTrainerResult = !user.is_athlete;
@@ -214,15 +213,10 @@ const TrainingsScreen = () => {
     }
 
     const pickImage = async (index) => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
+        let image = await pickImageFromGallery();
 
-        if (!result.canceled) {
-            handleInputChange(index, "media", result.assets[0].uri);
+        if (image) {
+            handleInputChange(index, "media", image);
         }
     };
 
@@ -412,7 +406,7 @@ const TrainingsScreen = () => {
                                 ))}
                             </View>
                             {training.media &&
-                                    <Image source={{uri: training.media}}
+                                    <Image source={{uri: showImage(training.media)}}
                                             style={{
                                                 width: 120,
                                                 height: 120,
@@ -421,7 +415,7 @@ const TrainingsScreen = () => {
                                             }}/>
                                 }
                             {isTrainer && editable && training.media &&
-                                    <Image source={{uri: training.media}}
+                                    <Image source={{uri: showImage(training.media)}}
                                             style={{
                                                 width: 120,
                                                 height: 120,

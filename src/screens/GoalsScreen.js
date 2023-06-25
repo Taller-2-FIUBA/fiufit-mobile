@@ -18,8 +18,7 @@ import {fiufitStyles} from "../consts/fiufitStyles";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import goalsService from "../services/goalsService";
 import FiufitDialog from "../components/FiufitDialog";
-import * as ImagePicker from "expo-image-picker";
-import {encode} from 'base-64';
+import {pickImageFromGallery, encodeImage} from "../services/imageService";
 import { sendNotification } from "../utils/notification";
 import utils from "../utils/Utils";
 
@@ -93,6 +92,7 @@ const GoalsScreen = () => {
                 setGoals([]);
                 setCompletedGoals([]);
                 response.forEach(goal => {
+                    console.log(goal);
                     if (goal.objective <= goal.progress) {
                         setCompletedGoals(prevState => [...prevState, goal]);
                     } else {
@@ -248,19 +248,20 @@ const GoalsScreen = () => {
         return valid;
     }
 
-    const createGoal = () => {
+    const createGoal = async () => {
         if (!validateGoalForm()) {
             setDialog(true);
             return;
         }
         setLoading(true);
+        const encodeImageGoal = await encodeImage(goalImage);
         const newGoal = {
             title: goalTitle,
             description: goalDescription,
             metric: goalMetric,
             objective: goalObjective,
             time_limit: goalTimeLimit,
-            image: encode(goalImage)
+            image: encodeImageGoal
         }
         resetNewGoalForm();
         goalsService.create(newGoal)
@@ -302,15 +303,10 @@ const GoalsScreen = () => {
     }
 
     const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
+        let image = await pickImageFromGallery();
 
-        if (!result.canceled) {
-            setGoalImage(result.assets[0].uri);
+        if (image) {
+            setGoalImage(image);
         }
     };
 
