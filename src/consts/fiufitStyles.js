@@ -125,6 +125,7 @@ export const fiufitStyles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 16,
         fontWeight: 'bold',
+        marginBottom: 15,
     },
     detailsText: {
         color: greyColor,

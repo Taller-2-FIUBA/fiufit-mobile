@@ -83,6 +83,15 @@ const authService = {
         }
     },
 
+    async resetPassword(user) {
+        try {
+            const response = await axiosInstance.post(requests.RESET_PASSWORD, user);
+            return response.data;
+        } catch (error) {
+            this._handleError(error);
+        }
+    },
+
     async logout() {
         try {
             await AsyncStorage.removeItem('@fiufit_token');
