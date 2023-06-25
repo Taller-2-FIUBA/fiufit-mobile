@@ -10,7 +10,6 @@ import {primaryColor, secondaryColor, tertiaryColor, redColor, greyColor} from "
 import { ActivityIndicator, FAB, IconButton, List, useTheme } from 'react-native-paper';
 import {UserService} from "../services/userService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {decode} from "base-64";
 
 
 
@@ -231,14 +230,14 @@ const SearchTrainingsScreen = () => {
                         ))}
                     </View>
                     {training.media &&
-                            <Image source={{uri: decode(training.media)}}
-                                    style={{
-                                        width: 120,
-                                        height: 120,
-                                        marginTop: 10,
-                                        borderRadius: 5,
-                                    }}/>
-                        }
+                      <Image source={{uri:training.media}}
+                        style={{
+                            width: 120,
+                            height: 120,
+                            marginTop: 10,
+                            borderRadius: 5,
+                        }}/>
+                      }
                 </List.Accordion>
             ))}
             </View>

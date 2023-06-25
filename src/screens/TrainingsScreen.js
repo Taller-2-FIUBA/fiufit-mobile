@@ -15,18 +15,15 @@ import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor, greyColor} from "../consts/colors";
 import { ActivityIndicator, FAB, IconButton, List, useTheme, Button as PapperButton, } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
-import {
-    getTrainingsTypes, getTrainingsByTrainerId, validateForm, trimUserData
+import {getTrainingsByTrainerId, validateForm, trimUserData
 } from "../services/TrainingsService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {UserService} from "../services/userService";
 import {getTrainingById} from "../services/TrainingsService";
-import {decode} from "base-64";
 import {useIsFocused} from "@react-navigation/core";
-import { is } from "@babel/types";
-import { set } from "react-native-reanimated";
+import {pickImageFromGallery} from "../services/imageService";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -63,7 +60,6 @@ const TrainingsScreen = () => {
             fetchGetTrainingsById(isTrainer, actualUser.id)
             .catch(error => {  
                 console.log("An error in fetching: ", error);
-                setDialog(false);
             }).finally(() => {
                 setLoading(false);
             })
@@ -96,7 +92,6 @@ const TrainingsScreen = () => {
     const initTrainings = async () => {
         console.log("Init Trainings");
         try {
-            setLoading(true);
             let user = await getUser();
             if (user) {
                 const isTrainerResult = !user.is_athlete;
@@ -163,21 +158,16 @@ const TrainingsScreen = () => {
     }
 
     const pickImage = async (index) => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
+        let image = await pickImageFromGallery();
 
-        if (!result.canceled) {
-            handleInputChange(index, "media", result.assets[0].uri);
+        if (image) {
+            handleInputChange(index, "media", image);
         }
     };
 
     const updateTraining = async (index) => {
         const copyTraining = {title: trainings[index].title, description: trainings[index].description, media: trainings[index].media};
-    
+        
         const token = await AsyncStorage.getItem('@fiufit_token');
         try {
             const response = await axios.patch(`${requests.BASE_URL}${requests.TRAINING}/${trainings[index].id}`, JSON.stringify(copyTraining),
@@ -368,7 +358,7 @@ const TrainingsScreen = () => {
                                 ))}
                             </View>
                             {training.media &&
-                                    <Image source={{uri: decode(training.media)}}
+                                    <Image source={{uri: training.media}}
                                             style={{
                                                 width: 120,
                                                 height: 120,
@@ -377,7 +367,7 @@ const TrainingsScreen = () => {
                                             }}/>
                                 }
                             {isTrainer && editable && training.media &&
-                                    <Image source={{uri: decode(training.media)}}
+                                    <Image source={{uri: training.media}}
                                             style={{
                                                 width: 120,
                                                 height: 120,

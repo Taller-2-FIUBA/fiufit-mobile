@@ -20,8 +20,8 @@ import {
     getTrainingsTypes, getExercises, createTraining,
     validateForm, trimUserData
 } from "../services/TrainingsService";
-import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { pickImageFromGallery } from '../services/imageService';
 
 
 
@@ -74,15 +74,10 @@ const CreateTrainingScreen = () => {
     };
 
     const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            training.media = result.assets[0].uri;
+        let image = await pickImageFromGallery();    
+        
+        if (image) {
+            training.media = image;
         }
     };
 
