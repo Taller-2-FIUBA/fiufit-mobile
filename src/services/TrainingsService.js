@@ -103,9 +103,7 @@ const getTrainingByTypeDifficultyAndTitle = async (type, difficulty, title) => {
 }
 
 const updateTraining = async (training, id) => {
-    console.log('update: ', training);
     const token = await AsyncStorage.getItem('@fiufit_token');
-    console.log('token: ', token);
     try {
         const response = await axios.patch(`${requests.BASE_URL}${requests.TRAINING}/${id}`, JSON.stringify(training),
         {
@@ -115,7 +113,6 @@ const updateTraining = async (training, id) => {
             }
           });
         console.log("Training updated successfully");
-        console.log('fail: ',response.data);
         return response.data;
     } catch (error) {
         console.log(error);
