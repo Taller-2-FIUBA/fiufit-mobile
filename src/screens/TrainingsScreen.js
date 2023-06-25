@@ -49,7 +49,9 @@ const TrainingEditableItem = ({value, editable, onChange, error, onFocus = () =>
             <TextInput
                 placeholderTextColor={secondaryColor}
                 style={[editable ? styles.trainingInput : styles.trainingNotEditableInpunt,
-                    {color: secondaryColor, flex: 1}]}
+                    {color: secondaryColor, flex: 1},
+                    {borderColor: error ? redColor : isFocused ? tertiaryColor : secondaryColor,
+                    }]}
                 autoCorrect={false}
                 onFocus={() => {
                     onFocus();
@@ -491,14 +493,14 @@ const TrainingsScreen = () => {
     },
     trainingInput: {
         fontSize: 14,
-        borderColor: primaryColor,
+        borderColor: secondaryColor,
         borderWidth: 0.8,
         color: tertiaryColor,
         paddingHorizontal: 5
     },
     trainingNotEditableInpunt: {
         fontSize: 14,
-        borderColor: primaryColor,
+        borderColor: secondaryColor,
         borderWidth: 0.8,
         color: secondaryColor,
         paddingHorizontal: 10
