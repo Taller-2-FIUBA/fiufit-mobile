@@ -4,7 +4,7 @@ export const validateNameLength = (name) => {
 
 export const validateName = (name) => {
     const trimmedName = name.trim();
-    return name === "" || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/.test(trimmedName);
+    return name === "" || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(trimmedName);
 }
 
 export const validateEmail = (email) => {
@@ -81,8 +81,17 @@ export const validateGoalObjective = (objective, isHelperText) => {
     return regex.test(objective);
 }
 
+export const validateTrainingName = (name) => {
+    const trimmedName = name.trim();
+    return name === "" || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(trimmedName);
+}
+
 export const validateTrainingNameLength = (name) => {
     return name.length >= 3 && name.length <= 40;
+}
+
+export const validateDescriptionLength = (name) => {
+    return name.length >= 3 && name.length <= 100;
 }
 
 export const validateMediaUrl = (url) => {
