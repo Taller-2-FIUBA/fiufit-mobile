@@ -82,7 +82,7 @@ const NotificationScreen = () => {
             case "CompletedGoal":
                 navigation.navigate("Goals");
             case "Follower":
-                navigation.navigate("Profile", {userId: notification.userId});
+                navigation.navigate("Profile");
         }
         
     }

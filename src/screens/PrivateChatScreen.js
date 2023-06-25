@@ -24,7 +24,8 @@ const PrivateChatScreen = ({route}) => {
         messages: [...messages, {message: actualMessage, userId: actualUserId}]
       });
       await sendNotification(chatInfo.otherUserId, {
-          title: actualUserName, message: actualMessage, 
+          title: `New message from ${actualUserName}`, 
+          message: actualMessage,
           body: {
             type: "PrivateChat", 
             chatInfo: {otherUserId: actualUserId, otherUsername: actualUserName, conversationId: chatInfo.conversationId}}

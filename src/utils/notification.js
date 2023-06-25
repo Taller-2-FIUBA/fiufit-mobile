@@ -71,8 +71,7 @@ const storeNotification = async (userId, message) => {
         title: message.title,
         message: message.message,
         type: message.body?.type,
-        chatInfo: message.body?.chatInfo || "",
-        userId: message.body?.userId || ""
+        chatInfo: message.body?.chatInfo || ""
     }
     console.log("Notification to store: ", notificationContent);
     if (docSnap.exists()) {
@@ -123,7 +122,7 @@ export const responseListenerSubscriber = (navigation) => {
                 navigation.navigate("Goals");
                 break;
             case 'Follower':
-                navigation.navigate("Profile", {userId: notificationContent.data?.userId});
+                navigation.navigate("Profile");
                 break;
         }
     });
