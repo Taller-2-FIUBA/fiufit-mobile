@@ -1,6 +1,6 @@
 import {Text, StyleSheet, View, Image} from 'react-native';
 import {Card, useTheme} from 'react-native-paper';
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import ProgressCircle from 'progress-circle-react-native'
 import {showImage} from "../services/imageService";
 
@@ -94,7 +94,6 @@ const Goal = ({
                                             marginTop: 10,
                                             borderRadius: 5,
                                         }}
-
                                     />
                                 }
                             </View>

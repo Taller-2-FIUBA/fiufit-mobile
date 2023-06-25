@@ -20,21 +20,38 @@
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./resources/logo.png",
+          "color": "#ffffff"
+        }
       ]
     ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.fi.uba.fiufit"
+      "package": "com.fi.uba.fiufit",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "scheme": "fiufit"
+    "scheme": "fiufit",
+    "extra": {
+      "eas": {
+        "projectId": "d085e464-2fd4-458d-9e89-b4e23b55402a"
+      }
+    },
+    "owner": "fiufit_grupo_5"
   }
 }

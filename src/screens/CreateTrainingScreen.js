@@ -18,7 +18,7 @@ import TrainingInput from "../components/TrainingInput";
 import ExerciseInput from "../components/ExerciseInput";
 import {
     getTrainingsTypes, getExercises, createTraining,
-    validateForm, trimUserData
+    trimUserData, getValidationData, 
 } from "../services/TrainingsService";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { pickImageFromGallery, showImage } from '../services/imageService';
@@ -89,14 +89,32 @@ const CreateTrainingScreen = () => {
         setTraining(prevState => ({...prevState, exercises: updatedExercises}));
     };
 
-    const handleCreate = () => {
-        handleError(null, 'title')
-        handleError(null, 'media')
+    // Validate form
+    const validateForm = async (training) => {
+        let valid = true;
+        try {
+            const validationData = await getValidationData(training)
+            for (const {value, validator, errorMessage, field} of validationData) {
+                if (!validator(value)) {
+                    handleError(errorMessage, field);
+                    valid = false;
+                }
+            }
+        } catch (error) {
+            console.log('Error while deleting favourite trainings: ', error);
+        }
+        return valid;
+    }
 
-        /* trimUserData(training);
-        if (!validateForm(training)) {
+    const handleCreate = async () => {
+        handleError(null, 'title')
+        handleError(null, 'description')
+
+        trimUserData(training);
+        const validForm = await validateForm(training);
+        if (!validForm) {
             return;
-        } */
+        }
         createTraining(training);
         navigation.navigate('Trainings');
     }

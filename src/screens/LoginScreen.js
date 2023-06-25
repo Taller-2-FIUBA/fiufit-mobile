@@ -7,7 +7,7 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import authService from "../services/authService";
-// import GoogleLoginButton from "../components/GoogleLoginButton";
+import GoogleLoginButton from "../components/GoogleLoginButton";
 
 const LoginScreen = () => {
     const navigation = useNavigation();
@@ -86,7 +86,7 @@ const LoginScreen = () => {
                         error={errors.password}
                     />
                     <Button onPress={handleLogin} title="Login"/>
-                    {/*<GoogleLoginButton navigation={navigation}/>*/}
+                    <GoogleLoginButton navigation={navigation}/>
                     <Text
                         onPress={() => navigation.navigate('Registration')}
                         style={fiufitStyles.haveAccount}>Do not have an account? Sign up</Text>

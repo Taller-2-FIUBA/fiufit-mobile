@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
-import {Button, Text, View, ScrollView, TouchableOpacity} from "react-native";
-import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from "../consts/colors";
-import { Searchbar } from 'react-native-paper';
+import {Text, View, ScrollView, TouchableOpacity} from "react-native";
+import {primaryColor} from "../consts/colors";
 import { UserService } from "../services/userService";
 import {useNavigation} from "@react-navigation/native";
 import {fiufitStyles} from "../consts/fiufitStyles";

@@ -12,10 +12,11 @@ import {
 import React, {useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
 import {fiufitStyles} from "../consts/fiufitStyles";
-import {primaryColor, secondaryColor, tertiaryColor, greyColor} from "../consts/colors";
+import {redColor, primaryColor, secondaryColor, tertiaryColor, greyColor} from "../consts/colors";
 import { ActivityIndicator, FAB, IconButton, List, useTheme, Button as PapperButton, } from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
-import {getTrainingsByTrainerId, validateForm, trimUserData
+import {
+    getTrainingsByTrainerId, updateTraining, getValidationData, trimUserData
 } from "../services/TrainingsService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
@@ -25,11 +26,11 @@ import {getTrainingById} from "../services/TrainingsService";
 import {useIsFocused} from "@react-navigation/core";
 import {pickImageFromGallery, showImage} from "../services/imageService";
 
-const TrainingItem = ({value, editable, onChange}) => {
+const TrainingItem = ({value, editable, onChange, error}) => {
     return (
     <View style={fiufitStyles.trainingItemContainer}>
         <TextInput
-            style={editable ? fiufitStyles.trainingInput : fiufitStyles.trainingNotEditableInpunt}
+            style={fiufitStyles.trainingNotEditableInpunt}
             value={value}
             onChangeText={onChange}
             editable={editable}
@@ -38,10 +39,41 @@ const TrainingItem = ({value, editable, onChange}) => {
     )
 }
 
+const TrainingEditableItem = ({value, editable, onChange, error, onFocus = () => {}, ...props}) => {
+        const [isFocused, setIsFocused] = useState(false);
+
+        return (
+            <View style={{marginBottom: 20,}}>
+            <View style={[editable ? fiufitStyles.trainingInput : fiufitStyles.trainingNotEditableInpunt,
+            {borderColor: error ? redColor : isFocused ? tertiaryColor : secondaryColor,
+            }]}>
+            <TextInput
+                placeholderTextColor={secondaryColor}
+                style={{color: secondaryColor, flex: 1}}
+                autoCorrect={false}
+                onFocus={() => {
+                    onFocus();
+                    setIsFocused(true);
+                }}
+                onBlur={() => setIsFocused(false)}
+                value={value}
+                onChangeText={onChange}
+                editable={editable}
+                {...props}
+            />
+            </View>
+            {error &&
+            <Text style={{color: redColor, marginLeft: 5, fontSize: 12, marginTop: 5}}>{error}</Text>
+            }
+            </View>
+        )
+}
+
 const TrainingsScreen = () => {
     const theme = useTheme();
     const navigation = useNavigation();
     const [editable, setEditable] = useState(false);
+    const [errors, setErrors] = useState({});
     const [isTrainer, setIsTrainer] = useState(true);
     const [loading, setLoading] = useState(true);
     const [actualUser, setActualUser] = useState(null);
@@ -65,6 +97,10 @@ const TrainingsScreen = () => {
             })
         }
     }, [isFocused]);
+
+    const handleError = (error, input) => {
+        setErrors(prevState => ({...prevState, [input]: error}));
+    };
 
     const getUser = async () => {
         let user = actualUser;
@@ -123,9 +159,7 @@ const TrainingsScreen = () => {
 
     const handleDeleteTrainingAction = async (event, index) => {
         event.stopPropagation();
-        console.log("Delete training action")
         const trainingId = trainings[index]?.id;
-        console.log("Training id: ", trainingId);
         try {
             setLoading(true);
             await UserService.deleteFavouriteTraining(trainingId);
@@ -137,15 +171,34 @@ const TrainingsScreen = () => {
         }
     }
 
-    const handleSaveAction = (index) => {
-        /* handleError(null, 'title')
-        handleError(null, 'media')
+    // Validate form
+    const validateForm = async (training) => {
+        let valid = true;
+        try {
+            const validationData = await getValidationData(training)
+            for (const {value, validator, errorMessage, field} of validationData) {
+                if (!validator(value)) {
+                    handleError(errorMessage, field);
+                    valid = false;
+                }
+            }
+        } catch (error) {
+            console.log('Error while deleting favourite trainings: ', error);
+        }
+        console.log('Success validation: ', valid);
+        return valid;
+    }
+
+    const handleSaveAction = async (index) => {
+        handleError(null, 'title')
+        handleError(null, 'description')
 
         trimUserData(trainings[index]);
-        if (!validateForm(trainings[index])) {
+        const validForm = await validateForm(trainings[index]);
+        if (!validForm) {
             return;
-        } */
-        updateTraining(index); 
+        }
+        updateTrainingInfo(index); 
         setEditable(false);
     };
 
@@ -165,21 +218,12 @@ const TrainingsScreen = () => {
         }
     };
 
-    const updateTraining = async (index) => {
-        const copyTraining = {title: trainings[index].title, description: trainings[index].description, media: trainings[index].media};
-        
-        const token = await AsyncStorage.getItem('@fiufit_token');
+    const updateTrainingInfo = async (index) => {
+        const copyTraining = {title: trainings[index].title, description: trainings[index].description, media: trainings[index].media};    
         try {
-            const response = await axios.patch(`${requests.BASE_URL}${requests.TRAINING}/${trainings[index].id}`, JSON.stringify(copyTraining),
-            {
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`,
-                }
-              });
-            ToastAndroid.show("Training updated successfully", ToastAndroid.SHORT);
+            const response = await updateTraining(copyTraining);
             setEditable(false);
-            return response.data;
+            return response;
         } catch (error) {
             console.log(error);
         }
@@ -307,16 +351,18 @@ const TrainingsScreen = () => {
                         >
                             
                             <TrainingItemHeader index={index} training={training}/>
-                            <TrainingItem
+                            <TrainingEditableItem
                                 value={training.title}
                                 editable={editable}
                                 onChange={(text) => handleInputChange(index, "title", text)}
                                 rating={training.rating}
+                                error={errors.title}
                             />
-                            <TrainingItem
+                            <TrainingEditableItem
                                 value={training.description}
                                 editable={editable}
                                 onChange={(text) => handleInputChange(index, "description", text)}
+                                error={errors.description}
                             />
                             <TrainingItem
                                 value={trainings[index].type}

@@ -4,7 +4,6 @@ import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {UserService} from "../services/userService";
 import {useNavigation} from "@react-navigation/native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const ProfileItem = ({iconName, value, editable, onChange}) => {
@@ -25,7 +24,7 @@ const ProfileItem = ({iconName, value, editable, onChange}) => {
     )
 }
 
-const ProfileAvatar = ({userName, onChange}) => {
+const ProfileAvatar = ({userName}) => {
     return (
         <View style={styles.profileAvatarContainer}>
             <Image
@@ -61,7 +60,6 @@ const ProfileScreen = () => {
         console.log("Fetching user profile...");
         setLoading(true);
         UserService.getUser().then(async (profile) => {
-            const token = await AsyncStorage.getItem('@fiufit_token');
             setLoading(false);
             setUserProfile(profile);
         }).catch((error) => {
