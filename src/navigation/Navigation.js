@@ -33,6 +33,7 @@ import {
     notificationListenerSubscriber, 
     responseListenerSubscriber } from "../utils/notification";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import PaymentsScreen from "../screens/PaymentsScreen";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -134,6 +135,23 @@ const AuthStack = () => {
                 ),
                 drawerIcon: ({color, size}) => {
                     return <Icon name="forum" size={size} color={color}/>;
+                },
+                drawerActiveTintColor: theme.colors.secondary,
+                drawerInactiveTintColor: theme.colors.tertiary,
+            }}/>
+            <Drawer.Screen name="Wallet" component={PaymentsScreen} options={{
+                title: 'Wallet',
+                headerStyle: {
+                    backgroundColor: theme.colors.background,
+                },
+                headerTintColor: theme.colors.tertiary,
+                headerLeft: () => (
+                    <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <Icon name="arrow-left" size={24} color={theme.colors.tertiary} style={{marginLeft: 10}}/>
+                    </TouchableOpacity>
+                ),
+                drawerIcon: ({color, size}) => {
+                    return <Icon name="wallet" size={size} color={color}/>;
                 },
                 drawerActiveTintColor: theme.colors.secondary,
                 drawerInactiveTintColor: theme.colors.tertiary,

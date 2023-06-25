@@ -4,7 +4,7 @@ export const validateNameLength = (name) => {
 
 export const validateName = (name) => {
     const trimmedName = name.trim();
-    return name === "" || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/.test(trimmedName);
+    return name === "" || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(trimmedName);
 }
 
 export const validateEmail = (email) => {
@@ -81,11 +81,52 @@ export const validateGoalObjective = (objective, isHelperText) => {
     return regex.test(objective);
 }
 
+export const validateTrainingName = (name) => {
+    const trimmedName = name.trim();
+    return name === "" || /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(trimmedName);
+}
+
 export const validateTrainingNameLength = (name) => {
     return name.length >= 3 && name.length <= 40;
+}
+
+export const validateDescriptionLength = (name) => {
+    return name.length >= 3 && name.length <= 100;
 }
 
 export const validateMediaUrl = (url) => {
     const regex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w.-]*)*\/?$/;
     return regex.test(url);
+}
+
+export const validateAmount = (amount, isHelperText) => {
+    if (isHelperText && amount.length === 0) {
+        return true;
+    }
+
+    if (!/^(\d{1,3}(\.\d{1,3})?)?$/.test(amount)) {
+        return false;
+    }
+
+    const number = parseFloat(amount);
+
+    return !(isNaN(number) || number < 0 || number > 1000 || number.toString() !== amount || (amount.includes('.')
+        && amount.split('.')[1].length > 3));
+}
+
+export const validateWallet = (address, isHelperText) => {
+    if (isHelperText && address.length === 0) {
+        return true;
+    }
+
+    const regex = /^0x[A-Fa-f0-9]+$/;
+    return regex.test(address);
+}
+
+export const validateTransferUsername = (username, isHelperText) => {
+    if (isHelperText && username.length === 0) {
+        return true;
+    }
+
+    return validateUsername(username);
 }
