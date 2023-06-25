@@ -268,24 +268,24 @@ export const fiufitStyles = StyleSheet.create({
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-end",
-        height: '100%'
+        height: '100%',
     },
     messageChatInputContainer: {
         display: 'flex',
         flexDirection: 'row',
-        width: '100%',
-        height: 50,
+        height: 50
     },
     messageChatInput: {
         backgroundColor: secondaryColor,
+        color: whiteColor,
+        width: '90%',
         flexGrow: 4,
-        color: whiteColor
     },
     messageChatButton: {
         backgroundColor: tertiaryColor,
-        flexGrow: 0.5,
         justifyContent: 'center',
         alignItems: 'center',
+        flexGrow: 1,
     },
     messageChatItemLeft: {
         backgroundColor: secondaryColor,
@@ -325,6 +325,23 @@ export const fiufitStyles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: 5,
         marginBottom: 10,
+    },
+    notificationContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 3,
+        height: 50,
+        
+    },
+    notificationInfo: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        width: '95%',
+        paddingLeft: 10,
+        borderRadius: 10,
+
     },
     containerStyle: {
         backgroundColor: primaryColor,

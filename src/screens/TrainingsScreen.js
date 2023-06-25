@@ -92,7 +92,6 @@ const TrainingsScreen = () => {
             fetchGetTrainingsById(isTrainer, actualUser.id)
             .catch(error => {  
                 console.log("An error in fetching: ", error);
-                setDialog(false);
             }).finally(() => {
                 setLoading(false);
             })
@@ -411,7 +410,7 @@ const TrainingsScreen = () => {
                                 ))}
                             </View>
                             {training.media &&
-                                    <Image source={{uri: decode(training.media)}}
+                                    <Image source={{uri: training.media}}
                                             style={{
                                                 width: 120,
                                                 height: 120,
@@ -420,7 +419,7 @@ const TrainingsScreen = () => {
                                             }}/>
                                 }
                             {isTrainer && editable && training.media &&
-                                    <Image source={{uri: decode(training.media)}}
+                                    <Image source={{uri: training.media}}
                                             style={{
                                                 width: 120,
                                                 height: 120,

@@ -6,7 +6,8 @@ import {
     Button,
     FAB,
     Card,
-    HelperText, ActivityIndicator
+    HelperText, 
+    ActivityIndicator
 } from "react-native-paper";
 import {validateGoalDescription, validateGoalObjective, validateGoalTitle} from "../utils/validations";
 import Input from "../components/Input";
@@ -19,6 +20,8 @@ import goalsService from "../services/goalsService";
 import FiufitDialog from "../components/FiufitDialog";
 import * as ImagePicker from "expo-image-picker";
 import {encode} from 'base-64';
+import { sendNotification } from "../utils/notification";
+import utils from "../utils/Utils";
 
 const GoalsScreen = () => {
     const theme = useTheme();
@@ -193,7 +196,7 @@ const GoalsScreen = () => {
     }
 
     // Saves the changes made to the selected goal
-    const editSelectedGoal = () => {
+    const editSelectedGoal = async () => {
         if (!validateGoalForm()) {
             setDialog(true);
             return;
@@ -210,19 +213,29 @@ const GoalsScreen = () => {
             setGoals(prevCardData => [...prevCardData]);
             setEditMode(false);
         }
-        goalsService.update(card)
+        try {
+            await goalsService.update(card);
+            if (Number(goalObjective) <= Number(currentProgress)) {
+                console.log("entra");
+                const userToNotified = await utils.getUserId();
+                sendNotification(userToNotified, {
+                    title: "Completed Goal", 
+                    message: `You have completed the goal ${goalTitle}`, 
+                    body: {type: "CompletedGoal"}
+                });
+            } else {
+                console.log("no entra");
+            }
+        } catch (error) {
+            console.log(error);
+            setDialog(false);
+        }
+        getGoals()
             .catch(error => {
                 console.log(error);
                 setDialog(false);
-            })
-            .finally(() => {
-                getGoals()
-                    .catch(error => {
-                        console.log(error);
-                        setDialog(false);
-                    });
-                resetNewGoalForm();
             });
+        resetNewGoalForm();
     }
 
     const validateGoalForm = () => {
@@ -330,9 +343,8 @@ const GoalsScreen = () => {
             }}>
                 Goals
             </Text>
-            {loading ? (
-                    <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
-                )
+            {loading 
+                ?  <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
                 :
                 (
                     <View style={{flex: 1}}>
@@ -432,90 +444,92 @@ const GoalsScreen = () => {
                         {editMode && (
                             <View style={{
                                 justifyContent: 'center',
-                                position: 'absolute',
                                 width: '100%',
+                                display: "flex",
                             }}>
-                                <Card style={{
-                                    margin: 10,
-                                    borderRadius: 5,
-                                    elevation: 5,
-                                    backgroundColor: theme.colors.background,
-                                    justifyContent: 'center',
-                                    borderWidth: 1,
-                                    borderColor: theme.colors.secondary,
-                                }}>
-                                    <Card.Content>
-                                        <Input label="Title"
-                                               placeholder="Enter title"
-                                               value={goalTitle}
-                                               onChangeText={text => setGoalTitle(text)}
-                                        />
-                                        <HelperText type="error" visible={!validateGoalTitle(goalTitle, true)}
-                                                    style={{
-                                                        marginTop: -20,
-                                                        marginBottom: validateGoalTitle(goalTitle, true) ? -20 : 0,
-                                                    }}>
-                                            Title should be between 1 and 15 characters long
-                                        </HelperText>
-                                        <Input label="Description"
-                                               placeholder="Enter description"
-                                               value={goalDescription}
-                                               onChangeText={text => setGoalDescription(text)}
-                                        />
-                                        <HelperText type="error"
-                                                    visible={!validateGoalDescription(goalDescription, true)}
-                                                    style={{
-                                                        marginTop: -20,
-                                                        marginBottom: !validateGoalDescription(goalDescription, true) ? -20 : -30,
-                                                    }}>
-                                            Description should be between 1 and 30 characters long
-                                        </HelperText>
-                                        <Input label={`Current ${goalUnit ? `(${goalUnit})` : ''}`}
-                                               placeholder="Enter your progress"
-                                               keyboardType={'numeric'}
-                                               value={currentProgress}
-                                               onChangeText={text => setCurrentProgress(text)}
-                                        />
-                                        <Input label={`Objective ${goalUnit ? `(${goalUnit})` : ''}`}
-                                               placeholder="Enter objective"
-                                               keyboardType={'numeric'}
-                                               value={goalObjective}
-                                               onChangeText={text => setGoalObjective(text)}
-                                        />
-                                        <HelperText type="error" visible={!validateGoalObjective(goalObjective, true)}
-                                                    style={{
-                                                        marginTop: -20,
-                                                        marginBottom: !validateGoalObjective(goalObjective, true) ? -20 : 0,
-                                                    }}>
-                                            Objective should be a natural number
-                                        </HelperText>
-                                        <View style={{
-                                            flexDirection: 'row',
-                                            justifyContent: 'space-around',
-                                            marginTop: 15,
-                                        }}>
-                                            <Button onPress={() => {
-                                                setEditMode(false);
-                                                resetNewGoalForm();
-                                            }}
-                                                    textColor={theme.colors.background}
-                                                    style={{
-                                                        backgroundColor: theme.colors.primary,
-                                                        width: 100,
-                                                        alignSelf: 'center',
-                                                    }}>Cancel</Button>
-                                            <Button onPress={editSelectedGoal}
-                                                    textColor={theme.colors.secondary}
-                                                    style={{
-                                                        backgroundColor: theme.colors.background,
-                                                        borderWidth: 1,
-                                                        borderColor: theme.colors.secondary,
-                                                        width: 100,
-                                                        alignSelf: 'center',
-                                                    }}>Save</Button>
-                                        </View>
-                                    </Card.Content>
-                                </Card>
+                                <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                                    <Card style={{
+                                        margin: 10,
+                                        borderRadius: 5,
+                                        elevation: 5,
+                                        backgroundColor: theme.colors.background,
+                                        justifyContent: 'center',
+                                        borderWidth: 1,
+                                        borderColor: theme.colors.secondary,
+                                    }}>
+                                        <Card.Content>
+                                            <Input label="Title"
+                                                placeholder="Enter title"
+                                                value={goalTitle}
+                                                onChangeText={text => setGoalTitle(text)}
+                                            />
+                                            <HelperText type="error" visible={!validateGoalTitle(goalTitle, true)}
+                                                        style={{
+                                                            marginTop: -20,
+                                                            marginBottom: validateGoalTitle(goalTitle, true) ? -20 : 0,
+                                                        }}>
+                                                Title should be between 1 and 15 characters long
+                                            </HelperText>
+                                            <Input label="Description"
+                                                placeholder="Enter description"
+                                                value={goalDescription}
+                                                onChangeText={text => setGoalDescription(text)}
+                                            />
+                                            <HelperText type="error"
+                                                        visible={!validateGoalDescription(goalDescription, true)}
+                                                        style={{
+                                                            marginTop: -20,
+                                                            marginBottom: !validateGoalDescription(goalDescription, true) ? -20 : -30,
+                                                        }}>
+                                                Description should be between 1 and 30 characters long
+                                            </HelperText>
+                                            <Input label={`Current ${goalUnit ? `(${goalUnit})` : ''}`}
+                                                placeholder="Enter your progress"
+                                                keyboardType={'numeric'}
+                                                value={currentProgress}
+                                                onChangeText={text => setCurrentProgress(text)}
+                                            />
+                                            <Input label={`Objective ${goalUnit ? `(${goalUnit})` : ''}`}
+                                                placeholder="Enter objective"
+                                                keyboardType={'numeric'}
+                                                value={goalObjective}
+                                                onChangeText={text => setGoalObjective(text)}
+                                            />
+                                            <HelperText type="error" visible={!validateGoalObjective(goalObjective, true)}
+                                                        style={{
+                                                            marginTop: -20,
+                                                            marginBottom: !validateGoalObjective(goalObjective, true) ? -20 : 0,
+                                                        }}>
+                                                Objective should be a natural number
+                                            </HelperText>
+                                            <View style={{
+                                                flexDirection: 'row',
+                                                justifyContent: 'space-around',
+                                                marginTop: 15,
+                                            }}>
+                                                <Button onPress={() => {
+                                                    setEditMode(false);
+                                                    resetNewGoalForm();
+                                                }}
+                                                        textColor={theme.colors.background}
+                                                        style={{
+                                                            backgroundColor: theme.colors.primary,
+                                                            width: 100,
+                                                            alignSelf: 'center',
+                                                        }}>Cancel</Button>
+                                                <Button onPress={editSelectedGoal}
+                                                        textColor={theme.colors.secondary}
+                                                        style={{
+                                                            backgroundColor: theme.colors.background,
+                                                            borderWidth: 1,
+                                                            borderColor: theme.colors.secondary,
+                                                            width: 100,
+                                                            alignSelf: 'center',
+                                                        }}>Save</Button>
+                                            </View>
+                                        </Card.Content>
+                                    </Card>
+                                </ScrollView>
                             </View>
                         )}
                         {newGoalFormVisible && (

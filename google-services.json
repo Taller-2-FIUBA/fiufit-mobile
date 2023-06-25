@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "306390698180",
+    "firebase_url": "https://taller2-fiufit-default-rtdb.firebaseio.com",
+    "project_id": "taller2-fiufit",
+    "storage_bucket": "taller2-fiufit.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:306390698180:android:7216dde33b9f0fe6212191",
+        "android_client_info": {
+          "package_name": "com.fi.uba.fiufit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "306390698180-ienrk1gntpq7cnpk28omm0s2rt53chvm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzXs0UeX2KL11-RGeyhok49Vgie7vnoME"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "306390698180-6g97d979939hqljfu9p2f49va5c8sdd8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
