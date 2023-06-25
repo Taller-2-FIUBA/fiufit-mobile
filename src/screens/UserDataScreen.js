@@ -4,7 +4,6 @@ import {
     View
 } from 'react-native'
 import {
-    validateLocation,
     validateName, validateNameLength,
     validateUsername, validateUsernameLength
 } from "../utils/validations";
@@ -31,6 +30,7 @@ const UserDataScreen = ({navigation}) => {
     const getLocations = async () => {
         try {
             const response = await UserService.getLocations();
+            response.unshift({"coordinates": [0, 0], "location": "Select your location"});
             setLocations(response);
         } catch(error) {
             console.error("Something went wrong while fetching locations. Please try again later.");
@@ -42,17 +42,16 @@ const UserDataScreen = ({navigation}) => {
     };
 
     const handleInputChange = (key, value) => {
-        console.log('handleInputChange: ', key, value);
         setUserData({...userData, [key]: value});
     };
 
     const handleLocationInputChange = (value) => {
         const locationInfo = locations[value];
-        console.log('Location Selected: ', locationInfo);
-        setLocationIndex(value);
-        const newUserData = {...userData, ['location']: locationInfo.location, ['coordinates']: locationInfo.coordinates};
-        setUserData(newUserData);
-        console.log('handleInputChange: ', newUserData);
+        if(locationInfo.location !== "Select your location") {
+            setLocationIndex(value);
+            const newUserData = {...userData, ['location']: locationInfo.location, ['coordinates']: locationInfo.coordinates};
+            setUserData(newUserData);
+        }
     };
 
     const validateForm = (userData) => {
@@ -74,7 +73,6 @@ const UserDataScreen = ({navigation}) => {
                 field: 'username'
             },
             {value: userData.username, validator: validateUsername, errorMessage: 'Invalid username', field: 'username'},
-            {value: userData.location, validator: validateLocation, errorMessage: 'Invalid location', field: 'location'},
         ];
 
         for (const {value, validator, errorMessage, field} of validationData) {
@@ -88,7 +86,7 @@ const UserDataScreen = ({navigation}) => {
     }
 
     const trimUserData = (userData) => {
-        let trimableFields = ['email', 'name', 'surname', 'username', 'location'];
+        let trimableFields = ['email', 'name', 'surname', 'username'];
         for (const key of trimableFields) {
             userData[key] = userData[key].trim();
         }
@@ -98,7 +96,6 @@ const UserDataScreen = ({navigation}) => {
         handleError(null, 'name')
         handleError(null, 'surname')
         handleError(null, 'username')
-        handleError(null, 'location')
 
         trimUserData(userData);
         if (!validateForm(userData)) {
@@ -151,7 +148,6 @@ const UserDataScreen = ({navigation}) => {
                             selectedValue={locationIndex}
                             style={fiufitStyles.locationPickerSelect}
                             onValueChange={(itemValue) => handleLocationInputChange(itemValue)}
-                            prompt='Select your location'
                         >
                             {locations.map((locationInfo, index) => 
                                 <Picker.Item label={locationInfo.location} value={index} key={index}/>

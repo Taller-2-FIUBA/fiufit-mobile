@@ -179,7 +179,6 @@ export const UserService = {
     async getLocations() {
         try {
             const response = await axios.get(`${requests.BASE_URL}${requests.USER}/locations/`);
-            console.log(response.data);
             if(response.data.length > 0) {
                 return response.data;
             } else {
