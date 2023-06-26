@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import goalsService from "../services/goalsService";
 
 const DashboardScreen = () => {
-  const [period, setPeriod] = useState('month');
+  const [period, setPeriod] = useState(7);
 
   const changePeriod = (newPeriod) => {
     setPeriod(newPeriod);
@@ -16,7 +16,7 @@ const DashboardScreen = () => {
     // Ejemplo: { distancia: 10, tiempo: 120, calorias: 500, hitos: 3, actividad: 'correr' }
     const userId =  await AsyncStorage.getItem('@fiufit_userId');
     try {
-      const metricsProgress = await goalsService.getMetricsProgress(userId, metric, days);
+      const metricsProgress = await goalsService.getMetricsProgress(userId, period);
     } catch (error) {
         console.error("Error on chaning training rating: ", error);
     }
@@ -24,33 +24,61 @@ const DashboardScreen = () => {
   };
 
   const renderMetrics = () => {
-    const metricas = getMetrics();
+    const metrics = getMetrics();
 
-    if (metricas) {
+    if (metrics) {
       return (
         <View>
-          <Text>Distance: {metricas.distancia} km</Text>
-          <Text>Time: {metricas.tiempo} minutos</Text>
-          <Text>Calories expended: {metricas.calorias} kcal</Text>
-          <Text>Number of milestones achieved: {metricas.hitos}</Text>
-          <Text>Type of activity: {metricas.actividad}</Text>
+          <Text style={styles.metricText}>Distance: {metrics.distancia} km</Text>
+          <Text style={styles.metricText}>Time: {metrics.tiempo} minutos</Text>
+          <Text style={styles.metricText}>Calories expended: {metrics.calorias} kcal</Text>
+          <Text style={styles.metricText}>Number of milestones achieved: {metrics.hitos}</Text>
+          <Text style={styles.metricText}>Type of activity: {metrics.actividad}</Text>
         </View>
       );
     } else {
-      return <Text>There are no metrics available for the selected period.</Text>;
+      return <Text style={styles.noMetricsText}>There are no metrics available for the selected period.</Text>;
     }
   };
 
   return (
-    <View>
-      <Text>Metrics Dashboard</Text>
-      <Button title="Today" onPress={() => changePeriod('today')} />
-      <Button title="Week" onPress={() => changePeriod('week')} />
-      <Button title="Month" onPress={() => changePeriod('month')} />
-      
+    <View style={styles.container}>
+      <Text style={styles.title}>Metrics Dashboard</Text>
+      <View style={styles.buttonContainer}>
+        <Button title="Today" onPress={() => changePeriod(1)} />
+        <Button title="Week" onPress={() => changePeriod(7)} />
+        <Button title="Month" onPress={() => changePeriod(30)} />
+      </View>
       {renderMetrics()}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  metricText: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  noMetricsText: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    textAlign: 'center',
+  },
+});
 
 export default DashboardScreen;

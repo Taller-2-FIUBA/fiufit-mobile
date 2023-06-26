@@ -32,10 +32,18 @@ const goalsService = {
         }
     },
 
-    async getMetricsProgress(userId, metric, days) {
+    async getMetricsProgress(userId, days) {
         try {
-            const response = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/${metric}?days=${days}`);
-            return response.data;
+            const response1 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/distance?days=${days}`);
+            const response2 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/fat?days=${days}`);
+            const response3 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/muscle?days=${days}`);
+            //const response4 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/steps?days=${days}`);
+
+            console.log(response1.data);
+            console.log(response2.data);
+            console.log(response3.data);
+
+            return response1.data;
         } catch (error) {
             console.log(error);
         }

@@ -56,6 +56,7 @@ const CreateTrainingScreen = () => {
     useEffect(() => {
         const fetchExercises = async () => {
             const response = await getExercises();
+            console.log(response);
             setTrainingExercises(response);
         };
     
