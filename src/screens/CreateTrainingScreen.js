@@ -93,7 +93,7 @@ const CreateTrainingScreen = () => {
     const validateForm = async (training) => {
         let valid = true;
         try {
-            const validationData = await getValidationData(training)
+            const validationData = getValidationData(training)
             for (const {value, validator, errorMessage, field} of validationData) {
                 if (!validator(value)) {
                     handleError(errorMessage, field);

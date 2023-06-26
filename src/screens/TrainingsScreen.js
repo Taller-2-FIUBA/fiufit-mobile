@@ -19,14 +19,13 @@ import {
     getTrainingsByTrainerId, updateTraining, getValidationData, trimUserData
 } from "../services/TrainingsService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import requests from "../consts/requests";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {UserService} from "../services/userService";
 import {getTrainingById} from "../services/TrainingsService";
 import {useIsFocused} from "@react-navigation/core";
 import {pickImageFromGallery, showImage} from "../services/imageService";
 
-const TrainingItem = ({value, editable, onChange, error}) => {
+const TrainingItem = ({value, editable, onChange}) => {
     return (
     <View style={fiufitStyles.trainingItemContainer}>
         <TextInput
@@ -44,12 +43,15 @@ const TrainingEditableItem = ({value, editable, onChange, error, onFocus = () =>
 
         return (
             <View style={{marginBottom: 20,}}>
-            <View style={[editable ? fiufitStyles.trainingInput : fiufitStyles.trainingNotEditableInpunt,
+            <View style={[
             {borderColor: error ? redColor : isFocused ? tertiaryColor : secondaryColor,
             }]}>
             <TextInput
                 placeholderTextColor={secondaryColor}
-                style={{color: secondaryColor, flex: 1}}
+                style={[editable ? styles.trainingInput : styles.trainingNotEditableInpunt,
+                    {color: secondaryColor, flex: 1},
+                    {borderColor: error ? redColor : isFocused ? tertiaryColor : secondaryColor,
+                    }]}
                 autoCorrect={false}
                 onFocus={() => {
                     onFocus();
@@ -219,7 +221,7 @@ const TrainingsScreen = () => {
     };
 
     const updateTrainingInfo = async (index) => {
-        const copyTraining = {title: trainings[index].title, description: trainings[index].description, media: trainings[index].media};    
+        const copyTraining = {title: trainings[index].title, description: trainings[index].description};    
         try {
             await updateTraining(copyTraining);
         } catch (error) {
@@ -480,7 +482,21 @@ const TrainingsScreen = () => {
         flexDirection: 'row',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-    }
+    },
+    trainingInput: {
+        fontSize: 14,
+        borderColor: secondaryColor,
+        borderWidth: 0.8,
+        color: tertiaryColor,
+        paddingHorizontal: 5
+    },
+    trainingNotEditableInpunt: {
+        fontSize: 14,
+        borderColor: secondaryColor,
+        borderWidth: 0.8,
+        color: secondaryColor,
+        paddingHorizontal: 10
+    },
 });
 
   export default TrainingsScreen;

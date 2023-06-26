@@ -3,6 +3,8 @@ import {Alert, ToastAndroid} from "react-native";
 import { db } from './firebase';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Utils from "./Utils";
+import {FIREBASE_SERVER_KEY} from "@env";
 
 
 Notifications.setNotificationHandler({
@@ -128,10 +130,11 @@ export const responseListenerSubscriber = (navigation) => {
     });
 }
 
-export const registerToken = async (user) => {
+export const registerToken = async () => {
     const token = await registerForPushNotificationsAsync();
+    let userId = await Utils.getUserId();
     if (token) {
-        const docRef = doc(db, "notificationTokens", user.id.toString());
+        const docRef = doc(db, "notificationTokens", userId);
         const docSnap = await getDoc(docRef);
         let tokens = [];
         if (docSnap.exists()) {

@@ -4,6 +4,8 @@ import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {UserService} from "../services/userService";
 import {useNavigation} from "@react-navigation/native";
+import {Avatar, useTheme} from "react-native-paper";
+import {showImage} from "../services/imageService";
 
 
 const ProfileItem = ({iconName, value, editable, onChange}) => {
@@ -24,13 +26,40 @@ const ProfileItem = ({iconName, value, editable, onChange}) => {
     )
 }
 
-const ProfileAvatar = ({userName}) => {
+const ProfileAvatar = ({image, name, surname, editable}) => {
+    const theme = useTheme();
     return (
-        <View style={styles.profileAvatarContainer}>
-            <Image
-                style={styles.profileAvatar}
-                source={require('../../resources/profile.jpg')}
-            />
+        <View style={{alignItems: 'center',}}>
+            {editable ? (
+                <TouchableOpacity style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 50,
+                    marginTop: 20,
+                    marginBottom: 20,
+                }}>
+                    <Icon name="pencil"></Icon>
+                </TouchableOpacity>
+                ) : (
+                   <View>
+                       {image ? (
+                           <Image source={{uri: showImage(image)}} style={{
+                               width: 80,
+                               height: 80,
+                               borderRadius: 50,
+                               marginTop: 20,
+                               marginBottom: 20,
+                           }}/>
+                       ) : (
+                           <Avatar.Text size={80} color={theme.colors.secondary}
+                                        style={{
+                                            backgroundColor: theme.colors.primary
+                                        }}
+                                        label={name?.charAt(0) + surname?.charAt(0)}
+                           />
+                       )}
+                   </View>
+                )}
         </View>
     )
 }
@@ -52,6 +81,7 @@ const ProfileScreen = () => {
         is_athlete: false,
         is_blocked: false,
     });
+    const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [editable, setEditable] = useState(false);
     const [error, setError] = useState(null);
@@ -59,14 +89,20 @@ const ProfileScreen = () => {
     useEffect(() => {
         console.log("Fetching user profile...");
         setLoading(true);
-        UserService.getUser().then(async (profile) => {
-            setLoading(false);
-            setUserProfile(profile);
-        }).catch((error) => {
-            setLoading(false);
-            setError(error);
-            console.log(error);
-        });
+        UserService.getUser()
+            .then(async (profile) => {
+                setLoading(false);
+                setUserProfile(profile);
+                UserService.getUserByUsername(profile.username)
+                    .then((userData) => {
+                        setImage(userData.image);
+                    });
+            })
+            .catch((error) => {
+                setLoading(false);
+                setError(error);
+                console.log(error);
+            });
     }, []);
 
 
@@ -101,7 +137,9 @@ const ProfileScreen = () => {
     return (
         <ScrollView style={styles.profileContainer}>
             <ProfileAvatar
-                userName={userProfile.name}
+                image={image}
+                name={userProfile.name}
+                surname={userProfile.surname}
             />
             <ProfileItem
                 iconName="account"
@@ -164,14 +202,14 @@ const ProfileScreen = () => {
             <View style={styles.followersContainer}>
                 <TouchableOpacity
                     style={[styles.button, styles.followingButton]}
-                    onPress={() => navigation.navigate('FollowTabs', { user: userProfile })}
+                    onPress={() => navigation.navigate('FollowTabs', {user: userProfile})}
                 >
                     <Text style={styles.buttonText}>Following</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                     style={styles.button}
-                    onPress={() => navigation.navigate('FollowTabs', { user: userProfile })}
+                    onPress={() => navigation.navigate('FollowTabs', {user: userProfile})}
                 >
                     <Text style={styles.buttonText}>Followers</Text>
                 </TouchableOpacity>

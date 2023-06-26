@@ -6,8 +6,8 @@ import {
     Button,
     FAB,
     Card,
-    HelperText, 
-    ActivityIndicator
+    HelperText,
+    ActivityIndicator, Divider
 } from "react-native-paper";
 import {validateGoalDescription, validateGoalObjective, validateGoalTitle} from "../utils/validations";
 import Input from "../components/Input";
@@ -27,7 +27,6 @@ const GoalsScreen = () => {
     const rolePickerRef = useRef();
 
     const [goals, setGoals] = useState([]);
-    const [completedGoals, setCompletedGoals] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
     const [newGoalFormVisible, setNewGoalFormVisible] = useState(false);
     const [editMode, setEditMode] = useState(false);
@@ -89,15 +88,16 @@ const GoalsScreen = () => {
             setLoading(true);
             const response = await goalsService.get();
             if (response) {
-                setGoals([]);
-                setCompletedGoals([]);
+                let aux_goals = [];
+                let aux_completedGoals = [];
                 response.forEach(goal => {
                     if (goal.objective <= goal.progress) {
-                        setCompletedGoals(prevState => [...prevState, goal]);
+                        aux_completedGoals.push(goal);
                     } else {
-                        setGoals(prevState => [...prevState, goal]);
+                        aux_goals.push(goal);
                     }
                 });
+                setGoals(aux_completedGoals.concat(aux_goals));
                 setLoading(false)
             }
         } catch (error) {
@@ -215,15 +215,12 @@ const GoalsScreen = () => {
         try {
             await goalsService.update(card);
             if (Number(goalObjective) <= Number(currentProgress)) {
-                console.log("entra");
                 const userToNotified = await utils.getUserId();
-                sendNotification(userToNotified, {
-                    title: "Completed Goal", 
-                    message: `You have completed the goal ${goalTitle}`, 
+                await sendNotification(userToNotified, {
+                    title: "Completed Goal",
+                    message: `You have completed the goal ${goalTitle}`,
                     body: {type: "CompletedGoal"}
                 });
-            } else {
-                console.log("no entra");
             }
         } catch (error) {
             console.log(error);
@@ -345,7 +342,7 @@ const GoalsScreen = () => {
                     <View style={{flex: 1}}>
                         {!newGoalFormVisible && !editMode && (
                             <View>
-                                {goals && goals.length === 0 && completedGoals.length === 0 && (
+                                {goals && goals.length === 0 && (
                                     <Text style={{
                                         alignSelf: 'center',
                                         marginTop: 10,
@@ -355,31 +352,8 @@ const GoalsScreen = () => {
                                         You have no goals yet, add one!
                                     </Text>
                                 )}
-                                {completedGoals && completedGoals.length > 0 && (
-                                    <View>
-                                        <Text style={{
-                                            alignSelf: 'center',
-                                            marginTop: 10,
-                                            color: theme.colors.tertiary,
-                                        }}>
-                                            Completed goals
-                                        </Text>
-                                        <FlatList data={completedGoals} renderItem={renderGoals}
-                                                  keyExtractor={item => item.id}/>
-                                    </View>
-                                )}
-                                {goals && goals.length > 0 && (
-                                    <View>
-                                        <Text style={{
-                                            alignSelf: 'center',
-                                            marginTop: 10,
-                                            color: theme.colors.tertiary,
-                                        }}>
-                                            Active goals
-                                        </Text>
-                                        <FlatList data={goals} renderItem={renderGoals} keyExtractor={item => item.id}/>
-                                    </View>
-                                )}
+                                <FlatList data={goals} renderItem={renderGoals}
+                                          keyExtractor={item => item.id}/>
                             </View>
                         )}
                         <FAB
@@ -575,7 +549,7 @@ const GoalsScreen = () => {
                                             <Text style={{
                                                 color: theme.colors.tertiary,
                                                 marginBottom: 5,
-                                                marginTop: validateGoalDescription(goalDescription, true) ? -35 : 5,
+                                                marginTop: validateGoalDescription(goalDescription, true) ? -15 : 5,
                                             }}>Activity</Text>
                                             <View style={{
                                                 borderRadius: 10,
@@ -630,7 +604,7 @@ const GoalsScreen = () => {
                                                         marginTop: validateGoalObjective(goalObjective, true) ? 5 : 10,
                                                     }}>Time limit (optional)</Text>
                                                     <TouchableOpacity
-                                                        style={{...fiufitStyles.buttonDate, width: 150}}
+                                                        style={fiufitStyles.buttonDate}
                                                         onPress={showDatepicker}
                                                     >
                                                         <Icon name={"calendar-range"} style={fiufitStyles.iconStyle}/>

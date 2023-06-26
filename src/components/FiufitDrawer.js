@@ -1,31 +1,41 @@
 import {DrawerContentScrollView, DrawerItemList} from "@react-navigation/drawer";
-import {Alert, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, Text, TouchableOpacity, View} from "react-native";
 import {Avatar, useTheme} from "react-native-paper";
 import React, {useEffect, useState} from "react";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import authService from "../services/authService";
-import { UserService } from "../services/userService";
+import {UserService} from "../services/userService";
+import {decode} from "base-64";
+import {showImage} from "../services/imageService";
 
 const FiufitDrawer = (props) => {
     const theme = useTheme();
-    const [userData, setUserData] = useState({
-        name: '',
-        surname: '',
-        username: '',
-    });
+    const [name, setName] = useState("");
+    const [surname, setSurname] = useState("");
+    const [userName, setUserName] = useState("");
+    const [image, setImage] = useState("");
 
     useEffect(() => {
-        UserService.getUser().then((profile) => {
-            setUserData(profile);
-        }).catch(() => {
-            Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
-        });
+        UserService.getUserUsername()
+            .then((username) => {
+                console.log(username)
+                UserService.getUserByUsername(username)
+                    .then((userData) => {
+                        setUserName(username?.toString());
+                        setName(userData.name);
+                        setSurname(userData.surname);
+                        setImage(userData.image);
+                    });
+            })
+            .catch(() => {
+                Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
+            });
     }, []);
 
     const handleLogout = () => {
         authService.logout().then(() => {
             props.navigation.replace('Login');
-        }).catch(error => {
+        }).catch(() => {
             Alert.alert("Error", "Something went wrong while logging out. Please try again later.");
         });
     }
@@ -43,13 +53,23 @@ const FiufitDrawer = (props) => {
                 borderBottomColor: theme.colors.primary,
             }}>
                 <TouchableOpacity onPress={() => props.navigation.navigate("Profile")}>
-                    <Avatar.Text size={50} color={theme.colors.secondary}
-                                 label={userData.name.charAt(0) + userData.surname.charAt(0)}
-                                 style={{
-                                     backgroundColor: theme.colors.primary,
-                                     marginTop: 20,
-                                     marginBottom: 10,
-                                 }}/>
+                    {image ? (
+                        <Image source={{uri: showImage(image)}} style={{
+                            width: 100,
+                            height: 100,
+                            borderRadius: 50,
+                            marginTop: 20,
+                            marginBottom: 10,
+                        }}/>
+                    ) : (
+                        <Avatar.Text size={100} color={theme.colors.secondary}
+                                     label={name?.charAt(0) + surname?.charAt(0)}
+                                     style={{
+                                         backgroundColor: theme.colors.primary,
+                                         marginTop: 20,
+                                         marginBottom: 10,
+                                     }}/>
+                    )}
                 </TouchableOpacity>
                 <Text
                     style={{
@@ -59,7 +79,7 @@ const FiufitDrawer = (props) => {
                         fontWeight: 'bold',
                         marginBottom: 20,
                     }}>
-                    {userData.username}
+                    {userName}
                 </Text>
             </View>
             <DrawerContentScrollView {...props} contentContainerStyle={{
