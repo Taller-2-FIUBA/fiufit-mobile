@@ -7,7 +7,7 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import authService from "../services/authService";
-// import GoogleLoginButton from "../components/GoogleLoginButton";
+import GoogleLoginButton from "../components/GoogleLoginButton";
 import {Divider, Modal, Portal, useTheme} from "react-native-paper";
 
 const LoginScreen = () => {
@@ -121,7 +121,7 @@ const LoginScreen = () => {
                         Did you forget your password? Reset it
                     </Text>
                     <Divider style={{backgroundColor: theme.colors.secondary, marginBottom: 15}} bold={true}/>
-                    {/*<GoogleLoginButton navigation={navigation}/>*/}
+                    <GoogleLoginButton navigation={navigation}/>
                 </View>
             </ScrollView>
             <Text
