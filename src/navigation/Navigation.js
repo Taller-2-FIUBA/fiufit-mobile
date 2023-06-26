@@ -19,21 +19,23 @@ import FollowedsScreen from "../screens/FollowedsScreen";
 import FollowersScreen from "../screens/FollowersScreen";
 import ProfilePublicScreen from "../screens/ProfilePublicScreen";
 import GoalsScreen from "../screens/GoalsScreen";
-import {Alert, TouchableOpacity} from "react-native";
+import {Alert, Image, TouchableOpacity} from "react-native";
 import ChatScreen from "../screens/ChatScreen";
 import InitialScreen from "../screens/InitialScreen";
-import {useEffect, useState, useRef} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import { UserService } from "../services/userService";
 import UserDataContext from "../contexts/userDataContext";
 import PrivateChatScreen from "../screens/PrivateChatScreen";
 import NotificationScreen from "../screens/NotificationScreen";
-import { 
+import {
     registerToken,
-    removeNotificationSubscription, 
-    notificationListenerSubscriber, 
+    removeNotificationSubscription,
+    notificationListenerSubscriber,
     responseListenerSubscriber } from "../utils/notification";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PaymentsScreen from "../screens/PaymentsScreen";
+import {decode} from "base-64";
+import {showImage} from "../services/imageService";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -44,22 +46,28 @@ const FollowsTopTab = createMaterialTopTabNavigator();
 const AuthStack = () => {
     const theme = useTheme();
     const navigation = useNavigation();
-    const [userData, setUserData] = useState({
-        name: '',
-        surname: '',
-    });
+    const [name, setName] = useState("");
+    const [surname, setSurname] = useState("");
+    const [image, setImage] = useState("");
     const notificationListener = useRef();
     const responseListener = useRef();
 
     useEffect(() => {
-        UserService.getUser().then((user) => {
-            AsyncStorage.setItem('@fiufit_username', user.username);
-            setUserData(user);
-            registerToken(user);
-        }).catch((error) => {
-            console.log("Something went wrong while fetching user data ", error);
-            Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
-        });
+        console.log("AuthStack useEffect")
+        UserService.getUserUsername()
+            .then((username) => {
+                AsyncStorage.setItem('@fiufit_username', username?.toString());
+                registerToken();
+                UserService.getUserByUsername(username)
+                    .then((userData) => {
+                        setName(userData.name);
+                        setSurname(userData.surname);
+                        setImage(userData.image);
+                    });
+            })
+            .catch(() => {
+                Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
+            });
 
         notificationListener.current = notificationListenerSubscriber();
         responseListener.current = responseListenerSubscriber(navigation);
@@ -76,14 +84,23 @@ const AuthStack = () => {
                 title: 'Fiufit',
                 headerTitleAlign: 'center',
                 headerLeft: () => (
-                    <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer)}>
-                        <Avatar.Text size={30} color={theme.colors.secondary}
-                                     style={{
-                                         marginLeft: 10,
-                                         backgroundColor: theme.colors.primary
-                                     }}
-                                     label={userData.name.charAt(0) + userData.surname.charAt(0)}
-                        />
+                    <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer)} style={{marginLeft: 10}}>
+                        {image ? (
+                            <Image source={{uri: showImage(image)}} style={{
+                                width: 30,
+                                height: 30,
+                                borderRadius: 50,
+                                marginTop: 20,
+                                marginBottom: 10,
+                            }}/>
+                        ) : (
+                            <Avatar.Text size={30} color={theme.colors.secondary}
+                                         style={{
+                                             backgroundColor: theme.colors.primary
+                                         }}
+                                         label={name?.charAt(0) + surname?.charAt(0)}
+                            />
+                        )}
                     </TouchableOpacity>
                 ),
                 headerRight: () => (

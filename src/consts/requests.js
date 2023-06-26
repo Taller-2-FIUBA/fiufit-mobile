@@ -14,6 +14,7 @@ const requests = {
     DEPOSIT: '/users/deposit',
     BALANCE: '/balance',
     WITHDRAW: '/users/extraction',
+    RESET_PASSWORD: '/users/recovery/user_test',
 }
 
 export default requests;

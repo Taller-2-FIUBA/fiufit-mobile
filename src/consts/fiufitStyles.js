@@ -68,6 +68,7 @@ export const fiufitStyles = StyleSheet.create({
         borderRadius: 10,
         marginBottom: 15,
         height: 51,
+        width: 150
     },
     buttonDateError: {
         backgroundColor: secondaryColor,
@@ -125,6 +126,7 @@ export const fiufitStyles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 16,
         fontWeight: 'bold',
+        marginBottom: 15,
     },
     detailsText: {
         color: greyColor,

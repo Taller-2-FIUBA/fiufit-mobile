@@ -9,14 +9,13 @@ import {
     View
 } from "react-native";
 import {greyColor, primaryColor, secondaryColor, tertiaryColor} from "../consts/colors";
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useRef, useState} from "react";
 import {Picker} from "@react-native-picker/picker";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import Utils from "../utils/Utils";
 import Button from "../components/Button";
 import {
-    validateBirthDate,
-    validateHeight,
+    validateBirthDate, validateHeight,
     validateHeightCentimeters,
     validateHeightMeters,
     validateWeight
@@ -26,8 +25,11 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Input from "../components/Input";
 import authService from "../services/authService";
 import UserDataContext from "../contexts/userDataContext";
+import {Button as PaperButton, useTheme} from "react-native-paper";
+import {encodeImage, pickImageFromGallery} from "../services/imageService";
 
 const UserBiologicsScreen = ({navigation}) => {
+    const theme = useTheme();
     const rolePickerRef = useRef();
     const {userData, setUserData} = useContext(UserDataContext);
 
@@ -35,11 +37,12 @@ const UserBiologicsScreen = ({navigation}) => {
     const [centimeters, setCentimeters] = useState('');
     const [weight, setWeight] = useState('');
     const [date, setDate] = useState(null);
+    const [image, setImage] = useState(null);
     const [errorDate, setErrorDate] = useState(false);
     const [errors, setErrors] = useState({});
 
     const handleInputChange = (key, value) => {
-        setUserData({ ...userData, [key]: value });
+        setUserData({...userData, [key]: value});
     }
 
     const showDatepicker = () => {
@@ -72,16 +75,22 @@ const UserBiologicsScreen = ({navigation}) => {
         setWeight(Utils.parseWeight(value));
     }
 
-    const handleSignUp = () => {
+    const handleSignUp = async () => {
         Keyboard.dismiss();
         if (validateForm()) {
             const updatedUser
-                = { ...userData, height: parseFloat(meters + '.' + centimeters), weight: parseInt(weight) };
+                = {
+                ...userData,
+                height: parseFloat(meters + '.' + centimeters),
+                weight: parseInt(weight),
+                image: await encodeImage(image)
+            };
             signUpUser(updatedUser);
         }
     }
 
     const signUpUser = (user) => {
+        console.log(JSON.stringify(user, null, 2));
         if (user.google_token) {
             authService.registerWithGoogle(user)
                 .then(() => {
@@ -142,6 +151,11 @@ const UserBiologicsScreen = ({navigation}) => {
 
         return valid;
     }
+
+    const pickImage = async () => {
+        let image = await pickImageFromGallery();
+        setImage(image)
+    };
 
     return (
         <SafeAreaView style={{
@@ -233,40 +247,65 @@ const UserBiologicsScreen = ({navigation}) => {
                     </View>
                 </View>
 
-                <View style={{marginBottom: 5}}>
-                    <Text style={{color: greyColor, flex: 1, marginLeft: 5, marginBottom: -10}}>
-                        Enter your birthdate
-                    </Text>
-                    {!errorDate ?
-                        <View style={{marginLeft: 5}}>
-                            <TouchableOpacity
-                                style={fiufitStyles.buttonDate}
-                                onPress={showDatepicker}
-                            >
-                                <Icon name={"calendar-range"} style={fiufitStyles.iconStyle}/>
-                                <Text style={{color: date ? tertiaryColor : greyColor, marginLeft: 33, marginTop: -20}}>
-                                    {date ? date.toISOString().split("T")[0] : "Birthdate"}
+                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <View style={{marginBottom: 5}}>
+                        <Text style={{color: greyColor, flex: 1, marginLeft: 5, marginBottom: -10}}>
+                            Enter your birthdate
+                        </Text>
+                        {!errorDate ?
+                            <View style={{marginLeft: 5}}>
+                                <TouchableOpacity
+                                    style={fiufitStyles.buttonDate}
+                                    onPress={showDatepicker}
+                                >
+                                    <Icon name={"calendar-range"} style={fiufitStyles.iconStyle}/>
+                                    <Text style={{
+                                        color: date ? tertiaryColor : greyColor,
+                                        marginLeft: 33,
+                                        marginTop: -20
+                                    }}>
+                                        {date ? date.toISOString().split("T")[0] : "Birthdate"}
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            :
+                            <View>
+                                <TouchableOpacity
+                                    style={fiufitStyles.buttonDateError}
+                                    onPress={showDatepicker}
+                                >
+                                    <Icon name={"calendar-range"} style={fiufitStyles.iconStyle}/>
+                                    <Text style={{
+                                        color: date ? tertiaryColor : greyColor,
+                                        marginLeft: 33,
+                                        marginTop: -20
+                                    }}>
+                                        {date ? date.toISOString().split("T")[0] : "Birthdate"}
+                                    </Text>
+                                </TouchableOpacity>
+                                <Text style={{
+                                    color: 'red',
+                                    marginTop: -10,
+                                    fontSize: 12,
+                                    marginLeft: 5,
+                                    marginBottom: 15
+                                }}>
+                                    Invalid birthdate
                                 </Text>
-                            </TouchableOpacity>
-                        </View>
-                        :
-                        <View>
-                            <TouchableOpacity
-                                style={fiufitStyles.buttonDateError}
-                                onPress={showDatepicker}
-                            >
-                                <Icon name={"calendar-range"} style={fiufitStyles.iconStyle}/>
-                                <Text style={{color: date ? tertiaryColor : greyColor, marginLeft: 33, marginTop: -20}}>
-                                    {date ? date.toISOString().split("T")[0] : "Birthdate"}
-                                </Text>
-                            </TouchableOpacity>
-                            <Text style={{color: 'red', marginTop: -10, fontSize: 12, marginLeft: 5, marginBottom: 15}}>
-                                Invalid birthdate
-                            </Text>
-                        </View>
-                    }
+                            </View>
+                        }
+                    </View>
+                    <View>
+                        <Text style={{
+                            color: theme.colors.tertiary,
+                            marginBottom: -7,
+                        }}>Image (optional)</Text>
+                        <PaperButton onPress={pickImage}
+                                     style={fiufitStyles.imagePickerButton}>
+                            <Icon name={"camera"} style={{...fiufitStyles.iconStyle}}/>
+                        </PaperButton>
+                    </View>
                 </View>
-
                 <Button onPress={handleSignUp} title="Register"/>
             </ScrollView>
         </SafeAreaView>
