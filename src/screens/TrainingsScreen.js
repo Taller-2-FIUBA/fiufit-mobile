@@ -198,7 +198,7 @@ const TrainingsScreen = () => {
         if (!validForm) {
             return;
         }
-        updateTrainingInfo(index); 
+        updateTrainingInfo(index);
         setEditable(false);
     };
 
@@ -221,9 +221,7 @@ const TrainingsScreen = () => {
     const updateTrainingInfo = async (index) => {
         const copyTraining = {title: trainings[index].title, description: trainings[index].description, media: trainings[index].media};    
         try {
-            const response = await updateTraining(copyTraining);
-            setEditable(false);
-            return response;
+            await updateTraining(copyTraining);
         } catch (error) {
             console.log(error);
         }

@@ -1,5 +1,6 @@
 import {decode} from 'base-64';
 import * as ImagePicker from "expo-image-picker";
+import RNFetchBlob from "react-native-blob-util";
 
 export const pickImageFromGallery = async() => {
     try {
@@ -19,13 +20,8 @@ export const pickImageFromGallery = async() => {
 export const encodeImage = async(uri) => {
     if (!uri) return null;
     try {
-        const response = await fetch(uri);
-        const blob = await response.blob();
-        const fileReaderInstance = new FileReader();
-        fileReaderInstance.readAsDataURL(blob);
-        await new Promise(resolve => fileReaderInstance.onload = () => resolve());
-        const base64data = fileReaderInstance.result;
-        return base64data ? base64data.split(',')[1] : null;
+        const base64data = await RNFetchBlob.fs.readFile(uri, 'base64');
+        return base64data || null;
     } catch(e) {
         throw new Error("Cannot encode Image: " + uri, e);
     }

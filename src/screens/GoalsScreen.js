@@ -92,7 +92,6 @@ const GoalsScreen = () => {
                 setGoals([]);
                 setCompletedGoals([]);
                 response.forEach(goal => {
-                    console.log(goal);
                     if (goal.objective <= goal.progress) {
                         setCompletedGoals(prevState => [...prevState, goal]);
                     } else {
