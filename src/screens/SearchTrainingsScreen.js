@@ -7,10 +7,11 @@ import {Picker} from '@react-native-picker/picker';
 import Button from "../components/Button";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor, redColor, greyColor} from "../consts/colors";
-import { ActivityIndicator, FAB, IconButton, List, useTheme } from 'react-native-paper';
+import { ActivityIndicator, IconButton, List, useTheme } from 'react-native-paper';
 import {UserService} from "../services/userService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {decode} from "base-64";
+import {showImage} from "../services/imageService";
+import FastImage from "react-native-fast-image";
 
 
 
@@ -178,58 +179,64 @@ const SearchTrainingsScreen = () => {
             <Text>There are no results for your search.</Text>
         </View>
       )}
-      {loading 
-        ? <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
-        : <View>
-          {trainings && trainings.map((training, index) => (
-              <List.Accordion
-                  key={index}
-                  style={[fiufitStyles.trainingsList, {alignSelf: 'center'}]}
-                  left={(props) => <List.Icon {...props} icon="bike" />}
-                  title={training.title}
-                  titleStyle={{ color: primaryColor }}
-                  expanded={expandedList[index]}
-                  onPress={() => toogleExpanded(index)}
-              >
-                  <View style={styles.ratingAndFavContainer}>
-                    {training.rating >= 0 ?<Text style={styles.ratingText}>Global training rating: {training.rating}</Text> : null}
-                    {isAthlete && 
-                      <FavouriteIcon training={training} index={index}/>
-                    }
-                  </View>
-                  
-                  <TrainingItem value={training.title}/>
-                  <TrainingItem value={training.description}/>
-                  <TrainingItem value={trainings[index].type}/>
-                  <TrainingItem value={trainings[index].difficulty}/>
-                  <View key={training.id}>
-                      <Text style={{color: greyColor,
-                          fontSize: 18,
-                          marginVertical: 10,
-                          marginRight: 1,
-                      }}>
-                          Exercises:
-                      </Text>
-                      {training.exercises.map((exercise, index) => (
-                      <View key={index} style={{paddingBottom: 10}}>
-                          <Text style={{ color: greyColor }}>{exercise.name} {exercise.unit ? `[${exercise.unit}]` : ''}</Text>
-                          <View style={fiufitStyles.exerciseDetails}>
-                              <Text style={{ color: greyColor }}>{`Count: ${exercise.count}`}</Text>
-                              <Text style={{ color: greyColor }}>{`Series: ${exercise.series}`}</Text>
-                          </View>
-                      </View>
-                      ))}
-                  </View>
-                  {training.media &&
-                    <Image source={{uri: decode(training.media)}}
-                      style={{
-                          width: 120,
-                          height: 120,
-                          marginTop: 10,
-                          borderRadius: 5,
-                      }}/>
-                  }
-              </List.Accordion>
+      {loading ? (
+                    <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
+                )
+                : <View>
+                {trainings && trainings.map((training, index) => (
+                <List.Accordion
+                    key={index}
+                    style={[fiufitStyles.trainingsList, {alignSelf: 'center'}]}
+                    left={(props) => <List.Icon {...props} icon="bike" />}
+                    title={training.title}
+                    titleStyle={{ color: primaryColor }}
+                    expanded={expandedList[index]}
+                    onPress={() => toogleExpanded(index)}
+                >
+                    <View style={styles.ratingAndFavContainer}>
+                      {training.rating >= 0 ?<Text style={styles.ratingText}>Global training rating: {training.rating}</Text> : null}
+                      {isAthlete && 
+                        <FavouriteIcon training={training} index={index}/>
+                      }
+                    </View>
+                    
+                    <TrainingItem value={training.title}/>
+                    <TrainingItem value={training.description}/>
+                    <TrainingItem value={trainings[index].type}/>
+                    <TrainingItem value={trainings[index].difficulty}/>
+                    <View key={training.id}>
+                        <Text style={{color: greyColor,
+                            fontSize: 18,
+                            marginVertical: 10,
+                            marginRight: 1,
+                        }}>
+                            Exercises:
+                        </Text>
+                        {training.exercises.map((exercise, index) => (
+                        <View key={index} style={{paddingBottom: 10}}>
+                            <Text style={{ color: greyColor }}>{exercise.name} {exercise.unit ? `[${exercise.unit}]` : ''}</Text>
+                            <View style={fiufitStyles.exerciseDetails}>
+                                <Text style={{ color: greyColor }}>{`Count: ${exercise.count}`}</Text>
+                                <Text style={{ color: greyColor }}>{`Series: ${exercise.series}`}</Text>
+                            </View>
+                        </View>
+                        ))}
+                    </View>
+                    {training.media &&
+                      <FastImage 
+                        source={{
+                          uri: showImage(training.media),
+                          priority: FastImage.priority.normal
+                        }}
+                        style={{
+                            width: 120,
+                            height: 120,
+                            marginTop: 10,
+                            borderRadius: 5,
+                        }}
+                      />
+                      }
+                </List.Accordion>
             ))}
             </View>
 }

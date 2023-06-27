@@ -68,6 +68,7 @@ export const fiufitStyles = StyleSheet.create({
         borderRadius: 10,
         marginBottom: 15,
         height: 51,
+        width: 150
     },
     buttonDateError: {
         backgroundColor: secondaryColor,
@@ -125,6 +126,7 @@ export const fiufitStyles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 16,
         fontWeight: 'bold',
+        marginBottom: 15,
     },
     detailsText: {
         color: greyColor,
@@ -151,13 +153,13 @@ export const fiufitStyles = StyleSheet.create({
     trainingItemContainer: {
         height: 50,
         backgroundColor: primaryColor,
-        borderColor: tertiaryColor,
+        borderColor: secondaryColor,
         flexDirection: 'row',
         borderWidth: 0.5,
         alignItems: 'center',
         paddingHorizontal: 15,
         borderRadius: 10,
-        marginBottom: 5,
+        marginBottom: 10,
         width: 345,
         alignSelf: 'center',
         justifyContent: 'flex-start'
@@ -189,7 +191,8 @@ export const fiufitStyles = StyleSheet.create({
         borderColor: primaryColor,
         borderWidth: 0.8,
         color: secondaryColor,
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
+        marginBottom: 3
     },
     trainingButtonContainer: {
         flexDirection: 'row',
@@ -198,7 +201,7 @@ export const fiufitStyles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 2,
         marginBottom: 5,
-        marginLeft: 30
+        marginLeft: 50
     },
     trainingActionButton: {
         backgroundColor: secondaryColor,
@@ -222,9 +225,9 @@ export const fiufitStyles = StyleSheet.create({
         borderRadius: 10
     },
     trainingsList: { 
-        height: 50,
-        width: 350,
-        marginBottom: 3,
+        height: 55, 
+        width: 350, 
+        marginBottom: 3, 
         backgroundColor: tertiaryColor,
         borderRadius: 10
     },
@@ -268,24 +271,24 @@ export const fiufitStyles = StyleSheet.create({
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-end",
-        height: '100%'
+        height: '100%',
     },
     messageChatInputContainer: {
         display: 'flex',
         flexDirection: 'row',
-        width: '100%',
-        height: 50,
+        height: 50
     },
     messageChatInput: {
         backgroundColor: secondaryColor,
-        flexGrow: 4,
-        color: whiteColor
+        color: whiteColor,
+        width: '80%',
+        flexGrow: 2,
     },
     messageChatButton: {
         backgroundColor: tertiaryColor,
-        flexGrow: 0.5,
         justifyContent: 'center',
         alignItems: 'center',
+        flexGrow: 1,
     },
     messageChatItemLeft: {
         backgroundColor: secondaryColor,
@@ -332,7 +335,7 @@ export const fiufitStyles = StyleSheet.create({
         marginBottom: 6,
         alignSelf: 'flex-start',
         marginLeft: 2,
-      },
+    },
     locationPickerSelect: {
         marginTop: 2,
         marginBottom: 5,
@@ -341,5 +344,42 @@ export const fiufitStyles = StyleSheet.create({
         backgroundColor: secondaryColor,
         color: tertiaryColor,
         borderRadius: 10
+    },
+    notificationContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 3,
+        height: 50,
+        
+    },
+    notificationInfo: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        width: '95%',
+        paddingLeft: 10,
+        borderRadius: 10,
+
+    },
+    containerStyle: {
+        backgroundColor: primaryColor,
+        padding: 20,
+        marginHorizontal: 20,
+        borderRadius: 10,
+    },
+    hintStyle: {
+        marginTop: 16,
+        color: greyColor,
+        fontSize: 16,
+        paddingHorizontal: 20,
+        textAlign: 'center',
+    },
+    FABContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 60,
+        marginTop: 10,
     },
 })

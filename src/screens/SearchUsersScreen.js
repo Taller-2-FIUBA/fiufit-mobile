@@ -1,7 +1,10 @@
 import {Text, View, ScrollView, TouchableOpacity} from "react-native";
-import {primaryColor, secondaryColor, tertiaryColor, whiteColor} from "../consts/colors";
+import {primaryColor, tertiaryColor, whiteColor} from "../consts/colors";
 import React, { useEffect } from "react";
 import { Searchbar, ActivityIndicator, useTheme } from 'react-native-paper';
+import {primaryColor, tertiaryColor} from "../consts/colors";
+import React from "react";
+import { Searchbar } from 'react-native-paper';
 import { UserService } from "../services/userService";
 import {useNavigation} from "@react-navigation/native";
 import {fiufitStyles} from "../consts/fiufitStyles";

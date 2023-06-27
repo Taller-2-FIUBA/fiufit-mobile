@@ -2,21 +2,29 @@ import {Alert, Keyboard, SafeAreaView, ScrollView, Text, View} from "react-nativ
 import {primaryColor} from "../consts/colors";
 import {useNavigation} from "@react-navigation/native";
 import React, {useState} from "react";
-import {validateEmail} from "../utils/validations";
+import {validateEmail, validateUsername} from "../utils/validations";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import authService from "../services/authService";
-// import GoogleLoginButton from "../components/GoogleLoginButton";
+import GoogleLoginButton from "../components/GoogleLoginButton";
+import {Divider, Modal, Portal, useTheme} from "react-native-paper";
 
 const LoginScreen = () => {
     const navigation = useNavigation();
+    const theme = useTheme();
 
     const [inputs, setInputs] = useState({
         email: '',
         password: '',
     });
+    const [recoverUser, setRecoverUser] = useState('');
+
     const [errors, setErrors] = useState({});
+
+    const [modalVisible, setModalVisible] = useState(false);
+    const showModal = () => setModalVisible(true);
+    const hideModal = () => setModalVisible(false);
 
     const handleInputChange = (key, value) => {
         setInputs({...inputs, [key]: value});
@@ -54,6 +62,27 @@ const LoginScreen = () => {
         }
     }
 
+    const handleResetPassword = () => {
+        Keyboard.dismiss();
+        handleError(null, 'username');
+        if (!validateUsername(recoverUser)) {
+            handleError('Invalid username', 'username');
+        } else {
+            hideModal();
+            authService.resetPassword(recoverUser)
+                .then(() => {
+                    Alert.alert("Password reset", "Check your email for further instructions.");
+                })
+                .catch(error => {
+                    console.log(error.message);
+                    Alert.alert("Error resetting password", "Something went wrong. Please try again later.");
+                })
+                .finally(() => {
+                    setRecoverUser('');
+                });
+        }
+    }
+
     return (
         <SafeAreaView style={{
             backgroundColor: primaryColor,
@@ -86,12 +115,39 @@ const LoginScreen = () => {
                         error={errors.password}
                     />
                     <Button onPress={handleLogin} title="Login"/>
-                    {/*<GoogleLoginButton navigation={navigation}/>*/}
                     <Text
-                        onPress={() => navigation.navigate('Registration')}
-                        style={fiufitStyles.haveAccount}>Do not have an account? Sign up</Text>
+                        onPress={() => showModal()}
+                        style={fiufitStyles.haveAccount}>
+                        Did you forget your password? Reset it
+                    </Text>
+                    <Divider style={{backgroundColor: theme.colors.secondary, marginBottom: 15}} bold={true}/>
+                    <GoogleLoginButton navigation={navigation}/>
                 </View>
             </ScrollView>
+            <Text
+                onPress={() => navigation.navigate('Registration')}
+                style={fiufitStyles.haveAccount}>Do not have an account? Sign up</Text>
+            <Portal>
+                <Modal visible={modalVisible} onDismiss={() => {
+                    hideModal();
+                    setRecoverUser('');
+                    handleError(null, 'username');
+                }} contentContainerStyle={fiufitStyles.containerStyle}>
+                    <Text style={{
+                        ...fiufitStyles.titleText,
+                        fontSize: 20,
+                        marginBottom: -10,
+                        alignSelf: 'center'
+                    }}>Password reset</Text>
+                    <Input
+                        iconName={"account-tie"}
+                        placeholder="Username"
+                        onChangeText={text => setRecoverUser(text)}
+                        error={errors.username}
+                    />
+                    <Button onPress={handleResetPassword} title="Confirm"/>
+                </Modal>
+            </Portal>
         </SafeAreaView>
     )
 }

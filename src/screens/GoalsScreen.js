@@ -6,7 +6,8 @@ import {
     Button,
     FAB,
     Card,
-    HelperText, ActivityIndicator
+    HelperText,
+    ActivityIndicator, Divider
 } from "react-native-paper";
 import {validateGoalDescription, validateGoalObjective, validateGoalTitle} from "../utils/validations";
 import Input from "../components/Input";
@@ -17,15 +18,15 @@ import {fiufitStyles} from "../consts/fiufitStyles";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import goalsService from "../services/goalsService";
 import FiufitDialog from "../components/FiufitDialog";
-import * as ImagePicker from "expo-image-picker";
-import {encode} from 'base-64';
+import {pickImageFromGallery, encodeImage} from "../services/imageService";
+import { sendNotification } from "../utils/notification";
+import utils from "../utils/Utils";
 
 const GoalsScreen = () => {
     const theme = useTheme();
     const rolePickerRef = useRef();
 
     const [goals, setGoals] = useState([]);
-    const [completedGoals, setCompletedGoals] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
     const [newGoalFormVisible, setNewGoalFormVisible] = useState(false);
     const [editMode, setEditMode] = useState(false);
@@ -87,15 +88,16 @@ const GoalsScreen = () => {
             setLoading(true);
             const response = await goalsService.get();
             if (response) {
-                setGoals([]);
-                setCompletedGoals([]);
+                let aux_goals = [];
+                let aux_completedGoals = [];
                 response.forEach(goal => {
                     if (goal.objective <= goal.progress) {
-                        setCompletedGoals(prevState => [...prevState, goal]);
+                        aux_completedGoals.push(goal);
                     } else {
-                        setGoals(prevState => [...prevState, goal]);
+                        aux_goals.push(goal);
                     }
                 });
+                setGoals(aux_completedGoals.concat(aux_goals));
                 setLoading(false)
             }
         } catch (error) {
@@ -193,7 +195,7 @@ const GoalsScreen = () => {
     }
 
     // Saves the changes made to the selected goal
-    const editSelectedGoal = () => {
+    const editSelectedGoal = async () => {
         if (!validateGoalForm()) {
             setDialog(true);
             return;
@@ -210,19 +212,26 @@ const GoalsScreen = () => {
             setGoals(prevCardData => [...prevCardData]);
             setEditMode(false);
         }
-        goalsService.update(card)
+        try {
+            await goalsService.update(card);
+            if (Number(goalObjective) <= Number(currentProgress)) {
+                const userToNotified = await utils.getUserId();
+                await sendNotification(userToNotified, {
+                    title: "Completed Goal",
+                    message: `You have completed the goal ${goalTitle}`,
+                    body: {type: "CompletedGoal"}
+                });
+            }
+        } catch (error) {
+            console.log(error);
+            setDialog(false);
+        }
+        getGoals()
             .catch(error => {
                 console.log(error);
                 setDialog(false);
-            })
-            .finally(() => {
-                getGoals()
-                    .catch(error => {
-                        console.log(error);
-                        setDialog(false);
-                    });
-                resetNewGoalForm();
             });
+        resetNewGoalForm();
     }
 
     const validateGoalForm = () => {
@@ -235,19 +244,20 @@ const GoalsScreen = () => {
         return valid;
     }
 
-    const createGoal = () => {
+    const createGoal = async () => {
         if (!validateGoalForm()) {
             setDialog(true);
             return;
         }
         setLoading(true);
+        const encodeImageGoal = await encodeImage(goalImage);
         const newGoal = {
             title: goalTitle,
             description: goalDescription,
             metric: goalMetric,
             objective: goalObjective,
             time_limit: goalTimeLimit,
-            image: encode(goalImage)
+            image: encodeImageGoal
         }
         resetNewGoalForm();
         goalsService.create(newGoal)
@@ -289,15 +299,10 @@ const GoalsScreen = () => {
     }
 
     const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
+        let image = await pickImageFromGallery();
 
-        if (!result.canceled) {
-            setGoalImage(result.assets[0].uri);
+        if (image) {
+            setGoalImage(image);
         }
     };
 
@@ -330,15 +335,14 @@ const GoalsScreen = () => {
             }}>
                 Goals
             </Text>
-            {loading ? (
-                    <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
-                )
+            {loading 
+                ?  <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
                 :
                 (
                     <View style={{flex: 1}}>
                         {!newGoalFormVisible && !editMode && (
                             <View>
-                                {goals && goals.length === 0 && completedGoals.length === 0 && (
+                                {goals && goals.length === 0 && (
                                     <Text style={{
                                         alignSelf: 'center',
                                         marginTop: 10,
@@ -348,31 +352,8 @@ const GoalsScreen = () => {
                                         You have no goals yet, add one!
                                     </Text>
                                 )}
-                                {completedGoals && completedGoals.length > 0 && (
-                                    <View>
-                                        <Text style={{
-                                            alignSelf: 'center',
-                                            marginTop: 10,
-                                            color: theme.colors.tertiary,
-                                        }}>
-                                            Completed goals
-                                        </Text>
-                                        <FlatList data={completedGoals} renderItem={renderGoals}
-                                                  keyExtractor={item => item.id}/>
-                                    </View>
-                                )}
-                                {goals && goals.length > 0 && (
-                                    <View>
-                                        <Text style={{
-                                            alignSelf: 'center',
-                                            marginTop: 10,
-                                            color: theme.colors.tertiary,
-                                        }}>
-                                            Active goals
-                                        </Text>
-                                        <FlatList data={goals} renderItem={renderGoals} keyExtractor={item => item.id}/>
-                                    </View>
-                                )}
+                                <FlatList data={goals} renderItem={renderGoals}
+                                          keyExtractor={item => item.id}/>
                             </View>
                         )}
                         <FAB
@@ -432,90 +413,92 @@ const GoalsScreen = () => {
                         {editMode && (
                             <View style={{
                                 justifyContent: 'center',
-                                position: 'absolute',
                                 width: '100%',
+                                display: "flex",
                             }}>
-                                <Card style={{
-                                    margin: 10,
-                                    borderRadius: 5,
-                                    elevation: 5,
-                                    backgroundColor: theme.colors.background,
-                                    justifyContent: 'center',
-                                    borderWidth: 1,
-                                    borderColor: theme.colors.secondary,
-                                }}>
-                                    <Card.Content>
-                                        <Input label="Title"
-                                               placeholder="Enter title"
-                                               value={goalTitle}
-                                               onChangeText={text => setGoalTitle(text)}
-                                        />
-                                        <HelperText type="error" visible={!validateGoalTitle(goalTitle, true)}
-                                                    style={{
-                                                        marginTop: -20,
-                                                        marginBottom: validateGoalTitle(goalTitle, true) ? -20 : 0,
-                                                    }}>
-                                            Title should be between 1 and 15 characters long
-                                        </HelperText>
-                                        <Input label="Description"
-                                               placeholder="Enter description"
-                                               value={goalDescription}
-                                               onChangeText={text => setGoalDescription(text)}
-                                        />
-                                        <HelperText type="error"
-                                                    visible={!validateGoalDescription(goalDescription, true)}
-                                                    style={{
-                                                        marginTop: -20,
-                                                        marginBottom: !validateGoalDescription(goalDescription, true) ? -20 : -30,
-                                                    }}>
-                                            Description should be between 1 and 30 characters long
-                                        </HelperText>
-                                        <Input label={`Current ${goalUnit ? `(${goalUnit})` : ''}`}
-                                               placeholder="Enter your progress"
-                                               keyboardType={'numeric'}
-                                               value={currentProgress}
-                                               onChangeText={text => setCurrentProgress(text)}
-                                        />
-                                        <Input label={`Objective ${goalUnit ? `(${goalUnit})` : ''}`}
-                                               placeholder="Enter objective"
-                                               keyboardType={'numeric'}
-                                               value={goalObjective}
-                                               onChangeText={text => setGoalObjective(text)}
-                                        />
-                                        <HelperText type="error" visible={!validateGoalObjective(goalObjective, true)}
-                                                    style={{
-                                                        marginTop: -20,
-                                                        marginBottom: !validateGoalObjective(goalObjective, true) ? -20 : 0,
-                                                    }}>
-                                            Objective should be a natural number
-                                        </HelperText>
-                                        <View style={{
-                                            flexDirection: 'row',
-                                            justifyContent: 'space-around',
-                                            marginTop: 15,
-                                        }}>
-                                            <Button onPress={() => {
-                                                setEditMode(false);
-                                                resetNewGoalForm();
-                                            }}
-                                                    textColor={theme.colors.background}
-                                                    style={{
-                                                        backgroundColor: theme.colors.primary,
-                                                        width: 100,
-                                                        alignSelf: 'center',
-                                                    }}>Cancel</Button>
-                                            <Button onPress={editSelectedGoal}
-                                                    textColor={theme.colors.secondary}
-                                                    style={{
-                                                        backgroundColor: theme.colors.background,
-                                                        borderWidth: 1,
-                                                        borderColor: theme.colors.secondary,
-                                                        width: 100,
-                                                        alignSelf: 'center',
-                                                    }}>Save</Button>
-                                        </View>
-                                    </Card.Content>
-                                </Card>
+                                <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                                    <Card style={{
+                                        margin: 10,
+                                        borderRadius: 5,
+                                        elevation: 5,
+                                        backgroundColor: theme.colors.background,
+                                        justifyContent: 'center',
+                                        borderWidth: 1,
+                                        borderColor: theme.colors.secondary,
+                                    }}>
+                                        <Card.Content>
+                                            <Input label="Title"
+                                                placeholder="Enter title"
+                                                value={goalTitle}
+                                                onChangeText={text => setGoalTitle(text)}
+                                            />
+                                            <HelperText type="error" visible={!validateGoalTitle(goalTitle, true)}
+                                                        style={{
+                                                            marginTop: -20,
+                                                            marginBottom: validateGoalTitle(goalTitle, true) ? -20 : 0,
+                                                        }}>
+                                                Title should be between 1 and 15 characters long
+                                            </HelperText>
+                                            <Input label="Description"
+                                                placeholder="Enter description"
+                                                value={goalDescription}
+                                                onChangeText={text => setGoalDescription(text)}
+                                            />
+                                            <HelperText type="error"
+                                                        visible={!validateGoalDescription(goalDescription, true)}
+                                                        style={{
+                                                            marginTop: -20,
+                                                            marginBottom: !validateGoalDescription(goalDescription, true) ? -20 : -30,
+                                                        }}>
+                                                Description should be between 1 and 30 characters long
+                                            </HelperText>
+                                            <Input label={`Current ${goalUnit ? `(${goalUnit})` : ''}`}
+                                                placeholder="Enter your progress"
+                                                keyboardType={'numeric'}
+                                                value={currentProgress}
+                                                onChangeText={text => setCurrentProgress(text)}
+                                            />
+                                            <Input label={`Objective ${goalUnit ? `(${goalUnit})` : ''}`}
+                                                placeholder="Enter objective"
+                                                keyboardType={'numeric'}
+                                                value={goalObjective}
+                                                onChangeText={text => setGoalObjective(text)}
+                                            />
+                                            <HelperText type="error" visible={!validateGoalObjective(goalObjective, true)}
+                                                        style={{
+                                                            marginTop: -20,
+                                                            marginBottom: !validateGoalObjective(goalObjective, true) ? -20 : 0,
+                                                        }}>
+                                                Objective should be a natural number
+                                            </HelperText>
+                                            <View style={{
+                                                flexDirection: 'row',
+                                                justifyContent: 'space-around',
+                                                marginTop: 15,
+                                            }}>
+                                                <Button onPress={() => {
+                                                    setEditMode(false);
+                                                    resetNewGoalForm();
+                                                }}
+                                                        textColor={theme.colors.background}
+                                                        style={{
+                                                            backgroundColor: theme.colors.primary,
+                                                            width: 100,
+                                                            alignSelf: 'center',
+                                                        }}>Cancel</Button>
+                                                <Button onPress={editSelectedGoal}
+                                                        textColor={theme.colors.secondary}
+                                                        style={{
+                                                            backgroundColor: theme.colors.background,
+                                                            borderWidth: 1,
+                                                            borderColor: theme.colors.secondary,
+                                                            width: 100,
+                                                            alignSelf: 'center',
+                                                        }}>Save</Button>
+                                            </View>
+                                        </Card.Content>
+                                    </Card>
+                                </ScrollView>
                             </View>
                         )}
                         {newGoalFormVisible && (
@@ -566,7 +549,7 @@ const GoalsScreen = () => {
                                             <Text style={{
                                                 color: theme.colors.tertiary,
                                                 marginBottom: 5,
-                                                marginTop: validateGoalDescription(goalDescription, true) ? -35 : 5,
+                                                marginTop: validateGoalDescription(goalDescription, true) ? -15 : 5,
                                             }}>Activity</Text>
                                             <View style={{
                                                 borderRadius: 10,
@@ -621,7 +604,7 @@ const GoalsScreen = () => {
                                                         marginTop: validateGoalObjective(goalObjective, true) ? 5 : 10,
                                                     }}>Time limit (optional)</Text>
                                                     <TouchableOpacity
-                                                        style={{...fiufitStyles.buttonDate, width: 150}}
+                                                        style={fiufitStyles.buttonDate}
                                                         onPress={showDatepicker}
                                                     >
                                                         <Icon name={"calendar-range"} style={fiufitStyles.iconStyle}/>

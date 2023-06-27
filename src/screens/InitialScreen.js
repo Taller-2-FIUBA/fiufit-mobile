@@ -4,6 +4,7 @@ import {fiufitStyles} from "../consts/fiufitStyles";
 import {useEffect} from "react";
 import {setNavigation} from "../services/config/axiosConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import FastImage from "react-native-fast-image";
 
 const InitialScreen = ({ navigation }) => {
     const theme = useTheme();
@@ -29,7 +30,7 @@ const InitialScreen = ({ navigation }) => {
             justifyContent: 'center',
             alignItems: 'center',
         }}>
-            <Image source={require('../../resources/logo.png')} style={fiufitStyles.logo}/>
+            <FastImage source={require('../../resources/logo.png')} style={fiufitStyles.logo}/>
         </SafeAreaView>
     );
 }
