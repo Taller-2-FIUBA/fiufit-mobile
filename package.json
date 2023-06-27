@@ -34,11 +34,8 @@
     "expo-clipboard": "~4.1.2",
     "expo-device": "~5.2.1",
     "expo-image-picker": "~14.1.1",
-<<<<<<< HEAD
     "expo-location": "~15.1.1",
-=======
     "expo-notifications": "~0.18.1",
->>>>>>> c1e44c47b30b4e94eeb49f1e968c7cd005210ed3
     "expo-status-bar": "~1.4.4",
     "firebase": "^9.22.1",
     "http-status-codes": "^2.2.0",
