@@ -19,6 +19,7 @@ const createTraining = async (training) => {
 
     const token = await AsyncStorage.getItem('@fiufit_token');
     training.media = await encodeImage(training.media);
+    console.log('TRAINING: ', training);
     try {
         const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
         {

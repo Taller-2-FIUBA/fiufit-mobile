@@ -55,6 +55,7 @@ const CreateTrainingScreen = () => {
         };
         const fetchExercises = async () => {
             const response = await getExercises();
+            console.log(response);
             setTrainingExercises(response);
         };
         try {
@@ -113,6 +114,7 @@ const CreateTrainingScreen = () => {
     }
 
     const handleCreate = async () => {
+        console.log('Creating training...');
         handleError(null, 'title')
         handleError(null, 'description')
 
@@ -121,7 +123,9 @@ const CreateTrainingScreen = () => {
         if (!validForm) {
             return;
         }
-        createTraining(training);
+        console.log('Trying to create training: ', training);
+
+        await createTraining(training);
         navigation.navigate('Trainings');
     }
 

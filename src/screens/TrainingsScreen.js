@@ -1,11 +1,9 @@
-import axios from "axios";
 import {
     Image,
     ScrollView,
     Text,
     TextInput,
     View,
-    ToastAndroid,
     TouchableOpacity,
     StyleSheet,
 } from 'react-native'
