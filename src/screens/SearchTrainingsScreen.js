@@ -68,7 +68,6 @@ const SearchTrainingsScreen = () => {
   }, []);
 
   const checkFavourites = async (trainings) => {
-    console.log('trainings: ', trainings);
 
     let favouritesTrainings = [];
     try {
@@ -76,7 +75,6 @@ const SearchTrainingsScreen = () => {
         console.log('userId: ', userId);
 
         favouritesTrainings = await UserService.getTrainingsByUserId(userId);
-        console.log('favourites: ', favouritesTrainings);
 
     } catch (error) {
       console.log('Error while checking favourites training: ', error);
