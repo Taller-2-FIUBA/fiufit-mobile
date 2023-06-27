@@ -43,16 +43,13 @@ const TrainingEditableItem = ({value, editable, onChange, error, onFocus = () =>
         const [isFocused, setIsFocused] = useState(false);
 
         return (
-            <View style={{marginBottom: 20,}}>
-            <View style={[
-            {borderColor: error ? redColor : isFocused ? tertiaryColor : secondaryColor,
+            <View>
+            <View style={
+            [fiufitStyles.trainingItemContainer, {borderColor: error ? redColor : isFocused ? tertiaryColor : secondaryColor,
             }]}>
             <TextInput
-                placeholderTextColor={secondaryColor}
                 style={[editable ? styles.trainingInput : styles.trainingNotEditableInpunt,
-                    {color: secondaryColor, flex: 1},
-                    {borderColor: error ? redColor : isFocused ? tertiaryColor : secondaryColor,
-                    }]}
+                    ]}
                 autoCorrect={false}
                 onFocus={() => {
                     onFocus();
@@ -66,7 +63,7 @@ const TrainingEditableItem = ({value, editable, onChange, error, onFocus = () =>
             />
             </View>
             {error &&
-            <Text style={{color: redColor, marginLeft: 5, fontSize: 12, marginTop: 5}}>{error}</Text>
+            <Text style={{color: redColor, marginLeft: 15, fontSize: 12, marginTop: 1, marginBottom: 2}}>{error}</Text>
             }
             </View>
         )
@@ -345,6 +342,7 @@ const TrainingsScreen = () => {
                             key={index}
                             style={fiufitStyles.trainingsList}
                             left={(props) => <List.Icon {...props} icon="bike" />}
+                            right={(props) => <List.Icon {...props} icon={expandedList[index] ? 'chevron-up' : 'chevron-down'} />}
                             title={training.title}
                             titleStyle={{ color: primaryColor }}
                             expanded={expandedList[index]}
@@ -404,7 +402,7 @@ const TrainingsScreen = () => {
                                 </View>
                                 ))}
                             </View>
-                            {training.media &&
+                            {!editable && training.media &&
                                     <FastImage 
                                         source={{
                                             uri: showImage(training.media),
@@ -414,6 +412,7 @@ const TrainingsScreen = () => {
                                             width: 120,
                                             height: 120,
                                             marginTop: 10,
+                                            marginBottom: 5,
                                             borderRadius: 5,
                                         }}
                                     />
@@ -443,7 +442,8 @@ const TrainingsScreen = () => {
                                         <Icon name={"camera"} style={{
                                             fontSize: 22,
                                             color: secondaryColor,
-                                            marginRight: 10,
+                                            flexDirection: 'row',
+                                            justifyContent: 'center',
                                         }}/>
                                     </PapperButton>
                                 </View>
@@ -506,7 +506,7 @@ const TrainingsScreen = () => {
         borderColor: secondaryColor,
         borderWidth: 0.8,
         color: secondaryColor,
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
     },
 });
 
