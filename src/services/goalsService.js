@@ -37,13 +37,19 @@ const goalsService = {
             const response1 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/distance?days=${days}`);
             const response2 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/fat?days=${days}`);
             const response3 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/muscle?days=${days}`);
-            //const response4 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/steps?days=${days}`);
+            const response4 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/steps?days=${days}`);
 
             console.log(response1.data);
             console.log(response2.data);
             console.log(response3.data);
 
-            return response1.data;
+            return { 
+                time: days,
+                distance: response1.data.progress,
+                lost_weight: response2.data.progress,
+                muscle: response3.data.progress,
+                steps: response4.data.progress,
+            };   
         } catch (error) {
             console.log(error);
         }

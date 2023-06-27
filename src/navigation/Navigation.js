@@ -271,9 +271,9 @@ const BottomTabNavigator = () => {
                 name="Dashboard"
                 component={DashboardScreen}
                 options={{
-                    tabBarLabel: 'Dashboard',
+                    tabBarLabel: 'Progress',
                     tabBarIcon: ({color, size}) => {
-                        return <Icon name="flag-checkered" size={size} color={color}/>;
+                        return <Icon name="trophy" size={size} color={color}/>;
                     },
                 }}
             />
