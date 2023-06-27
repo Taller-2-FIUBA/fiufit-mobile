@@ -4,8 +4,9 @@ import {
     Text,
     View
 } from 'react-native'
-import {
+import { ActivityIndicator,
     Button as PapperButton,
+    useTheme,
 } from "react-native-paper";
 import {Picker} from '@react-native-picker/picker';
 import {useNavigation} from "@react-navigation/native";
@@ -26,8 +27,10 @@ import FastImage from 'react-native-fast-image';
 
 
 const CreateTrainingScreen = () => {
+    const theme = useTheme();
     const navigation = useNavigation();
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(true);
     const [trainingTypes, setTrainingTypes] = useState({});
     const [trainingExercises, setTrainingExercises] = useState([]);
     const [selectedExercises, setSelectedExercises] = useState([]);
@@ -45,21 +48,23 @@ const CreateTrainingScreen = () => {
     };
 
     useEffect(() => {
+        setLoading(true);
         const fetchTrainingTypes = async () => {
             const response = await getTrainingsTypes();
             setTrainingTypes(response);
         };
-    
-        fetchTrainingTypes();
-    }, []);
-
-    useEffect(() => {
         const fetchExercises = async () => {
             const response = await getExercises();
             setTrainingExercises(response);
         };
-    
-        fetchExercises();
+        try {
+            fetchTrainingTypes();
+            fetchExercises();
+        } catch (error) {
+            console.log('Error while fetching training types: ', error);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
     const handleInputChange = (key, value) => {
@@ -85,7 +90,8 @@ const CreateTrainingScreen = () => {
         const updatedExercises = [...training.exercises];
         updatedExercises[index][key] = parseInt(value);
         updatedExercises[index]['name'] = exercise.name;
-        updatedExercises[index]['type'] = exercise.type;
+        updatedExercises[index]['type'] = exercise.type;        
+        updatedExercises[index]['unit'] = exercise.unit;
         setTraining(prevState => ({...prevState, exercises: updatedExercises}));
     };
 
@@ -125,6 +131,10 @@ const CreateTrainingScreen = () => {
             backgroundColor: primaryColor,
             flex: 1,
         }}>
+            {loading ? (
+                    <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
+                )
+                : 
                 <ScrollView contentContainerStyle={{
                     paddingTop: 40, paddingHorizontal: 20,
                 }}>
@@ -226,6 +236,7 @@ const CreateTrainingScreen = () => {
                         <Button onPress={handleCreate} title="Register"/>
                     </View>
                 </ScrollView>
+            }
             </SafeAreaView>
         </View>
     )
