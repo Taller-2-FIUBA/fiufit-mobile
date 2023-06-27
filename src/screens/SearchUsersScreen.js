@@ -1,5 +1,5 @@
-import {Button, Text, View, ScrollView, TouchableOpacity} from "react-native";
-import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from "../consts/colors";
+import {Text, View, ScrollView, TouchableOpacity} from "react-native";
+import {primaryColor, tertiaryColor} from "../consts/colors";
 import React from "react";
 import { Searchbar } from 'react-native-paper';
 import { UserService } from "../services/userService";

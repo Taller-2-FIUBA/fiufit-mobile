@@ -18,10 +18,10 @@ import TrainingInput from "../components/TrainingInput";
 import ExerciseInput from "../components/ExerciseInput";
 import {
     getTrainingsTypes, getExercises, createTraining,
-    validateForm, trimUserData
+    trimUserData, getValidationData, 
 } from "../services/TrainingsService";
-import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { pickImageFromGallery, showImage } from '../services/imageService';
 
 
 
@@ -75,15 +75,10 @@ const CreateTrainingScreen = () => {
     };
 
     const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            training.media = result.assets[0].uri;
+        let image = await pickImageFromGallery();    
+        
+        if (image) {
+            training.media = image;
         }
     };
 
@@ -95,15 +90,36 @@ const CreateTrainingScreen = () => {
         setTraining(prevState => ({...prevState, exercises: updatedExercises}));
     };
 
-    const handleCreate = () => {
-        handleError(null, 'title')
-        handleError(null, 'media')
+    // Validate form
+    const validateForm = async (training) => {
+        let valid = true;
+        try {
+            const validationData = await getValidationData(training)
+            for (const {value, validator, errorMessage, field} of validationData) {
+                if (!validator(value)) {
+                    handleError(errorMessage, field);
+                    valid = false;
+                }
+            }
+        } catch (error) {
+            console.log('Error while deleting favourite trainings: ', error);
+        }
+        return valid;
+    }
 
-        /* trimUserData(training);
-        if (!validateForm(training)) {
+    const handleCreate = async () => {
+        console.log('Creating training...');
+        handleError(null, 'title')
+        handleError(null, 'description')
+
+        trimUserData(training);
+        const validForm = await validateForm(training);
+        if (!validForm) {
             return;
-        } */
-        createTraining(training);
+        }
+        console.log('Trying to create training: ', training);
+
+        await createTraining(training);
         navigation.navigate('Trainings');
     }
 
@@ -183,7 +199,7 @@ const CreateTrainingScreen = () => {
                             </View>
                         )}
                         {training.media &&
-                            <Image source={{uri: training.media}}
+                            <Image source={{uri: showImage(training.media)}}
                                     style={{
                                         width: 120,
                                         height: 120,

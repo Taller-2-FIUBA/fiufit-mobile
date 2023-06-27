@@ -5,6 +5,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from "@react-navigation/native";
 import {UserService} from "../services/userService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { sendNotification } from '../utils/notification';
+import {showImage} from "../services/imageService";
+import {Avatar, useTheme} from "react-native-paper";
 
 
 const ProfileItem = ({iconName, value, editable, onChange}) => {
@@ -25,13 +28,24 @@ const ProfileItem = ({iconName, value, editable, onChange}) => {
     )
 }
 
-const ProfileAvatar = ({userName, onChange}) => {
+const ProfileAvatar = ({image, name, surname}) => {
+    const theme = useTheme();
     return (
         <View style={styles.profileAvatarContainer}>
-            <Image
-                style={styles.profileAvatar}
-                source={require('../../resources/profile.jpg')}
-            />
+            {image ? (
+                <Image
+                    style={{
+                        width: 80,
+                        height: 80,
+                        borderRadius: 50,
+                    }}
+                    source={{uri: showImage(image)}}
+                />
+            ) : (
+                <Avatar.Text size={80} color={theme.colors.secondary}
+                             label={name?.charAt(0) + surname?.charAt(0)}
+                />
+            )}
         </View>
     )
 }
@@ -56,8 +70,18 @@ const ProfilePublicScreen = ({ route }) => {
     const navigation = useNavigation();
 
     const [isFollowed, setIsFollowed] = useState(false);
+    const [image, setImage] = useState(null);
+    const [name, setName] = useState(null);
+    const [surname, setSurname] = useState(null);
 
     useEffect(() => {
+        UserService.getUserByUsername(user.username)
+            .then((userData) => {
+                setName(user.name);
+                setSurname(user.surname);
+                setImage(userData.image);
+            });
+
         const fetchGetFolloweds = async () => {
             let userId = await AsyncStorage.getItem('@fiufit_userId');
 
@@ -71,23 +95,31 @@ const ProfilePublicScreen = ({ route }) => {
                 console.log(error);
             });
         };
-    
+
         fetchGetFolloweds();
     }, []);
 
     const handleFollowPress = async () => {
         let userId = await AsyncStorage.getItem('@fiufit_userId');
-        const id = user.id;
-    
+        const username = await AsyncStorage.getItem('@fiufit_username');
+        const followedId = user.id;
+
         if(isFollowed) {
-            UserService.deleteFollowed(userId, id).then(async (followers) => {
+            UserService.deleteFollowed(userId, followedId).then(async (followers) => {
                 setIsFollowed(false);
             }).catch((error) => {
                 console.log(error);
             });
         } else {
-            UserService.followUser(userId, id).then(async (followers) => {
+            UserService.followUser(userId, followedId).then(async (followers) => {
                 setIsFollowed(true);
+                sendNotification(followedId, {
+                    title: "New Follower",
+                    message: `${username} is now following you!`,
+                    body: {
+                        type: "Follower"
+                    }
+                });
             }).catch((error) => {
                 console.log(error);
             });
@@ -96,9 +128,7 @@ const ProfilePublicScreen = ({ route }) => {
 
     return (
         <ScrollView style={styles.profileContainer}>
-            <ProfileAvatar
-                userName={user.name}
-            />
+            <ProfileAvatar image={image} name={name} surname={surname}/>
             <FollowButton onPress={handleFollowPress} isFollowing={isFollowed}/>
             <ProfileItem
                 iconName="account"

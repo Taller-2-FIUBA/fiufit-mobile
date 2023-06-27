@@ -165,5 +165,10 @@ export const UserService = {
         } catch (error) {
             return 0;
         }
+    },
+
+    async getUserUsername() {
+        let userData = await this.getUser();
+        return userData?.username;
     }
 }

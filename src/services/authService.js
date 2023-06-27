@@ -2,6 +2,7 @@ import {axiosInstance} from "./config/axiosConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
 import axios from "axios";
+import { unregisterToken } from "../utils/notification";
 
 const authService = {
     _storeSensitiveData: async function (response) {
@@ -21,9 +22,18 @@ const authService = {
         }
     },
 
+    _cleanAsyncStorage: async function () {
+        try {
+            await AsyncStorage.removeItem('@fiufit_token');
+            await AsyncStorage.removeItem('@fiufit_userId');
+        } catch (error) {
+            throw new Error("Error deleting sensitive data from device");
+        }
+    },
+
     async login(user) {
         try {
-            await this.logout();
+            await this._cleanAsyncStorage();
             const response = await axiosInstance.post(requests.LOGIN, user);
             await this._storeSensitiveData(response);
             return response.data;
@@ -34,7 +44,7 @@ const authService = {
 
     async register(user) {
         try {
-            await this.logout();
+            await this._cleanAsyncStorage();
             const response = await axiosInstance.post(requests.SIGNUP, user);
             return response.data;
         } catch (error) {
@@ -83,10 +93,20 @@ const authService = {
         }
     },
 
+    async resetPassword(user) {
+        try {
+            const response = await axiosInstance.post(requests.RESET_PASSWORD, user);
+            return response.data;
+        } catch (error) {
+            this._handleError(error);
+        }
+    },
+
     async logout() {
         try {
-            await AsyncStorage.removeItem('@fiufit_token');
-            await AsyncStorage.removeItem('@fiufit_userId');
+            const userId = await AsyncStorage.getItem('@fiufit_userId');
+            await unregisterToken(userId);
+            await this._cleanAsyncStorage();
         } catch (error) {
             throw new Error("Error deleting sensitive data from device");
         }

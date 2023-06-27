@@ -1,7 +1,7 @@
 import axios from "axios";
 import {
-    validateName, validateTrainingNameLength,
-    validateMediaUrl
+    validateTrainingName, validateTrainingNameLength,
+    validateDescriptionLength
 } from "../utils/validations";
 import requests from "../consts/requests";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,7 +9,7 @@ import {axiosInstance} from "./config/axiosConfig";
 import {
     ToastAndroid
 } from "react-native";
-import { encode } from 'base-64';
+import {encodeImage} from "./imageService";
 
 const createTraining = async (training) => {
     training.exercises = training.exercises.filter(exercise => Object.keys(exercise).length !== 0);
@@ -18,7 +18,8 @@ const createTraining = async (training) => {
     training['trainer_id'] = userId;
 
     const token = await AsyncStorage.getItem('@fiufit_token');
-    training.media = encode(training.media);
+    training.media = await encodeImage(training.media);
+    console.log('TRAINING: ', training);
     try {
         const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
         {
@@ -37,7 +38,6 @@ const createTraining = async (training) => {
 const getTrainingById = async (trainingId) => {
     try {
         const response = await axiosInstance.get(`${requests.BASE_URL}${requests.TRAINING}/${trainingId}`);
-        console.log("Training by id: ", response.data);
         return response.data;
     } catch (error) {
         console.error("Error in getTrainingById: ", error);
@@ -103,28 +103,40 @@ const getTrainingByTypeDifficultyAndTitle = async (type, difficulty, title) => {
     }
 }
 
-const validateForm = (training) => {
-    let valid = true;
-    const validationData = [
-        {value: training.title, validator: validateName, errorMessage: 'Invalid title', field: 'title'},
-        {value: training.title, validator: validateTrainingNameLength, errorMessage: 'Title must be at least 3 characters long', field: 'title'},
-        {value: training.media, validator: validateMediaUrl, errorMessage: 'Invalid link', field: 'media'},
-    ];
-
-    for (const {value, validator, errorMessage, field} of validationData) {
-        if (!validator(value)) {
-            handleError(errorMessage, field);
-            valid = false;
-        }
+const updateTraining = async (training, id) => {
+    const token = await AsyncStorage.getItem('@fiufit_token');
+    try {
+        const response = await axios.patch(`${requests.BASE_URL}${requests.TRAINING}/${id}`, JSON.stringify(training),
+        {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            }
+          });
+        console.log("Training updated successfully");
+        return response.data;
+    } catch (error) {
+        console.log(error);
     }
+}
 
-    return valid;
+const getValidationData = (training) => {
+    const validationData = [
+        {value: training.title, validator: validateTrainingName, errorMessage: 'Invalid title', field: 'title'},
+        {value: training.title, validator: validateTrainingNameLength, errorMessage: 'Title must be at least 3 characters long', field: 'title'},
+        {value: training.description, validator: validateTrainingName, errorMessage: 'Invalid description', field: 'description'},
+        {value: training.description, validator: validateDescriptionLength, errorMessage: 'Description must be at least 3 characters long', field: 'description'},
+    ];
+    return validationData;
 }
 
 const trimUserData = (training) => {
-    for (const key in training) {
-        training[key] = training[key].trim();
+    let trimableFields = ['title', 'description'];
+    for (const key in trimableFields) {
+        if(training[key] !== "" && training[key] !== undefined) {
+            training[key] = training[key].trim();
+        }
     }
 }
 
-export {createTraining, getTrainingsByTrainerId, getTrainingsTypes, getExercises, validateForm, trimUserData, getTrainingByTypeDifficultyAndTitle, getTrainingById}
+export {createTraining, updateTraining, getTrainingsByTrainerId, getTrainingsTypes, getExercises, trimUserData, getTrainingByTypeDifficultyAndTitle, getTrainingById, getValidationData}
