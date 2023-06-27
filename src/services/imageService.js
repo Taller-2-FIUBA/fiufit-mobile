@@ -27,8 +27,9 @@ export const encodeImage = async(uri) => {
     }
 }
 
-export const showImage = (uri) => {
+export const showImage = (uri, isPreview = false) => {
     if (!uri) return null;
+    if (isPreview) return uri;
     if (uri.startsWith('data:')) return uri;
     try {
         const oldImage = decode(uri);

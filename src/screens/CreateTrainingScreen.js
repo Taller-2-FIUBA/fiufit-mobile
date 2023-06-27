@@ -195,7 +195,7 @@ const CreateTrainingScreen = () => {
                             </View>
                         )}
                         {training.media &&
-                            <Image source={{uri: showImage(training.media)}}
+                            <Image source={{uri: showImage(training.media, true)}}
                                     style={{
                                         width: 120,
                                         height: 120,

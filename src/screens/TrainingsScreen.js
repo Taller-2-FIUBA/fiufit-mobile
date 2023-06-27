@@ -223,7 +223,7 @@ const TrainingsScreen = () => {
     const updateTrainingInfo = async (index) => {
         const copyTraining = {title: trainings[index].title, description: trainings[index].description};    
         try {
-            await updateTraining(copyTraining);
+            await updateTraining(copyTraining, trainings[index].id);
         } catch (error) {
             console.log(error);
         }
