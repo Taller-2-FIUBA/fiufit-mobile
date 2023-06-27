@@ -90,7 +90,6 @@ const UserBiologicsScreen = ({navigation}) => {
     }
 
     const signUpUser = (user) => {
-        console.log(JSON.stringify(user, null, 2));
         if (user.google_token) {
             authService.registerWithGoogle(user)
                 .then(() => {

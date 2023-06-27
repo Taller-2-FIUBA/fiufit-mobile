@@ -153,13 +153,13 @@ export const fiufitStyles = StyleSheet.create({
     trainingItemContainer: {
         height: 50,
         backgroundColor: primaryColor,
-        borderColor: tertiaryColor,
+        borderColor: secondaryColor,
         flexDirection: 'row',
         borderWidth: 0.5,
         alignItems: 'center',
         paddingHorizontal: 15,
         borderRadius: 10,
-        marginBottom: 5,
+        marginBottom: 10,
         width: 345,
         alignSelf: 'center',
         justifyContent: 'flex-start'
@@ -191,7 +191,8 @@ export const fiufitStyles = StyleSheet.create({
         borderColor: primaryColor,
         borderWidth: 0.8,
         color: secondaryColor,
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
+        marginBottom: 3
     },
     trainingButtonContainer: {
         flexDirection: 'row',
@@ -200,7 +201,7 @@ export const fiufitStyles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 2,
         marginBottom: 5,
-        marginLeft: 30
+        marginLeft: 50
     },
     trainingActionButton: {
         backgroundColor: secondaryColor,
@@ -224,7 +225,7 @@ export const fiufitStyles = StyleSheet.create({
         borderRadius: 10
     },
     trainingsList: { 
-        height: 50, 
+        height: 55, 
         width: 350, 
         marginBottom: 3, 
         backgroundColor: tertiaryColor,
@@ -280,8 +281,8 @@ export const fiufitStyles = StyleSheet.create({
     messageChatInput: {
         backgroundColor: secondaryColor,
         color: whiteColor,
-        width: '90%',
-        flexGrow: 4,
+        width: '80%',
+        flexGrow: 2,
     },
     messageChatButton: {
         backgroundColor: tertiaryColor,

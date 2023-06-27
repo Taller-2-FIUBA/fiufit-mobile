@@ -35,8 +35,8 @@ import {
     responseListenerSubscriber } from "../utils/notification";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PaymentsScreen from "../screens/PaymentsScreen";
-import {decode} from "base-64";
 import {showImage} from "../services/imageService";
+import FastImage from 'react-native-fast-image';
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -87,13 +87,19 @@ const AuthStack = () => {
                 headerLeft: () => (
                     <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer)} style={{marginLeft: 10}}>
                         {image ? (
-                            <Image source={{uri: showImage(image)}} style={{
-                                width: 30,
-                                height: 30,
-                                borderRadius: 50,
-                                marginTop: 20,
-                                marginBottom: 10,
-                            }}/>
+                            <FastImage 
+                                source={{
+                                    uri: showImage(image),
+                                    priority: FastImage.priority.high,
+                                }}
+                                style={{
+                                    width: 30,
+                                    height: 30,
+                                    borderRadius: 50,
+                                    marginTop: 20,
+                                    marginBottom: 10
+                                }}
+                            />
                         ) : (
                             <Avatar.Text size={30} color={theme.colors.secondary}
                                          style={{

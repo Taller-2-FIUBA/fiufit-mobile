@@ -22,6 +22,7 @@ import {UserService} from "../services/userService";
 import {getTrainingById} from "../services/TrainingsService";
 import {useIsFocused} from "@react-navigation/core";
 import {pickImageFromGallery, showImage} from "../services/imageService";
+import FastImage from "react-native-fast-image";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -40,16 +41,13 @@ const TrainingEditableItem = ({value, editable, onChange, error, onFocus = () =>
         const [isFocused, setIsFocused] = useState(false);
 
         return (
-            <View style={{marginBottom: 20,}}>
-            <View style={[
-            {borderColor: error ? redColor : isFocused ? tertiaryColor : secondaryColor,
+            <View>
+            <View style={
+            [fiufitStyles.trainingItemContainer, {borderColor: error ? redColor : isFocused ? tertiaryColor : secondaryColor,
             }]}>
             <TextInput
-                placeholderTextColor={secondaryColor}
                 style={[editable ? styles.trainingInput : styles.trainingNotEditableInpunt,
-                    {color: secondaryColor, flex: 1},
-                    {borderColor: error ? redColor : isFocused ? tertiaryColor : secondaryColor,
-                    }]}
+                    ]}
                 autoCorrect={false}
                 onFocus={() => {
                     onFocus();
@@ -63,7 +61,7 @@ const TrainingEditableItem = ({value, editable, onChange, error, onFocus = () =>
             />
             </View>
             {error &&
-            <Text style={{color: redColor, marginLeft: 5, fontSize: 12, marginTop: 5}}>{error}</Text>
+            <Text style={{color: redColor, marginLeft: 15, fontSize: 12, marginTop: 1, marginBottom: 2}}>{error}</Text>
             }
             </View>
         )
@@ -175,7 +173,7 @@ const TrainingsScreen = () => {
     const validateForm = async (training) => {
         let valid = true;
         try {
-            const validationData = await getValidationData(training)
+            const validationData = getValidationData(training)
             for (const {value, validator, errorMessage, field} of validationData) {
                 if (!validator(value)) {
                     handleError(errorMessage, field);
@@ -183,7 +181,7 @@ const TrainingsScreen = () => {
                 }
             }
         } catch (error) {
-            console.log('Error while deleting favourite trainings: ', error);
+            console.log('Error while updating trainings: ', error);
         }
         console.log('Success validation: ', valid);
         return valid;
@@ -198,7 +196,7 @@ const TrainingsScreen = () => {
         if (!validForm) {
             return;
         }
-        updateTrainingInfo(index); 
+        updateTrainingInfo(index);
         setEditable(false);
     };
 
@@ -219,11 +217,9 @@ const TrainingsScreen = () => {
     };
 
     const updateTrainingInfo = async (index) => {
-        const copyTraining = {title: trainings[index].title, description: trainings[index].description};    
+        const copyTraining = {title: trainings[index].title, description: trainings[index].description, media: trainings[index].media};    
         try {
-            const response = await updateTraining(copyTraining, trainings[index].id);
-            setEditable(false);
-            return response;
+            await updateTraining(copyTraining, trainings[index].id);
         } catch (error) {
             console.log(error);
         }
@@ -344,6 +340,7 @@ const TrainingsScreen = () => {
                             key={index}
                             style={fiufitStyles.trainingsList}
                             left={(props) => <List.Icon {...props} icon="bike" />}
+                            right={(props) => <List.Icon {...props} icon={expandedList[index] ? 'chevron-up' : 'chevron-down'} />}
                             title={training.title}
                             titleStyle={{ color: primaryColor }}
                             expanded={expandedList[index]}
@@ -403,23 +400,34 @@ const TrainingsScreen = () => {
                                 </View>
                                 ))}
                             </View>
-                            {training.media &&
-                                    <Image source={{uri: showImage(training.media)}}
-                                            style={{
-                                                width: 120,
-                                                height: 120,
-                                                marginTop: 10,
-                                                borderRadius: 5,
-                                            }}/>
+                            {!editable && training.media &&
+                                    <FastImage 
+                                        source={{
+                                            uri: showImage(training.media),
+                                            priority: FastImage.priority.normal,
+                                        }}
+                                        style={{
+                                            width: 120,
+                                            height: 120,
+                                            marginTop: 10,
+                                            marginBottom: 5,
+                                            borderRadius: 5,
+                                        }}
+                                    />
                                 }
                             {isTrainer && editable && training.media &&
-                                    <Image source={{uri: showImage(training.media)}}
-                                            style={{
-                                                width: 120,
-                                                height: 120,
-                                                marginTop: 10,
-                                                borderRadius: 5,
-                                            }}/>
+                                    <FastImage 
+                                        source={{
+                                            uri: showImage(training.media, true),
+                                            priority: FastImage.priority.normal,
+                                        }}
+                                        style={{
+                                            width: 120,
+                                            height: 120,
+                                            marginTop: 10,
+                                            borderRadius: 5,
+                                        }}
+                                    />
                                 }
                             {isTrainer && editable && <View>
                                     <Text style={{
@@ -432,7 +440,8 @@ const TrainingsScreen = () => {
                                         <Icon name={"camera"} style={{
                                             fontSize: 22,
                                             color: secondaryColor,
-                                            marginRight: 10,
+                                            flexDirection: 'row',
+                                            justifyContent: 'center',
                                         }}/>
                                     </PapperButton>
                                 </View>
@@ -495,7 +504,7 @@ const TrainingsScreen = () => {
         borderColor: secondaryColor,
         borderWidth: 0.8,
         color: secondaryColor,
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
     },
 });
 

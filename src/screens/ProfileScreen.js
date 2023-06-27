@@ -6,6 +6,7 @@ import {UserService} from "../services/userService";
 import {useNavigation} from "@react-navigation/native";
 import {Avatar, useTheme} from "react-native-paper";
 import {showImage} from "../services/imageService";
+import FastImage from 'react-native-fast-image';
 
 
 const ProfileItem = ({iconName, value, editable, onChange}) => {
@@ -43,13 +44,19 @@ const ProfileAvatar = ({image, name, surname, editable}) => {
                 ) : (
                    <View>
                        {image ? (
-                           <Image source={{uri: showImage(image)}} style={{
-                               width: 80,
-                               height: 80,
-                               borderRadius: 50,
-                               marginTop: 20,
-                               marginBottom: 20,
-                           }}/>
+                            <FastImage 
+                                source={{
+                                    uri: showImage(image),
+                                    priority: FastImage.priority.normal
+                                }} 
+                                style={{
+                                    width: 80,
+                                    height: 80,
+                                    borderRadius: 50,
+                                    marginTop: 20,
+                                    marginBottom: 20,
+                                }}
+                            />
                        ) : (
                            <Avatar.Text size={80} color={theme.colors.secondary}
                                         style={{
