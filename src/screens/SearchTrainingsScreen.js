@@ -7,10 +7,11 @@ import {Picker} from '@react-native-picker/picker';
 import Button from "../components/Button";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import {primaryColor, secondaryColor, tertiaryColor, redColor, greyColor} from "../consts/colors";
-import { ActivityIndicator, FAB, IconButton, List, useTheme } from 'react-native-paper';
+import { ActivityIndicator, IconButton, List, useTheme } from 'react-native-paper';
 import {UserService} from "../services/userService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {showImage} from "../services/imageService";
+import FastImage from "react-native-fast-image";
 
 
 
@@ -231,13 +232,18 @@ const SearchTrainingsScreen = () => {
                         ))}
                     </View>
                     {training.media &&
-                      <Image source={{uri: showImage(training.media)}}
+                      <FastImage 
+                        source={{
+                          uri: showImage(training.media),
+                          priority: FastImage.priority.normal
+                        }}
                         style={{
                             width: 120,
                             height: 120,
                             marginTop: 10,
                             borderRadius: 5,
-                        }}/>
+                        }}
+                      />
                       }
                 </List.Accordion>
             ))}
