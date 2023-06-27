@@ -24,6 +24,7 @@ import {UserService} from "../services/userService";
 import {getTrainingById} from "../services/TrainingsService";
 import {useIsFocused} from "@react-navigation/core";
 import {pickImageFromGallery, showImage} from "../services/imageService";
+import FastImage from "react-native-fast-image";
 
 const TrainingItem = ({value, editable, onChange}) => {
     return (
@@ -177,7 +178,7 @@ const TrainingsScreen = () => {
     const validateForm = async (training) => {
         let valid = true;
         try {
-            const validationData = await getValidationData(training)
+            const validationData = getValidationData(training)
             for (const {value, validator, errorMessage, field} of validationData) {
                 if (!validator(value)) {
                     handleError(errorMessage, field);
@@ -185,7 +186,7 @@ const TrainingsScreen = () => {
                 }
             }
         } catch (error) {
-            console.log('Error while deleting favourite trainings: ', error);
+            console.log('Error while updating trainings: ', error);
         }
         console.log('Success validation: ', valid);
         return valid;
@@ -200,7 +201,7 @@ const TrainingsScreen = () => {
         if (!validForm) {
             return;
         }
-        updateTrainingInfo(index); 
+        updateTrainingInfo(index);
         setEditable(false);
     };
 
@@ -221,11 +222,9 @@ const TrainingsScreen = () => {
     };
 
     const updateTrainingInfo = async (index) => {
-        const copyTraining = {title: trainings[index].title, description: trainings[index].description};    
+        const copyTraining = {title: trainings[index].title, description: trainings[index].description, media: trainings[index].media};    
         try {
-            const response = await updateTraining(copyTraining, trainings[index].id);
-            setEditable(false);
-            return response;
+            await updateTraining(copyTraining, trainings[index].id);
         } catch (error) {
             console.log(error);
         }
@@ -406,22 +405,32 @@ const TrainingsScreen = () => {
                                 ))}
                             </View>
                             {training.media &&
-                                    <Image source={{uri: showImage(training.media)}}
-                                            style={{
-                                                width: 120,
-                                                height: 120,
-                                                marginTop: 10,
-                                                borderRadius: 5,
-                                            }}/>
+                                    <FastImage 
+                                        source={{
+                                            uri: showImage(training.media),
+                                            priority: FastImage.priority.normal,
+                                        }}
+                                        style={{
+                                            width: 120,
+                                            height: 120,
+                                            marginTop: 10,
+                                            borderRadius: 5,
+                                        }}
+                                    />
                                 }
                             {isTrainer && editable && training.media &&
-                                    <Image source={{uri: showImage(training.media)}}
-                                            style={{
-                                                width: 120,
-                                                height: 120,
-                                                marginTop: 10,
-                                                borderRadius: 5,
-                                            }}/>
+                                    <FastImage 
+                                        source={{
+                                            uri: showImage(training.media, true),
+                                            priority: FastImage.priority.normal,
+                                        }}
+                                        style={{
+                                            width: 120,
+                                            height: 120,
+                                            marginTop: 10,
+                                            borderRadius: 5,
+                                        }}
+                                    />
                                 }
                             {isTrainer && editable && <View>
                                     <Text style={{

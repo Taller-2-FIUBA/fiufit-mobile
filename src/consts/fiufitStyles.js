@@ -280,8 +280,8 @@ export const fiufitStyles = StyleSheet.create({
     messageChatInput: {
         backgroundColor: secondaryColor,
         color: whiteColor,
-        width: '90%',
-        flexGrow: 4,
+        width: '80%',
+        flexGrow: 2,
     },
     messageChatButton: {
         backgroundColor: tertiaryColor,

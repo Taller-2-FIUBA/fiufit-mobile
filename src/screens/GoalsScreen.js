@@ -91,7 +91,6 @@ const GoalsScreen = () => {
                 let aux_goals = [];
                 let aux_completedGoals = [];
                 response.forEach(goal => {
-                    console.log(goal);
                     if (goal.objective <= goal.progress) {
                         aux_completedGoals.push(goal);
                     } else {

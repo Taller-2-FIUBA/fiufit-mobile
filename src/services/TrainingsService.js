@@ -104,6 +104,7 @@ const getTrainingByTypeDifficultyAndTitle = async (type, difficulty, title) => {
 
 const updateTraining = async (training, id) => {
     const token = await AsyncStorage.getItem('@fiufit_token');
+    training.media = await encodeImage(training.media);
     try {
         const response = await axios.patch(`${requests.BASE_URL}${requests.TRAINING}/${id}`, JSON.stringify(training),
         {

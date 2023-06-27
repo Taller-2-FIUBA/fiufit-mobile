@@ -1,9 +1,9 @@
-import {Text, StyleSheet, View, Image} from 'react-native';
+import {Text, StyleSheet, View} from 'react-native';
 import {Card, useTheme} from 'react-native-paper';
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import ProgressCircle from 'progress-circle-react-native'
 import {showImage} from "../services/imageService";
-import {decode} from "base-64";
+import FastImage from 'react-native-fast-image';
 
 const Goal = ({
                   title, description, activity, unit, objective, progress,
@@ -88,14 +88,17 @@ const Goal = ({
                                     }}>Finishes on {timeLimit}</Text>
                                 )}
                                 {image &&
-                                    <Image source={{uri: decode(image.toString())}}
-                                           style={{
-                                               width: 120,
-                                               height: 120,
-                                               marginTop: 10,
-                                               borderRadius: 5,
-                                           }}
-
+                                    <FastImage 
+                                        source={{
+                                            uri: showImage(image),
+                                            priority: FastImage.priority.normal
+                                        }}
+                                        style={{
+                                            width: 120,
+                                            height: 120,
+                                            marginTop: 10,
+                                            borderRadius: 5
+                                        }}
                                     />
                                 }
                             </View>

@@ -105,7 +105,7 @@ export const removeNotificationSubscription = (ref) => {
 
 export const notificationListenerSubscriber = () => {
     return Notifications.addNotificationReceivedListener(async notification => {
-        ToastAndroid.showWithGravity(notification.request.content.title + ": "+ notification.request.content.body , ToastAndroid.SHORT, ToastAndroid.TOP);
+        ToastAndroid.showWithGravity(notification.request.content.title, ToastAndroid.LONG, ToastAndroid.TOP);
     });
 }
 

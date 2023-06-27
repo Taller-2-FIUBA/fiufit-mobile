@@ -6,7 +6,6 @@ import {
 } from 'react-native'
 import {
     Button as PapperButton,
-    FAB,
 } from "react-native-paper";
 import {Picker} from '@react-native-picker/picker';
 import {useNavigation} from "@react-navigation/native";
@@ -18,10 +17,11 @@ import TrainingInput from "../components/TrainingInput";
 import ExerciseInput from "../components/ExerciseInput";
 import {
     getTrainingsTypes, getExercises, createTraining,
-    trimUserData, getValidationData, 
+    trimUserData, getValidationData,
 } from "../services/TrainingsService";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { pickImageFromGallery, showImage } from '../services/imageService';
+import FastImage from 'react-native-fast-image';
 
 
 
@@ -93,7 +93,7 @@ const CreateTrainingScreen = () => {
     const validateForm = async (training) => {
         let valid = true;
         try {
-            const validationData = await getValidationData(training)
+            const validationData = getValidationData(training)
             for (const {value, validator, errorMessage, field} of validationData) {
                 if (!validator(value)) {
                     handleError(errorMessage, field);
@@ -195,13 +195,18 @@ const CreateTrainingScreen = () => {
                             </View>
                         )}
                         {training.media &&
-                            <Image source={{uri: showImage(training.media)}}
-                                    style={{
-                                        width: 120,
-                                        height: 120,
-                                        marginTop: 10,
-                                        borderRadius: 5,
-                                    }}/>
+                            <FastImage 
+                                source={{
+                                    uri: showImage(training.media, true),
+                                    priority: FastImage.priority.normal
+                                }}
+                                style={{
+                                    width: 120,
+                                    height: 120,
+                                    marginTop: 10,
+                                    borderRadius: 5,
+                                }}
+                            />
                         }
                         <View>
                             <Text style={{
