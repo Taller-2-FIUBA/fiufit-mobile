@@ -346,6 +346,15 @@ export const fiufitStyles = StyleSheet.create({
         color: tertiaryColor,
         borderRadius: 10
     },
+    locationEditPickerSelect: {
+        marginTop: 2,
+        marginBottom: 5,
+        alignItems: "center",
+        width: 220,
+        backgroundColor: secondaryColor,
+        color: tertiaryColor,
+        borderRadius: 10
+    },
     notificationContainer: {
         display: 'flex',
         flexDirection: 'row',
