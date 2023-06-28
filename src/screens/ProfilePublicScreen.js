@@ -117,7 +117,7 @@ const ProfilePublicScreen = ({ route }) => {
         } else {
             UserService.followUser(userId, followedId).then(async (followers) => {
                 setIsFollowed(true);
-                sendNotification(followedId, {
+                sendNotification(followedId.toString(), {
                     title: "New Follower",
                     message: `${username} is now following you!`,
                     body: {

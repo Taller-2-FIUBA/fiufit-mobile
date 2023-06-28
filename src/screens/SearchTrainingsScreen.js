@@ -68,16 +68,12 @@ const SearchTrainingsScreen = () => {
   }, []);
 
   const checkFavourites = async (trainings) => {
-
     let favouritesTrainings = [];
     try {
         const userId = await AsyncStorage.getItem('@fiufit_userId');
-        console.log('userId: ', userId);
-
         favouritesTrainings = await UserService.getTrainingsByUserId(userId);
-
     } catch (error) {
-      console.log('Error while checking favourites training: ', error);
+      console.error('Error while checking favourites training: ', error);
     }
     const favouritesIds = favouritesTrainings.map(favourite => favourite.id);
     const newTrainings = trainings.map(training => {
@@ -88,11 +84,8 @@ const SearchTrainingsScreen = () => {
   }
 
   const toggleFavourite = async (trainingId, index) => {
-    console.log('toggleFavourite Id --->: ', trainingId);
-
     for (let i = 0; i < trainings.length; i++) {
       if (trainings[i].id === trainingId) {
-          console.log('toggleFavourite: ', trainings[i].favourite);
           trainings[i].favourite = !trainings[i].favourite;
           break;
       }
@@ -105,7 +98,7 @@ const SearchTrainingsScreen = () => {
         await UserService.addFavouriteTraining(trainingId);
         toggleFavourite(trainingId, index);
     } catch (error) {
-        console.log('Error while adding favourites trainings: ', error);
+        console.error('Error while adding favourites trainings: ', error);
     }
   }
 
@@ -114,7 +107,7 @@ const SearchTrainingsScreen = () => {
         await UserService.deleteFavouriteTraining(trainingId);
         toggleFavourite(trainingId, index);
     } catch (error) {
-        console.log('Error while deleting favourite trainings: ', error);
+        console.error('Error while deleting favourite trainings: ', error);
     }
   }
 
@@ -190,7 +183,7 @@ const SearchTrainingsScreen = () => {
                     <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
                 )
                 : <View>
-      {trainings && trainings.map((training, index) => (
+                {trainings && trainings.map((training, index) => (
                 <List.Accordion
                     key={index}
                     style={[fiufitStyles.trainingsList, {alignSelf: 'center'}]}

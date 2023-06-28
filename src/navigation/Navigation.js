@@ -54,10 +54,12 @@ const AuthStack = () => {
     const responseListener = useRef();
 
     useEffect(() => {
-        console.log("AuthStack useEffect")
-        UserService.getUserUsername()
-            .then((username) => {
+        UserService.getUser()
+            .then((user) => {
+                const {username, is_athlete} = user;
+                const isTrainer = !is_athlete;
                 AsyncStorage.setItem('@fiufit_username', username?.toString());
+                AsyncStorage.setItem('@fiufit_is_trainer', isTrainer.toString());
                 registerToken();
                 UserService.getUserByUsername(username)
                     .then((userData) => {
