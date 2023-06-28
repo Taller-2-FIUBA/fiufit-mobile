@@ -49,7 +49,7 @@ const DashboardScreen = () => {
                       aux_goals.push(goal);
                   }
               });
-              setCompletedGoals(aux_completedGoals);
+              setCompletedGoals(completedGoals);
               setGoals(completedGoals.concat(aux_goals));
               setCompletedGoalsCount(completedGoals.length);
               setLoading(false)
