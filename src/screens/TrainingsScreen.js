@@ -1,12 +1,10 @@
 import {
-    Image,
     ScrollView,
     Text,
     TextInput,
     View,
     TouchableOpacity,
-    StyleSheet,
-    SafeAreaView
+    StyleSheet
 } from 'react-native'
 import React, {useEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
@@ -70,7 +68,6 @@ const TrainingEditableItem = ({value, editable, onChange, error, onFocus = () =>
 }
 
 const TrainingsScreen = () => {
-    let firstFetch = true;
     const theme = useTheme();
     const navigation = useNavigation();
     const [editable, setEditable] = useState(false);
@@ -86,6 +83,7 @@ const TrainingsScreen = () => {
     const [trainingDifficulty, setTrainingDifficulty] = useState('Easy');
     const [searchQuery, setSearchQuery] = React.useState('');
     const [notFound, setNotFound] = useState(false);
+    const [firstFetch, setFirstFetch] = useState(true);
 
     useEffect(() => {
         initTrainings();
@@ -94,11 +92,11 @@ const TrainingsScreen = () => {
     useEffect(() => {
         if (isFocused) {
             if (firstFetch) {
-                firstFetch = false;
+                setFirstFetch(false);
             } else {
                 setLoading(true);
                 console.log("Start fetching trainings by id");
-                fetchGetTrainingsById(isTrainer, actualUser.id)
+                fetchGetTrainingsById(isTrainer)
                     .catch(error => {  
                         console.log("An error in fetching: ", error);
                     }).finally(() => {
@@ -136,7 +134,8 @@ const TrainingsScreen = () => {
         }
     };
 
-    const fetchGetTrainingsById = async (isTrainerResult, userId) => {
+    const fetchGetTrainingsById = async (isTrainerResult) => {
+        const userId = await AsyncStorage.getItem('@fiufit_userId');
         const trainingResponse = isTrainerResult
             ? await getTrainingsByTrainerId(userId)
             : await UserService.getTrainingsByUserId(userId);
@@ -152,9 +151,8 @@ const TrainingsScreen = () => {
         console.log("Init Trainings");
         try {
             const isTrainerResult = await AsyncStorage.getItem('@fiufit_is_trainer');
-            const userId = await AsyncStorage.getItem('@fiufit_userId');
             await fetchTrainingTypes();
-            await fetchGetTrainingsById(isTrainerResult === 'true', userId);
+            await fetchGetTrainingsById(isTrainerResult === 'true');
             setIsTrainer(isTrainerResult === 'true');
             setLoading(false)
         } catch (error) {
@@ -195,7 +193,7 @@ const TrainingsScreen = () => {
         try {
             setLoading(true);
             await UserService.deleteFavouriteTraining(trainingId);
-            await fetchGetTrainingsById(isTrainer, actualUser.id);
+            await fetchGetTrainingsById(isTrainer);
         } catch (error) {
             console.log('Error while deleting favourite trainings: ', error);
         } finally {

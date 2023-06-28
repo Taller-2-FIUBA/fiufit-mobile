@@ -3,6 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import requests from "../consts/requests";
 import axios from "axios";
 import { unregisterToken } from "../utils/notification";
+import { Alert } from "react-native";
+import {UserService} from "./userService";
 
 const authService = {
     _storeSensitiveData: async function (response) {
@@ -10,6 +12,14 @@ const authService = {
         const userId = response.data.id;
         await AsyncStorage.setItem('@fiufit_token', token);
         await AsyncStorage.setItem('@fiufit_userId', userId.toString());
+        try {
+            const user = await UserService.getUser();
+            await AsyncStorage.setItem('@fiufit_username', user.username?.toString());
+            const isTrainer = !user.is_athlete;
+            await AsyncStorage.setItem('@fiufit_is_trainer', isTrainer.toString());
+        } catch (error) {
+            Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
+        }
     },
 
     _handleError: function (error) {
@@ -26,6 +36,7 @@ const authService = {
         try {
             await AsyncStorage.removeItem('@fiufit_token');
             await AsyncStorage.removeItem('@fiufit_userId');
+            await AsyncStorage.removeItem('@fiufit_is_trainer');
         } catch (error) {
             throw new Error("Error deleting sensitive data from device");
         }
