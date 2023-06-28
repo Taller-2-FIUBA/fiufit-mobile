@@ -67,20 +67,6 @@ const AuthStack = () => {
 
     useEffect(() => {
         initUserInfo();
-       /*  UserService.getUserUsername()
-            .then((username) => {
-                AsyncStorage.setItem('@fiufit_username', username?.toString());
-                registerToken();
-                UserService.getUserByUsername(username)
-                    .then((userData) => {
-                        setName(userData.name);
-                        setSurname(userData.surname);
-                        setImage(userData.image);
-                    });
-            })
-            .catch(() => {
-                Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
-            }); */
 
         notificationListener.current = notificationListenerSubscriber();
         responseListener.current = responseListenerSubscriber(navigation);
@@ -146,6 +132,7 @@ const AuthStack = () => {
                 headerStyle: {
                     backgroundColor: theme.colors.background,
                 },
+                statusBarColor: theme.colors.background,
                 headerTintColor: theme.colors.tertiary,
                 headerLeft: () => (
                     <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
@@ -437,7 +424,11 @@ const MainStackNavigator = () => {
                 }}/>
             <Stack.Screen name="ProfilePublic" component={ProfilePublicScreen}
                 options={{
-                    headerShown: false,
+                    title: 'Profile',
+                    headerStyle: {
+                        backgroundColor: theme.colors.background,
+                    },
+                    headerTintColor: theme.colors.tertiary,
                     statusBarColor: theme.colors.background,
                 }}/>
             <Stack.Screen name="PrivateChat" component={PrivateChatScreen}
