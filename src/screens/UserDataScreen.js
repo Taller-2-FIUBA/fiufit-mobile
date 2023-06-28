@@ -4,7 +4,6 @@ import {
     View
 } from 'react-native'
 import {
-    validateLocation,
     validateName, validateNameLength,
     validateUsername, validateUsernameLength
 } from "../utils/validations";
@@ -14,11 +13,29 @@ import {primaryColor} from "../consts/colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import UserDataContext from "../contexts/userDataContext";
+import {Picker} from '@react-native-picker/picker';
+import {UserService} from "../services/userService";
 
 const UserDataScreen = ({navigation}) => {
 
     const {userData, setUserData} = useContext(UserDataContext);
     const [errors, setErrors] = useState({});
+    const [locations, setLocations] = useState([]);
+    const [locationIndex, setLocationIndex] = useState(0);
+
+    useEffect(() => {
+        getLocations();
+    }, []);
+
+    const getLocations = async () => {
+        try {
+            const response = await UserService.getLocations();
+            response.unshift({"coordinates": [0, 0], "location": "Select your location"});
+            setLocations(response);
+        } catch(error) {
+            console.error("Something went wrong while fetching locations. Please try again later.");
+        }
+    }        
 
     const handleError = (error, input) => {
         setErrors(prevState => ({...prevState, [input]: error}));
@@ -26,6 +43,15 @@ const UserDataScreen = ({navigation}) => {
 
     const handleInputChange = (key, value) => {
         setUserData({...userData, [key]: value});
+    };
+
+    const handleLocationInputChange = (value) => {
+        const locationInfo = locations[value];
+        if(locationInfo.location !== "Select your location") {
+            setLocationIndex(value);
+            const newUserData = {...userData, ['location']: locationInfo.location, ['coordinates']: locationInfo.coordinates};
+            setUserData(newUserData);
+        }
     };
 
     const validateForm = (userData) => {
@@ -47,7 +73,6 @@ const UserDataScreen = ({navigation}) => {
                 field: 'username'
             },
             {value: userData.username, validator: validateUsername, errorMessage: 'Invalid username', field: 'username'},
-            {value: userData.location, validator: validateLocation, errorMessage: 'Invalid location', field: 'location'},
         ];
 
         for (const {value, validator, errorMessage, field} of validationData) {
@@ -61,7 +86,7 @@ const UserDataScreen = ({navigation}) => {
     }
 
     const trimUserData = (userData) => {
-        let trimableFields = ['email', 'name', 'surname', 'username', 'location'];
+        let trimableFields = ['email', 'name', 'surname', 'username'];
         for (const key of trimableFields) {
             userData[key] = userData[key].trim();
         }
@@ -71,7 +96,6 @@ const UserDataScreen = ({navigation}) => {
         handleError(null, 'name')
         handleError(null, 'surname')
         handleError(null, 'username')
-        handleError(null, 'location')
 
         trimUserData(userData);
         if (!validateForm(userData)) {
@@ -117,14 +141,19 @@ const UserDataScreen = ({navigation}) => {
                         onChangeText={text => handleInputChange('username', text)}
                         error={errors.username}
                     />
-
-                    <Input
-                        label="Location (optional)"
-                        iconName={"map-marker"}
-                        placeholder="Enter your location"
-                        onChangeText={text => handleInputChange('location', text)}
-                        error={errors.location}
-                    />
+                    <Text style={fiufitStyles.optionalText}>Location (optional)</Text>
+                    {locations && locations.length > 0 &&
+                        <Picker
+                            label="Location"
+                            selectedValue={locationIndex}
+                            style={fiufitStyles.locationPickerSelect}
+                            onValueChange={(itemValue) => handleLocationInputChange(itemValue)}
+                        >
+                            {locations.map((locationInfo, index) => 
+                                <Picker.Item label={locationInfo.location} value={index} key={index}/>
+                            )}
+                        </Picker>
+                    }
                     <Button onPress={handleNext} title="Next"/>
                 </View>
             </ScrollView>

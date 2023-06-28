@@ -329,6 +329,22 @@ export const fiufitStyles = StyleSheet.create({
         marginTop: 5,
         marginBottom: 10,
     },
+    optionalText: {
+        color: '#9E9E9E',
+        fontSize: 14,
+        marginBottom: 6,
+        alignSelf: 'flex-start',
+        marginLeft: 2,
+    },
+    locationPickerSelect: {
+        marginTop: 2,
+        marginBottom: 5,
+        alignItems: "center",
+        width: 220,
+        backgroundColor: secondaryColor,
+        color: tertiaryColor,
+        borderRadius: 10
+    },
     notificationContainer: {
         display: 'flex',
         flexDirection: 'row',
