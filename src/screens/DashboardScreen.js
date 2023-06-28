@@ -99,8 +99,8 @@ const DashboardScreen = () => {
                   <Text style={styles.metricText}>Time: {metrics.time > 1 ? `${metrics.time} days` : `${metrics.time} day`}</Text>
                   <Text style={styles.metricText}>Distance: {metrics.distance} km</Text>
                   <Text style={styles.metricText}>Lost_weight: {metrics.lost_weight} kcal</Text>
-                  <Text style={styles.metricText}>Number of milestones achieved: {metrics.hitos}</Text>
-                  <Text style={styles.metricText}>Type of activity: {completedGoalsCount}</Text>
+                  <Text style={styles.metricText}>Number of milestones achieved: {completedGoalsCount}</Text>
+                  <Text style={styles.metricText}>Type of activity: {nada}</Text>
                 </View>
               } 
               {!metrics && <Text style={styles.noMetricsText}>There are no progress for the selected period.</Text>}
