@@ -160,9 +160,7 @@ const GoalsScreen = () => {
 
     // Calendar to select the time limit of the goal
     const showDatepicker = () => {
-        console.log('show datepicker');
         showMode('date');
-        console.log('after showMode');
     };
 
     const showMode = (currentMode) => {
