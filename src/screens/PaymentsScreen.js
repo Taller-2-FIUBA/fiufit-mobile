@@ -116,6 +116,7 @@ const PaymentsScreen = () => {
             setLoading(true);
             let receiverId = await getReceiverId();
             if (!receiverId) {
+                setLoading(false);
                 setDialog('User not found', 'Please enter a valid username', true);
                 resetForm();
                 setVisible(true);
@@ -125,6 +126,11 @@ const PaymentsScreen = () => {
                 .then(() => {
                     setLoading(false);
                     resetForm();
+                })
+                .catch(() => {
+                    setLoading(false);
+                    resetDialog();
+                    setVisible(true);
                 });
         } catch (error) {
             console.error(error);
@@ -147,6 +153,11 @@ const PaymentsScreen = () => {
                 .then(() => {
                     setLoading(false);
                     resetForm();
+                })
+                .catch(() => {
+                    setLoading(false);
+                    resetDialog();
+                    setVisible(true);
                 });
         } catch (error) {
             console.error(error);
