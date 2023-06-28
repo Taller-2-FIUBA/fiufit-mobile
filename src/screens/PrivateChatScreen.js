@@ -19,6 +19,7 @@ const PrivateChatScreen = ({route}) => {
   };
 
   const handleSend = async () => {
+    setActualMessage(null);
     try {
       await updateDoc(doc(db, "conversations", chatInfo.conversationId), {
         messages: [...messages, {message: actualMessage, userId: actualUserId}]
@@ -33,7 +34,6 @@ const PrivateChatScreen = ({route}) => {
     } catch (e) {
       console.error("Error sending message: ", e);
     }
-    setActualMessage(null);
   }
 
   const MessageItem = ({message}) => {
@@ -92,7 +92,7 @@ const PrivateChatScreen = ({route}) => {
 
   return (
     <View style={fiufitStyles.messageChatContainer}>
-      <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <ScrollView contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}>
         {messages && messages.map((message, index) => (
           <MessageItem key={index} message={message} />
         ))}
