@@ -301,7 +301,7 @@ const TrainingsScreen = () => {
                 {(showEdit || showDelete) &&
                     <TouchableOpacity onPress={event => handlePressAction(event, index)}>
                         <IconButton
-                            icon={showEdit ? "pencil" : "delete"}
+                            icon={showEdit ? "pencil" : "heart"}
                             iconColor={tertiaryColor}
                             style={{backgroundColor: secondaryColor}}
                             size={20}

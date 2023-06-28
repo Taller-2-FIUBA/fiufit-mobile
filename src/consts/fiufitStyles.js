@@ -245,7 +245,7 @@ export const fiufitStyles = StyleSheet.create({
         justifyContent: 'space-evenly',
     },
     userContainer: {
-        backgroundColor: '#eaeaea',
+        backgroundColor: secondaryColor,
         padding: 10,
         marginVertical: 10,
         borderRadius: 5,

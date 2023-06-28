@@ -136,6 +136,7 @@ const AuthStack = () => {
                 headerStyle: {
                     backgroundColor: theme.colors.background,
                 },
+                statusBarColor: theme.colors.background,
                 headerTintColor: theme.colors.tertiary,
                 headerLeft: () => (
                     <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
@@ -359,9 +360,21 @@ const TabsNavigation = () => {
 };
 
 const FollowTabsNavigation = ({ route }) => {
+    const theme = useTheme();
+
     const { user } = route.params;
     return (
-      <FollowsTopTab.Navigator>
+      <FollowsTopTab.Navigator
+        screenOptions={{
+            tabBarActiveTintColor: theme.colors.secondary,
+            tabBarIndicatorStyle: {
+                backgroundColor: theme.colors.secondary,
+                height: 2
+            },
+            tabBarStyle: {
+                backgroundColor: theme.colors.primary,
+            },
+        }}>
         <FollowsTopTab.Screen name="Following" component={FollowedsScreen} initialParams={{ user }}/>
         <FollowsTopTab.Screen name="Followers" component={FollowersScreen} initialParams={{ user }}/>
       </FollowsTopTab.Navigator>
@@ -416,7 +429,11 @@ const MainStackNavigator = () => {
                 }}/>
             <Stack.Screen name="ProfilePublic" component={ProfilePublicScreen}
                 options={{
-                    headerShown: false,
+                    title: 'Profile',
+                    headerStyle: {
+                        backgroundColor: theme.colors.background,
+                    },
+                    headerTintColor: theme.colors.tertiary,
                     statusBarColor: theme.colors.background,
                 }}/>
             <Stack.Screen name="PrivateChat" component={PrivateChatScreen}
