@@ -2,13 +2,11 @@ import {Text, View, ScrollView, TouchableOpacity} from "react-native";
 import {primaryColor, tertiaryColor, whiteColor} from "../consts/colors";
 import React, { useEffect } from "react";
 import { Searchbar, ActivityIndicator, useTheme } from 'react-native-paper';
-import {primaryColor, tertiaryColor} from "../consts/colors";
-import React from "react";
-import { Searchbar } from 'react-native-paper';
 import { UserService } from "../services/userService";
 import {useNavigation} from "@react-navigation/native";
 import {fiufitStyles} from "../consts/fiufitStyles";
 import * as Location from 'expo-location';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SearchUsersScreen = () => {
   const [usersSearch, setUsersSearch] = React.useState(null);
@@ -16,6 +14,7 @@ const SearchUsersScreen = () => {
   const [notFound, setNotFound] = React.useState(false);
   const [nearUsers , setNearUsers] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [isTrainer, setIsTrainer] = React.useState(true);
   const navigation = useNavigation();
   const theme = useTheme();
 
@@ -33,15 +32,19 @@ const SearchUsersScreen = () => {
   };
 
   const initNearUsers = async () => {
-    const location = await getLocation();
-    try {
-      const response = await UserService.getUsersByLocation(location.coords.latitude, location.coords.longitude);
-      console.log("Near users: ", response.items);
-      setNearUsers(response.items);
-    } catch (error) {
-      console.log("Error cannot get near users: ", error);
+    const isTrainer = await AsyncStorage.getItem('@fiufit_is_trainer');
+    if (isTrainer === 'false') {
+      const location = await getLocation();
+      try {
+        const response = await UserService.getUsersByLocation(location.coords.latitude, location.coords.longitude);
+        console.log("Near users: ", response.items);
+        setNearUsers(response.items);
+      } catch (error) {
+        console.log("Error cannot get near users: ", error);
+      }
+      setLoading(false);
     }
-    setLoading(false);
+    setIsTrainer(isTrainer === 'true');
   }
 
   const getLocation = async () => {
@@ -78,7 +81,7 @@ const SearchUsersScreen = () => {
             color: tertiaryColor,
             fontSize: 20,
           }}>
-            There are no users near you.
+            There are no trainers near you.
           </Text>
         )}
       </View>
@@ -88,18 +91,18 @@ const SearchUsersScreen = () => {
   return (
     <ScrollView style={{backgroundColor: primaryColor}}>
         <Searchbar
-            placeholder="Search"
-            onSubmitEditing={handleSearch}
-            onChangeText={onChangeSearch}
-            value={searchQuery}
-            style={{backgroundColor: tertiaryColor, marginTop: 5}}
+          placeholder="Search"
+          onSubmitEditing={handleSearch}
+          onChangeText={onChangeSearch}
+          value={searchQuery}
+          style={{backgroundColor: tertiaryColor, marginTop: 5}}
         />
         {usersSearch && (
-            <TouchableOpacity
-              style={fiufitStyles.userContainer}
-              onPress={() => navigation.navigate("ProfilePublic", {user: usersSearch})}>
-                  <Text style={fiufitStyles.userName}>{usersSearch.username}</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={fiufitStyles.userContainer}
+            onPress={() => navigation.navigate("ProfilePublic", {user: usersSearch})}>
+                <Text style={fiufitStyles.userName}>{usersSearch.username}</Text>
+          </TouchableOpacity>
         )}
         {notFound && (
             <View style={{ alignItems: "center", marginTop: 20 }}>
@@ -113,19 +116,21 @@ const SearchUsersScreen = () => {
               </Text>
             </View>
         )}
-
-        <Text style={{
-          alignSelf: 'center',
-          marginTop: 10,
-          color: whiteColor,
-          fontSize: 32,
-        }}>
-          Users near you
-        </Text>
-        {loading 
-          ? <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
-          : <NearUsers/>
-        }
+        {!isTrainer && (
+          <View>
+            <Text style={{
+              alignSelf: 'center',
+              marginTop: 10,
+              color: whiteColor,
+              fontSize: 32,
+            }}>
+              Trainers near you
+            </Text>
+            {loading 
+              ? <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
+              : <NearUsers/>}
+          </View>
+        )}
     </ScrollView>
   );
 };
