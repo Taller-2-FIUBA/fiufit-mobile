@@ -222,7 +222,8 @@ export const fiufitStyles = StyleSheet.create({
         width: 150,
         backgroundColor: secondaryColor,
         color: tertiaryColor,
-        borderRadius: 10
+        borderRadius: 10,
+        height: 55,
     },
     trainingsList: { 
         height: 55, 

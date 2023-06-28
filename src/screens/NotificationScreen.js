@@ -81,8 +81,10 @@ const NotificationScreen = () => {
                 break;
             case "CompletedGoal":
                 navigation.navigate("Goals");
+                break;
             case "Follower":
                 navigation.navigate("Profile");
+                break;
         }
         
     }

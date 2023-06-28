@@ -77,19 +77,32 @@ const getExercises = async () => {
     }
 }
 
-const getTrainingByTypeDifficultyAndTitle = async (type, difficulty, title) => {
+const addParamToUrl = (url, param, value) => {
+    if (url.includes('?')) {
+        url += `&${param}=${value}`;
+    } else {
+        url += `?${param}=${value}`;
+    }
+    return url;
+}
+
+const getTrainingByTrainerTypeDifficultyAndTitle = async (type, difficulty, title, trainerId) => {
     let url = `${requests.BASE_URL}${requests.TRAINING}`;
+    if(trainerId) {
+        url += `?trainer_id=${trainerId}`;
+    }
     if (title) {
         title = title.trim();
-        url += `?title=${title}`;
+        url = addParamToUrl(url, 'title', title);
     } else {
         if (type) {
-            url += `?training_type=${type}`;
+            url = addParamToUrl(url, 'training_type', type);
         } 
         if (difficulty) {
-            url += type ? `&difficulty=${difficulty}` : `?difficulty=${difficulty}`;
+            url = addParamToUrl(url, 'difficulty', difficulty);
         }
     }
+    console.log("url ", url);
     try {
         const response = await axios.get(url);
         const trainings = response.data.items.filter(training => !training.blocked);
@@ -140,4 +153,14 @@ const trimUserData = (training) => {
     }
 }
 
-export {createTraining, updateTraining, getTrainingsByTrainerId, getTrainingsTypes, getExercises, trimUserData, getTrainingByTypeDifficultyAndTitle, getTrainingById, getValidationData}
+export {
+    createTraining, 
+    updateTraining, 
+    getTrainingsByTrainerId, 
+    getTrainingsTypes, 
+    getExercises, 
+    trimUserData, 
+    getTrainingByTrainerTypeDifficultyAndTitle, 
+    getTrainingById, 
+    getValidationData
+}

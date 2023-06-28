@@ -53,24 +53,20 @@ const AuthStack = () => {
     const notificationListener = useRef();
     const responseListener = useRef();
 
+    const initUserInfo = async () => {
+        const username = await AsyncStorage.getItem('@fiufit_username');
+        if (username) {
+            UserService.getUserByUsername(username)
+                .then((userData) => {
+                    setName(userData.name);
+                    setSurname(userData.surname);
+                    setImage(userData.image);
+                });
+        }
+    }
+
     useEffect(() => {
-        UserService.getUser()
-            .then((user) => {
-                const {username, is_athlete} = user;
-                const isTrainer = !is_athlete;
-                AsyncStorage.setItem('@fiufit_username', username?.toString());
-                AsyncStorage.setItem('@fiufit_is_trainer', isTrainer.toString());
-                registerToken();
-                UserService.getUserByUsername(username)
-                    .then((userData) => {
-                        setName(userData.name);
-                        setSurname(userData.surname);
-                        setImage(userData.image);
-                    });
-            })
-            .catch(() => {
-                Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
-            });
+        initUserInfo();
 
         notificationListener.current = notificationListenerSubscriber();
         responseListener.current = responseListenerSubscriber(navigation);
@@ -361,7 +357,6 @@ const TabsNavigation = () => {
 
 const FollowTabsNavigation = ({ route }) => {
     const theme = useTheme();
-
     const { user } = route.params;
     return (
       <FollowsTopTab.Navigator

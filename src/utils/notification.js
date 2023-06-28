@@ -75,7 +75,6 @@ const storeNotification = async (userId, message) => {
         type: message.body?.type,
         chatInfo: message.body?.chatInfo || ""
     }
-    console.log("Notification to store: ", notificationContent);
     if (docSnap.exists()) {
         const notifications = docSnap.data().notifications;
         notifications.push(notificationContent);
