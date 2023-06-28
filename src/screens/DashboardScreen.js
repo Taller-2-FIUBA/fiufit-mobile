@@ -13,6 +13,7 @@ const DashboardScreen = () => {
   const [loading, setLoading] = useState(true);
   const [goals, setGoals] = useState([]);
   const [completedGoals, setCompletedGoals] = useState([]);
+  const [completedGoalsCount, setCompletedGoalsCount] = useState(0);
 
   const changePeriod = (newPeriod) => {
     setPeriod(newPeriod);
@@ -50,6 +51,7 @@ const DashboardScreen = () => {
               });
               setCompletedGoals(aux_completedGoals);
               setGoals(completedGoals.concat(aux_goals));
+              setCompletedGoalsCount(completedGoals.length);
               setLoading(false)
           }
       } catch (error) {
@@ -98,10 +100,10 @@ const DashboardScreen = () => {
                   <Text style={styles.metricText}>Distance: {metrics.distance} km</Text>
                   <Text style={styles.metricText}>Lost_weight: {metrics.lost_weight} kcal</Text>
                   <Text style={styles.metricText}>Number of milestones achieved: {metrics.hitos}</Text>
-                  <Text style={styles.metricText}>Type of activity: {completedGoals.length}</Text>
+                  <Text style={styles.metricText}>Type of activity: {completedGoalsCount}</Text>
                 </View>
               } 
-              {!metrics && <Text style={styles.noMetricsText}>There are no metrics available for the selected period.</Text>}
+              {!metrics && <Text style={styles.noMetricsText}>There are no progress for the selected period.</Text>}
             </View>
       }
     </View>
