@@ -19,6 +19,7 @@ import FollowedsScreen from "../screens/FollowedsScreen";
 import FollowersScreen from "../screens/FollowersScreen";
 import ProfilePublicScreen from "../screens/ProfilePublicScreen";
 import GoalsScreen from "../screens/GoalsScreen";
+import DashboardScreen from "../screens/DashboardScreen";
 import {Alert, Image, TouchableOpacity} from "react-native";
 import ChatScreen from "../screens/ChatScreen";
 import InitialScreen from "../screens/InitialScreen";
@@ -271,6 +272,16 @@ const BottomTabNavigator = () => {
                     tabBarLabel: 'Goals',
                     tabBarIcon: ({color, size}) => {
                         return <Icon name="flag-checkered" size={size} color={color}/>;
+                    },
+                }}
+            />
+            <BottomTab.Screen
+                name="Dashboard"
+                component={DashboardScreen}
+                options={{
+                    tabBarLabel: 'Progress',
+                    tabBarIcon: ({color, size}) => {
+                        return <Icon name="trophy" size={size} color={color}/>;
                     },
                 }}
             />
