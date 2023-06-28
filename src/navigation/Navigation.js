@@ -359,9 +359,20 @@ const TabsNavigation = () => {
 };
 
 const FollowTabsNavigation = ({ route }) => {
+    const theme = useTheme();
     const { user } = route.params;
     return (
-      <FollowsTopTab.Navigator>
+      <FollowsTopTab.Navigator
+        screenOptions={{
+            tabBarActiveTintColor: theme.colors.secondary,
+            tabBarIndicatorStyle: {
+                backgroundColor: theme.colors.secondary,
+                height: 2
+            },
+            tabBarStyle: {
+                backgroundColor: theme.colors.primary,
+            },
+        }}>
         <FollowsTopTab.Screen name="Following" component={FollowedsScreen} initialParams={{ user }}/>
         <FollowsTopTab.Screen name="Followers" component={FollowersScreen} initialParams={{ user }}/>
       </FollowsTopTab.Navigator>
