@@ -42,7 +42,7 @@ const GoalsScreen = () => {
     const [goalUnit, setGoalUnit] = useState('');
     const [goalObjective, setGoalObjective] = useState('');
     const [currentProgress, setCurrentProgress] = useState('');
-    const [goalTimeLimit, setGoalTimeLimit] = useState('');
+    const [goalTimeLimit, setGoalTimeLimit] = useState(null);
     const [goalImage, setGoalImage] = useState(null);
 
     // Dialog
@@ -179,7 +179,7 @@ const GoalsScreen = () => {
     };
 
     const onChange = (event, selectedDate) => {
-        setGoalTimeLimit(selectedDate.toISOString().split('T')[0]);
+        setGoalTimeLimit(selectedDate);
     };
 
     // Activates edit mode and retrieves the data of the selected goal
@@ -209,7 +209,7 @@ const GoalsScreen = () => {
             card.title = goalTitle;
             card.description = goalDescription;
             card.objective = goalObjective;
-            goalTimeLimit ? (card.time_limit = goalTimeLimit) : (card.time_limit = '');
+            goalTimeLimit ? (card.time_limit = goalTimeLimit.toISOString().split('T')[0]) : (card.time_limit = '');
             currentProgress.length > 0 ? (card.progress = currentProgress) : (card.progress = 0);
             setGoals(prevCardData => [...prevCardData]);
             setEditMode(false);
@@ -258,7 +258,7 @@ const GoalsScreen = () => {
             description: goalDescription,
             metric: goalMetric,
             objective: goalObjective,
-            time_limit: goalTimeLimit,
+            time_limit: goalTimeLimit.toISOString().split('T')[0],
             image: encodeImageGoal
         }
         resetNewGoalForm();
@@ -628,7 +628,7 @@ const GoalsScreen = () => {
                                                             marginLeft: 33,
                                                             marginTop: -20
                                                         }}>
-                                                            {goalTimeLimit ? goalTimeLimit : "Enter date"}
+                                                            {goalTimeLimit ? goalTimeLimit.toISOString().split('T')[0] : "Enter date"}
                                                         </Text>
                                                     </TouchableOpacity>
                                                 </View>

@@ -39,20 +39,11 @@ This will run all the tests in the app and provide you with a coverage report.
 If you want to add more tests keep in mind that the tests file should be named
 `<name>.test.js`.
 
-# Components
-## FiufitDialog
-Dialog component that can be used to display information to the user. It can 
-be used with one confirm button in order to dismiss the dialog or with two 
-buttons, one to confirm and one to cancel. Each button's behavior can be 
-customized by passing a function as a prop.
-
-### Props
-* **visible**: boolean that indicates if the dialog should be displayed or not.
-* **title**: string that will be displayed as the dialog's title.
-* **content**: string that will be displayed as the dialog's content.
-* **isOk**: boolean that indicates if the dialog should have one or two buttons.
-* **onDismiss**: function that will be called when the dialog is dismissed.
-* **handleConfirm**: function that will be called when the confirm button is pressed.
-* **handleCancel**: function that will be called when the cancel button is pressed.
-* **handleOk**: function that will be called when the confirm button is pressed and the
-isOk prop is set to true.
+### Building an apk
+In order to build an apk, you first need to set up the environment variables in
+the eas.json file. Then, run the following command on your terminal:
+```
+eas build -p android --profile production
+```
+The --profile flag can be changed according to your eas.json configuration.
+Please refer to the expo documentation for more information.

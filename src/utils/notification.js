@@ -28,8 +28,6 @@ const registerForPushNotificationsAsync = async () => {
         return;
     }
     token = (await Notifications.getDevicePushTokenAsync()).data;
-    console.log(token);
-
   
     if (Platform.OS === 'android') {
       Notifications.setNotificationChannelAsync('default', {
