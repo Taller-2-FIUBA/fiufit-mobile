@@ -7,7 +7,7 @@ import {
     FAB,
     Card,
     HelperText,
-    ActivityIndicator, Divider
+    ActivityIndicator
 } from "react-native-paper";
 import {validateGoalDescription, validateGoalObjective, validateGoalTitle} from "../utils/validations";
 import Input from "../components/Input";
@@ -21,6 +21,8 @@ import FiufitDialog from "../components/FiufitDialog";
 import {pickImageFromGallery, encodeImage} from "../services/imageService";
 import { sendNotification } from "../utils/notification";
 import utils from "../utils/Utils";
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
 
 const GoalsScreen = () => {
     const theme = useTheme();
@@ -297,6 +299,19 @@ const GoalsScreen = () => {
         }
         showDialog();
     }
+
+
+    // Share content on social media
+    const shareContent = async () => {
+        const contentToShare = 'I have completed a new goal in the FiuFit app!';
+        try {
+            const fileUri = FileSystem.cacheDirectory + 'shared-twitter.txt'; // Ruta del archivo temporal
+            await FileSystem.writeAsStringAsync(fileUri, contentToShare);
+            await Sharing.shareAsync(fileUri, { mimeType: 'text/plain', dialogTitle: 'Compartir en Twitter', UTI: 'public.plain-text' });
+        } catch (error) {
+            console.log('Error while sharing content on social media:', error);
+        }
+      };
 
     const pickImage = async () => {
         let image = await pickImageFromGallery();
