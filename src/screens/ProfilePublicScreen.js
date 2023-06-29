@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { sendNotification } from '../utils/notification';
 import {showImage} from "../services/imageService";
 import {Avatar, useTheme} from "react-native-paper";
+import FastImage from 'react-native-fast-image';
 
 
 const ProfileItem = ({iconName, value, editable, onChange}) => {
@@ -33,13 +34,16 @@ const ProfileAvatar = ({image, name, surname}) => {
     return (
         <View style={styles.profileAvatarContainer}>
             {image ? (
-                <Image
+                <FastImage
+                    source={{
+                        uri: showImage(image),
+                        priority: FastImage.priority.normal
+                    }}
                     style={{
                         width: 80,
                         height: 80,
                         borderRadius: 50,
                     }}
-                    source={{uri: showImage(image)}}
                 />
             ) : (
                 <Avatar.Text size={80} color={theme.colors.secondary}
@@ -113,7 +117,7 @@ const ProfilePublicScreen = ({ route }) => {
         } else {
             UserService.followUser(userId, followedId).then(async (followers) => {
                 setIsFollowed(true);
-                sendNotification(followedId, {
+                sendNotification(followedId.toString(), {
                     title: "New Follower",
                     message: `${username} is now following you!`,
                     body: {

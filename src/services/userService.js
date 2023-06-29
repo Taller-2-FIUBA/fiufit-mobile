@@ -14,6 +14,15 @@ export const UserService = {
         }
     },
 
+    async getUsersByLocation(latitude, longitude, radius = 1000) {
+        try {
+            const response = await axiosInstance.get(`${requests.USER}?latitude=${latitude}&longitude=${longitude}&radius=${radius}`);
+            return response.data;
+        } catch (error) {
+            throw new Error(error.response.status.toString());
+        }
+    },
+
     async getUserById(userId) {
         try {
             const response = await axiosInstance.get(`${requests.USER}/${userId}`);
@@ -164,6 +173,19 @@ export const UserService = {
             return response.data;
         } catch (error) {
             return 0;
+        }
+    },
+
+    async getLocations() {
+        try {
+            const response = await axios.get(`${requests.BASE_URL}${requests.USER}/locations/`);
+            if(response.data.length > 0) {
+                return response.data;
+            } else {
+                return [];
+            }
+        } catch (error) {
+            console.log(error);
         }
     },
 

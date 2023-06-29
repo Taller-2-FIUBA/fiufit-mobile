@@ -1,6 +1,6 @@
 import {Text, TouchableOpacity} from "react-native";
 import React from "react";
-import {primaryColor, secondaryColor, tertiaryColor, whiteColor} from "../consts/colors";
+import {tertiaryColor} from "../consts/colors";
 import {fiufitStyles} from "../consts/fiufitStyles";
 
 const Button = ({title, onPress = () => {}}) => {

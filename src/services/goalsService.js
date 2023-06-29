@@ -32,6 +32,28 @@ const goalsService = {
         }
     },
 
+    async getMetricsProgress(userId, days) {
+        try {
+            const distancePromise = axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/distance?days=${days}`);
+            const fatPromise = axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/fat?days=${days}`);
+            const musclePromise = axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/muscle?days=${days}`);
+            const stepsPromise = axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/steps?days=${days}`);
+
+            const promises = [distancePromise, fatPromise, musclePromise, stepsPromise];
+
+            const [distanceResponse, fatResponse, muscleResponse, stepsResponse] = await Promise.all(promises);
+            return { 
+                time: days,
+                distance: distanceResponse.data.progress,
+                lost_weight: fatResponse.data.progress,
+                muscle: muscleResponse.data.progress,
+                steps: stepsResponse.data.progress,
+            };   
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
     async update(goal) {
         try {
             const response = await axiosInstance.patch(`${requests.GOALS}/${goal.id}`, goal);

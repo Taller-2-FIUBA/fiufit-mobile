@@ -19,6 +19,7 @@ const createTraining = async (training) => {
 
     const token = await AsyncStorage.getItem('@fiufit_token');
     training.media = await encodeImage(training.media);
+    console.log('TRAINING: ', training);
     try {
         const response = await axios.post(`${requests.BASE_URL}${requests.TRAINING}`, JSON.stringify(training),
         {
@@ -76,17 +77,29 @@ const getExercises = async () => {
     }
 }
 
-const getTrainingByTypeDifficultyAndTitle = async (type, difficulty, title) => {
+const addParamToUrl = (url, param, value) => {
+    if (url.includes('?')) {
+        url += `&${param}=${value}`;
+    } else {
+        url += `?${param}=${value}`;
+    }
+    return url;
+}
+
+const getTrainingByTrainerTypeDifficultyAndTitle = async (type, difficulty, title, trainerId) => {
     let url = `${requests.BASE_URL}${requests.TRAINING}`;
+    if(trainerId) {
+        url += `?trainer_id=${trainerId}`;
+    }
     if (title) {
         title = title.trim();
-        url += `?title=${title}`;
+        url = addParamToUrl(url, 'title', title);
     } else {
         if (type) {
-            url += `?training_type=${type}`;
+            url = addParamToUrl(url, 'training_type', type);
         } 
         if (difficulty) {
-            url += type ? `&difficulty=${difficulty}` : `?difficulty=${difficulty}`;
+            url = addParamToUrl(url, 'difficulty', difficulty);
         }
     }
     try {
@@ -104,6 +117,7 @@ const getTrainingByTypeDifficultyAndTitle = async (type, difficulty, title) => {
 
 const updateTraining = async (training, id) => {
     const token = await AsyncStorage.getItem('@fiufit_token');
+    training.media = await encodeImage(training.media);
     try {
         const response = await axios.patch(`${requests.BASE_URL}${requests.TRAINING}/${id}`, JSON.stringify(training),
         {
@@ -138,4 +152,14 @@ const trimUserData = (training) => {
     }
 }
 
-export {createTraining, updateTraining, getTrainingsByTrainerId, getTrainingsTypes, getExercises, trimUserData, getTrainingByTypeDifficultyAndTitle, getTrainingById, getValidationData}
+export {
+    createTraining, 
+    updateTraining, 
+    getTrainingsByTrainerId, 
+    getTrainingsTypes, 
+    getExercises, 
+    trimUserData, 
+    getTrainingByTrainerTypeDifficultyAndTitle, 
+    getTrainingById, 
+    getValidationData
+}

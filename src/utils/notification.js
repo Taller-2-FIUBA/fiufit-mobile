@@ -73,7 +73,6 @@ const storeNotification = async (userId, message) => {
         type: message.body?.type,
         chatInfo: message.body?.chatInfo || ""
     }
-    console.log("Notification to store: ", notificationContent);
     if (docSnap.exists()) {
         const notifications = docSnap.data().notifications;
         notifications.push(notificationContent);
@@ -103,7 +102,7 @@ export const removeNotificationSubscription = (ref) => {
 
 export const notificationListenerSubscriber = () => {
     return Notifications.addNotificationReceivedListener(async notification => {
-        ToastAndroid.showWithGravity(notification.request.content.title + ": "+ notification.request.content.body , ToastAndroid.SHORT, ToastAndroid.TOP);
+        ToastAndroid.showWithGravity(notification.request.content.title, ToastAndroid.LONG, ToastAndroid.TOP);
     });
 }
 

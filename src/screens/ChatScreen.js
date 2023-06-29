@@ -90,7 +90,7 @@ const ChatScreen = () => {
                 onSubmitEditing={handleSearch}
                 onChangeText={onChangeSearch}
                 value={searchQuery}
-                style={{backgroundColor: secondaryColor, marginTop: 5, color: theme.colors.tertiary, marginBottom: 5}}
+                style={{backgroundColor: secondaryColor, marginTop: 5, color: theme.colors.secondary, marginBottom: 5}}
             />
             {isLoading 
                 ? <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1, marginTop: 15}}/> 

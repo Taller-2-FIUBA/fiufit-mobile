@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
-import {Button, Text, View, ScrollView, TouchableOpacity} from "react-native";
-import {primaryColor, secondaryColor, tertiaryColor, whiteColor, greyColor} from "../consts/colors";
-import { Searchbar } from 'react-native-paper';
+import {Text, View, ScrollView, TouchableOpacity} from "react-native";
+import {primaryColor, tertiaryColor} from "../consts/colors";
 import { UserService } from "../services/userService";
 import {useNavigation} from "@react-navigation/native";
 import {fiufitStyles} from "../consts/fiufitStyles";
@@ -28,12 +27,18 @@ const FollowedsScreen = ({ route }) => {
     return (
         <ScrollView style={{backgroundColor: primaryColor}}>
             {notFound && (
-                <View style={{ alignItems: "center", marginTop: 20 }}>
-                    <Text>No followeds found.</Text>
-                </View>
+                <Text style={{ 
+                    alignSelf: 'center',
+                    marginTop: 20,
+                    color: tertiaryColor,
+                    fontSize: 20
+                }}>
+                    No followeds found
+                </Text>
             )}
-            {followeds && followeds.length > 0 && followeds.map(user => (
+            {followeds && followeds.length > 0 && followeds.map((user, index) => (
                 <TouchableOpacity
+                    key={index}
                     style={fiufitStyles.userContainer}
                     onPress={() => navigation.navigate("ProfilePublic", {user: user})}>
                         <Text style={fiufitStyles.userName}>{user.username}</Text>

@@ -4,9 +4,9 @@ import {
     Text,
     View
 } from 'react-native'
-import {
+import { ActivityIndicator,
     Button as PapperButton,
-    FAB,
+    useTheme,
 } from "react-native-paper";
 import {Picker} from '@react-native-picker/picker';
 import {useNavigation} from "@react-navigation/native";
@@ -18,16 +18,19 @@ import TrainingInput from "../components/TrainingInput";
 import ExerciseInput from "../components/ExerciseInput";
 import {
     getTrainingsTypes, getExercises, createTraining,
-    trimUserData, getValidationData, 
+    trimUserData, getValidationData,
 } from "../services/TrainingsService";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { pickImageFromGallery, showImage } from '../services/imageService';
+import FastImage from 'react-native-fast-image';
 
 
 
 const CreateTrainingScreen = () => {
+    const theme = useTheme();
     const navigation = useNavigation();
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(true);
     const [trainingTypes, setTrainingTypes] = useState({});
     const [trainingExercises, setTrainingExercises] = useState([]);
     const [selectedExercises, setSelectedExercises] = useState([]);
@@ -45,21 +48,24 @@ const CreateTrainingScreen = () => {
     };
 
     useEffect(() => {
+        setLoading(true);
         const fetchTrainingTypes = async () => {
             const response = await getTrainingsTypes();
             setTrainingTypes(response);
         };
-    
-        fetchTrainingTypes();
-    }, []);
-
-    useEffect(() => {
         const fetchExercises = async () => {
             const response = await getExercises();
+            console.log(response);
             setTrainingExercises(response);
         };
-    
-        fetchExercises();
+        try {
+            fetchTrainingTypes();
+            fetchExercises();
+        } catch (error) {
+            console.log('Error while fetching training types: ', error);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
     const handleInputChange = (key, value) => {
@@ -85,7 +91,8 @@ const CreateTrainingScreen = () => {
         const updatedExercises = [...training.exercises];
         updatedExercises[index][key] = parseInt(value);
         updatedExercises[index]['name'] = exercise.name;
-        updatedExercises[index]['type'] = exercise.type;
+        updatedExercises[index]['type'] = exercise.type;        
+        updatedExercises[index]['unit'] = exercise.unit;
         setTraining(prevState => ({...prevState, exercises: updatedExercises}));
     };
 
@@ -93,7 +100,7 @@ const CreateTrainingScreen = () => {
     const validateForm = async (training) => {
         let valid = true;
         try {
-            const validationData = await getValidationData(training)
+            const validationData = getValidationData(training)
             for (const {value, validator, errorMessage, field} of validationData) {
                 if (!validator(value)) {
                     handleError(errorMessage, field);
@@ -107,6 +114,7 @@ const CreateTrainingScreen = () => {
     }
 
     const handleCreate = async () => {
+        console.log('Creating training...');
         handleError(null, 'title')
         handleError(null, 'description')
 
@@ -115,7 +123,9 @@ const CreateTrainingScreen = () => {
         if (!validForm) {
             return;
         }
-        createTraining(training);
+        console.log('Trying to create training: ', training);
+
+        await createTraining(training);
         navigation.navigate('Trainings');
     }
 
@@ -125,6 +135,10 @@ const CreateTrainingScreen = () => {
             backgroundColor: primaryColor,
             flex: 1,
         }}>
+            {loading ? (
+                    <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
+                )
+                : 
                 <ScrollView contentContainerStyle={{
                     paddingTop: 40, paddingHorizontal: 20,
                 }}>
@@ -195,13 +209,18 @@ const CreateTrainingScreen = () => {
                             </View>
                         )}
                         {training.media &&
-                            <Image source={{uri: showImage(training.media)}}
-                                    style={{
-                                        width: 120,
-                                        height: 120,
-                                        marginTop: 10,
-                                        borderRadius: 5,
-                                    }}/>
+                            <FastImage 
+                                source={{
+                                    uri: showImage(training.media, true),
+                                    priority: FastImage.priority.normal
+                                }}
+                                style={{
+                                    width: 120,
+                                    height: 120,
+                                    marginTop: 10,
+                                    borderRadius: 5,
+                                }}
+                            />
                         }
                         <View>
                             <Text style={{
@@ -221,6 +240,7 @@ const CreateTrainingScreen = () => {
                         <Button onPress={handleCreate} title="Register"/>
                     </View>
                 </ScrollView>
+            }
             </SafeAreaView>
         </View>
     )

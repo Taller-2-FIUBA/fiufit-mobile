@@ -153,13 +153,13 @@ export const fiufitStyles = StyleSheet.create({
     trainingItemContainer: {
         height: 50,
         backgroundColor: primaryColor,
-        borderColor: tertiaryColor,
+        borderColor: secondaryColor,
         flexDirection: 'row',
         borderWidth: 0.5,
         alignItems: 'center',
         paddingHorizontal: 15,
         borderRadius: 10,
-        marginBottom: 5,
+        marginBottom: 10,
         width: 345,
         alignSelf: 'center',
         justifyContent: 'flex-start'
@@ -191,20 +191,21 @@ export const fiufitStyles = StyleSheet.create({
         borderColor: primaryColor,
         borderWidth: 0.8,
         color: secondaryColor,
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
+        marginBottom: 3
     },
     trainingButtonContainer: {
         flexDirection: 'row',
-        width: '55%',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 2,
+        alignContent: 'center',
+        marginTop: 10,
         marginBottom: 5,
-        marginLeft: 30
+        maxWidth: 350,
     },
     trainingActionButton: {
         backgroundColor: secondaryColor,
-        width: '100%',
+        width: 150,
         padding: 15,
         borderRadius: 20,
         alignItems: 'center'
@@ -221,10 +222,11 @@ export const fiufitStyles = StyleSheet.create({
         width: 150,
         backgroundColor: secondaryColor,
         color: tertiaryColor,
-        borderRadius: 10
+        borderRadius: 10,
+        height: 55,
     },
     trainingsList: { 
-        height: 50, 
+        height: 55, 
         width: 350, 
         marginBottom: 3, 
         backgroundColor: tertiaryColor,
@@ -244,10 +246,13 @@ export const fiufitStyles = StyleSheet.create({
         justifyContent: 'space-evenly',
     },
     userContainer: {
-        backgroundColor: '#eaeaea',
+        backgroundColor: secondaryColor,
         padding: 10,
         marginVertical: 10,
-        borderRadius: 5,
+        borderRadius: 10,
+        marginHorizontal: 20,
+        paddingVertical: 10,
+       alignItems: 'center',
       },
       userName: {
         fontSize: 16,
@@ -280,8 +285,8 @@ export const fiufitStyles = StyleSheet.create({
     messageChatInput: {
         backgroundColor: secondaryColor,
         color: whiteColor,
-        width: '90%',
-        flexGrow: 4,
+        width: '80%',
+        flexGrow: 2,
     },
     messageChatButton: {
         backgroundColor: tertiaryColor,
@@ -327,6 +332,31 @@ export const fiufitStyles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: 5,
         marginBottom: 10,
+    },
+    optionalText: {
+        color: '#9E9E9E',
+        fontSize: 14,
+        marginBottom: 6,
+        alignSelf: 'flex-start',
+        marginLeft: 2,
+    },
+    locationPickerSelect: {
+        marginTop: 2,
+        marginBottom: 5,
+        alignItems: "center",
+        width: 220,
+        backgroundColor: secondaryColor,
+        color: tertiaryColor,
+        borderRadius: 10
+    },
+    locationEditPickerSelect: {
+        marginTop: 2,
+        marginBottom: 5,
+        alignItems: "center",
+        width: 220,
+        backgroundColor: secondaryColor,
+        color: tertiaryColor,
+        borderRadius: 10
     },
     notificationContainer: {
         display: 'flex',

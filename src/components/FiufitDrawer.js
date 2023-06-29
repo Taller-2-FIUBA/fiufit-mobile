@@ -7,6 +7,7 @@ import authService from "../services/authService";
 import {UserService} from "../services/userService";
 import {decode} from "base-64";
 import {showImage} from "../services/imageService";
+import FastImage from "react-native-fast-image";
 
 const FiufitDrawer = (props) => {
     const theme = useTheme();
@@ -53,12 +54,17 @@ const FiufitDrawer = (props) => {
             }}>
                 <TouchableOpacity onPress={() => props.navigation.navigate("Profile")}>
                     {image ? (
-                        <Image source={{uri: showImage(image)}} style={{
-                            width: 100,
-                            height: 100,
-                            borderRadius: 50,
-                            marginTop: 20,
-                            marginBottom: 10,
+                        <FastImage 
+                            source={{
+                                uri: showImage(image),
+                                priority: FastImage.priority.normal,    
+                            }} 
+                            style={{
+                                width: 100,
+                                height: 100,
+                                borderRadius: 50,
+                                marginTop: 20,
+                                marginBottom: 10,
                         }}/>
                     ) : (
                         <Avatar.Text size={100} color={theme.colors.secondary}

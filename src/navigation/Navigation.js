@@ -19,6 +19,7 @@ import FollowedsScreen from "../screens/FollowedsScreen";
 import FollowersScreen from "../screens/FollowersScreen";
 import ProfilePublicScreen from "../screens/ProfilePublicScreen";
 import GoalsScreen from "../screens/GoalsScreen";
+import DashboardScreen from "../screens/DashboardScreen";
 import {Alert, Image, TouchableOpacity} from "react-native";
 import ChatScreen from "../screens/ChatScreen";
 import InitialScreen from "../screens/InitialScreen";
@@ -34,8 +35,8 @@ import {
     responseListenerSubscriber } from "../utils/notification";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PaymentsScreen from "../screens/PaymentsScreen";
-import {decode} from "base-64";
 import {showImage} from "../services/imageService";
+import FastImage from 'react-native-fast-image';
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -52,22 +53,21 @@ const AuthStack = () => {
     const notificationListener = useRef();
     const responseListener = useRef();
 
+    const initUserInfo = async () => {
+        const username = await AsyncStorage.getItem('@fiufit_username');
+        await registerToken();
+        if (username) {
+            UserService.getUserByUsername(username)
+                .then((userData) => {
+                    setName(userData.name);
+                    setSurname(userData.surname);
+                    setImage(userData.image);
+                });
+        }
+    }
+
     useEffect(() => {
-        console.log("AuthStack useEffect")
-        UserService.getUserUsername()
-            .then((username) => {
-                AsyncStorage.setItem('@fiufit_username', username?.toString());
-                registerToken();
-                UserService.getUserByUsername(username)
-                    .then((userData) => {
-                        setName(userData.name);
-                        setSurname(userData.surname);
-                        setImage(userData.image);
-                    });
-            })
-            .catch(() => {
-                Alert.alert("Error", "Something went wrong while fetching user data. Please try again later.");
-            });
+        initUserInfo();
 
         notificationListener.current = notificationListenerSubscriber();
         responseListener.current = responseListenerSubscriber(navigation);
@@ -86,13 +86,19 @@ const AuthStack = () => {
                 headerLeft: () => (
                     <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer)} style={{marginLeft: 10}}>
                         {image ? (
-                            <Image source={{uri: showImage(image)}} style={{
-                                width: 30,
-                                height: 30,
-                                borderRadius: 50,
-                                marginTop: 20,
-                                marginBottom: 10,
-                            }}/>
+                            <FastImage 
+                                source={{
+                                    uri: showImage(image),
+                                    priority: FastImage.priority.high,
+                                }}
+                                style={{
+                                    width: 30,
+                                    height: 30,
+                                    borderRadius: 50,
+                                    marginTop: 20,
+                                    marginBottom: 10
+                                }}
+                            />
                         ) : (
                             <Avatar.Text size={30} color={theme.colors.secondary}
                                          style={{
@@ -127,6 +133,7 @@ const AuthStack = () => {
                 headerStyle: {
                     backgroundColor: theme.colors.background,
                 },
+                statusBarColor: theme.colors.background,
                 headerTintColor: theme.colors.tertiary,
                 headerLeft: () => (
                     <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
@@ -266,6 +273,16 @@ const BottomTabNavigator = () => {
                     },
                 }}
             />
+            <BottomTab.Screen
+                name="Dashboard"
+                component={DashboardScreen}
+                options={{
+                    tabBarLabel: 'Progress',
+                    tabBarIcon: ({color, size}) => {
+                        return <Icon name="trophy" size={size} color={color}/>;
+                    },
+                }}
+            />
         </BottomTab.Navigator>
     );
 };
@@ -340,9 +357,20 @@ const TabsNavigation = () => {
 };
 
 const FollowTabsNavigation = ({ route }) => {
+    const theme = useTheme();
     const { user } = route.params;
     return (
-      <FollowsTopTab.Navigator>
+      <FollowsTopTab.Navigator
+        screenOptions={{
+            tabBarActiveTintColor: theme.colors.secondary,
+            tabBarIndicatorStyle: {
+                backgroundColor: theme.colors.secondary,
+                height: 2
+            },
+            tabBarStyle: {
+                backgroundColor: theme.colors.primary,
+            },
+        }}>
         <FollowsTopTab.Screen name="Following" component={FollowedsScreen} initialParams={{ user }}/>
         <FollowsTopTab.Screen name="Followers" component={FollowersScreen} initialParams={{ user }}/>
       </FollowsTopTab.Navigator>
@@ -397,7 +425,11 @@ const MainStackNavigator = () => {
                 }}/>
             <Stack.Screen name="ProfilePublic" component={ProfilePublicScreen}
                 options={{
-                    headerShown: false,
+                    title: 'Profile',
+                    headerStyle: {
+                        backgroundColor: theme.colors.background,
+                    },
+                    headerTintColor: theme.colors.tertiary,
                     statusBarColor: theme.colors.background,
                 }}/>
             <Stack.Screen name="PrivateChat" component={PrivateChatScreen}
