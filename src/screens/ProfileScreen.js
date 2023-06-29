@@ -7,6 +7,7 @@ import {useNavigation} from "@react-navigation/native";
 import {Avatar, useTheme} from "react-native-paper";
 import {showImage} from "../services/imageService";
 import {validateHeight, validateLocation, validateName, validateUsername, validateWeight} from "../utils/validations";
+import {fiufitStyles} from "../consts/fiufitStyles";
 
 
 const ProfileItem = ({iconName, value, editable, onChange}) => {
@@ -179,95 +180,92 @@ const ProfileScreen = () => {
     };
 
     return (
-        <ScrollView style={styles.profileContainer}>
-            <ProfileAvatar
-                image={image}
-                name={userProfile.name}
-                surname={userProfile.surname}
-            />
-            <ProfileItem
-                iconName="account"
-                value={userProfile.name}
-                editable={editable}
-                onChange={(text) => handleInputChange("name", text)}
-            />
-            <ProfileItem
-                iconName="account"
-                value={userProfile.surname}
-                editable={editable}
-                onChange={(text) => handleInputChange("surname", text)}
-            />
-            <ProfileItem
-                iconName="account"
-                value={userProfile.username}
-                editable={editable}
-                onChange={(text) => handleInputChange("username", text)}
-            />
-            <ProfileItem
-                iconName="email"
-                value={userProfile.email}
-                editable={false}
-                onChange={(text) => handleInputChange("email", text)}
-            />
-            <ProfileItem
-                iconName="map-marker"
-                value={userProfile.location}
-                editable={editable}
-                onChange={(text) => handleInputChange("location", text)}
-            />
-            <ProfileItem
-                iconName="human-male-height"
-                value={userProfile.height?.toString()}
-                editable={editable}
-                onChange={(text) => handleInputChange("height", text)}
-            />
-            <ProfileItem
-                iconName="weight-kilogram"
-                value={userProfile.weight?.toString()}
-                editable={editable}
-                onChange={(text) => handleInputChange("weight", text)}
-            />
+        <View style={fiufitStyles.container}>
+            <ScrollView style={styles.profileContainer}>
+                <ProfileAvatar
+                    image={image}
+                    name={userProfile.name}
+                    surname={userProfile.surname}
+                />
+                <ProfileItem
+                    iconName="account"
+                    value={userProfile.name}
+                    editable={editable}
+                    onChange={(text) => handleInputChange("name", text)}
+                />
+                <ProfileItem
+                    iconName="account"
+                    value={userProfile.surname}
+                    editable={editable}
+                    onChange={(text) => handleInputChange("surname", text)}
+                />
+                <ProfileItem
+                    iconName="account"
+                    value={userProfile.username}
+                    editable={editable}
+                    onChange={(text) => handleInputChange("username", text)}
+                />
+                <ProfileItem
+                    iconName="email"
+                    value={userProfile.email}
+                    editable={false}
+                    onChange={(text) => handleInputChange("email", text)}
+                />
+                <ProfileItem
+                    iconName="map-marker"
+                    value={userProfile.location}
+                    editable={editable}
+                    onChange={(text) => handleInputChange("location", text)}
+                />
+                <ProfileItem
+                    iconName="human-male-height"
+                    value={userProfile.height?.toString()}
+                    editable={editable}
+                    onChange={(text) => handleInputChange("height", text)}
+                />
+                <ProfileItem
+                    iconName="weight-kilogram"
+                    value={userProfile.weight?.toString()}
+                    editable={editable}
+                    onChange={(text) => handleInputChange("weight", text)}
+                />
 
-            {!editable &&
-                <TouchableOpacity style={{...styles.button, width: '100%'}} onPress={handleEditAction}>
-                    <Text style={styles.buttonText}>{'Edit profile'}</Text>
-                </TouchableOpacity>
-            }
-            {editable &&
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={{...styles.button, marginRight: 5}} onPress={handleSaveAction}>
-                        <Text style={styles.buttonText}>{'Save'}</Text>
+                {!editable &&
+                    <TouchableOpacity style={{...styles.button, width: '100%'}} onPress={handleEditAction}>
+                        <Text style={styles.buttonText}>{'Edit profile'}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={handleCancelAction}>
-                        <Text style={styles.buttonText}>{'Cancel'}</Text>
+                }
+                {editable &&
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={{...styles.button, marginRight: 5}} onPress={handleSaveAction}>
+                            <Text style={styles.buttonText}>{'Save'}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.button} onPress={handleCancelAction}>
+                            <Text style={styles.buttonText}>{'Cancel'}</Text>
+                        </TouchableOpacity>
+                    </View>
+                }
+                <View style={styles.followersContainer}>
+                    <TouchableOpacity
+                        style={[styles.button, styles.followingButton]}
+                        onPress={() => navigation.navigate('FollowTabs', {user: userProfile})}
+                    >
+                        <Text style={styles.buttonText}>Following</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => navigation.navigate('FollowTabs', {user: userProfile})}
+                    >
+                        <Text style={styles.buttonText}>Followers</Text>
                     </TouchableOpacity>
                 </View>
-            }
-            <View style={styles.followersContainer}>
-                <TouchableOpacity
-                    style={[styles.button, styles.followingButton]}
-                    onPress={() => navigation.navigate('FollowTabs', {user: userProfile})}
-                >
-                    <Text style={styles.buttonText}>Following</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => navigation.navigate('FollowTabs', {user: userProfile})}
-                >
-                    <Text style={styles.buttonText}>Followers</Text>
-                </TouchableOpacity>
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    profileContainer: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: primaryColor
-    },
     profileItemContainer: {
         height: 55,
         backgroundColor: secondaryColor,
