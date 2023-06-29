@@ -350,7 +350,7 @@ const TrainingsScreen = () => {
             </Text>
             <ScrollView contentContainerStyle={{flexGrow: 1}}>
             {isTrainer && trainings?.length > 0 && (
-                <View style={{width: 380}}>
+                <View style={{width: 350}}>
                     <Searchbar
                         placeholder="Search"
                         onSubmitEditing={handleSearch}
@@ -387,7 +387,7 @@ const TrainingsScreen = () => {
 
             {loading 
                 ?  <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
-                :  <View >
+                :  <ScrollView contentContainerStyle={{flexGrow: 1}}>
 
                         {trainings?.length === 0 && (
                             <Text style={{
@@ -549,7 +549,7 @@ const TrainingsScreen = () => {
                             color={tertiaryColor}
                             />
                         }
-                    </View> 
+                    </ScrollView> 
                 }
             </ScrollView>
         </View>
