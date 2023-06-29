@@ -70,10 +70,10 @@ const ProfileAvatar = ({image, name, surname, editable}) => {
                             />
                        ) : (
                            <Avatar.Text size={80} color={theme.colors.secondary}
-                                        style={{
-                                            backgroundColor: theme.colors.primary, marginBottom: 10,
-                                        }}
-                                        label={name?.charAt(0) + surname?.charAt(0)}
+                                style={{
+                                    backgroundColor: theme.colors.primary, marginBottom: 10,
+                                }}
+                                label={name?.charAt(0) + surname?.charAt(0)}
                            />
                        )}
                    </View>
@@ -303,12 +303,16 @@ const ProfileScreen = () => {
 
 
     return (
-        <ScrollView style={styles.profileContainer}>
+        <View style={fiufitStyles.container}>
+            
+            <ScrollView contentContainerStyle={{flexGrow: 1}} style={{paddingHorizontal: 20}}>
+
             <ProfileAvatar
                 image={image}
                 name={userProfile.name}
                 surname={userProfile.surname}
             />
+           
             <ProfileItem
                 iconName="account"
                 value={userProfile.username}
@@ -467,16 +471,12 @@ const ProfileScreen = () => {
                     <Text style={styles.buttonText}>Followers</Text>
                 </TouchableOpacity>
             </View>
-        </ScrollView>
+            </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    profileContainer: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: primaryColor
-    },
     profileItemContainer: {
         height: 55,
         backgroundColor: secondaryColor,
