@@ -387,7 +387,7 @@ const TrainingsScreen = () => {
 
             {loading 
                 ?  <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
-                :  <View >
+                :  <View style={{flex: 1}}>
 
                         {trainings?.length === 0 && (
                             <Text style={{
