@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {Text, View, ScrollView, TouchableOpacity} from "react-native";
-import {primaryColor} from "../consts/colors";
+import {primaryColor, tertiaryColor} from "../consts/colors";
 import { UserService } from "../services/userService";
 import {useNavigation} from "@react-navigation/native";
 import {fiufitStyles} from "../consts/fiufitStyles";
@@ -27,9 +27,14 @@ const FollowedsScreen = ({ route }) => {
     return (
         <ScrollView style={{backgroundColor: primaryColor}}>
             {notFound && (
-                <View style={{ alignItems: "center", marginTop: 20 }}>
-                    <Text>No followeds found.</Text>
-                </View>
+                <Text style={{ 
+                    alignSelf: 'center',
+                    marginTop: 20,
+                    color: tertiaryColor,
+                    fontSize: 20
+                }}>
+                    No followeds found
+                </Text>
             )}
             {followeds && followeds.length > 0 && followeds.map((user, index) => (
                 <TouchableOpacity
