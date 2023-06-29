@@ -181,7 +181,7 @@ const ProfileScreen = () => {
 
     return (
         <View style={fiufitStyles.container}>
-            <ScrollView style={styles.profileContainer}>
+            <ScrollView contentContainerStyle={{flexGrow: 1, paddingHorizontal: 20}}>
                 <ProfileAvatar
                     image={image}
                     name={userProfile.name}
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 15,
         borderRadius: 10,
-        marginBottom: 5
+        marginBottom: 10
     },
     profileAvatarContainer: {
         width: '100%',
@@ -293,23 +293,23 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5
     },
     notEditableInpunt: {
-        fontSize: 12,
+        fontSize: 14,
         borderColor: secondaryColor,
         borderWidth: 0.8,
         color: "#888",
         paddingHorizontal: 10
     },
     button: {
-        backgroundColor: secondaryColor,
-        paddingHorizontal: 15,
+        backgroundColor: tertiaryColor,
+        paddingHorizontal: 10,
         paddingVertical: 10,
         alignItems: 'center',
-        borderRadius: 5,
-        marginVertical: 10,
-        width: '50%'
+        borderRadius: 10,
+        marginVertical: 5,
+        width: '49%'
     },
     buttonText: {
-        color: whiteColor,
+        color: primaryColor,
         fontSize: 16
     },
     buttonContainer: {
@@ -320,6 +320,7 @@ const styles = StyleSheet.create({
     followersContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
+        marginBottom: 20
     },
     followingButton: {
         marginRight: 5,
