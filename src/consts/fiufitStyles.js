@@ -196,16 +196,16 @@ export const fiufitStyles = StyleSheet.create({
     },
     trainingButtonContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'space-evenly',
         alignItems: 'center',
         alignContent: 'center',
         marginTop: 10,
         marginBottom: 5,
-        maxWidth: 350,
+        maxWidth: 320,
     },
     trainingActionButton: {
         backgroundColor: secondaryColor,
-        width: 150,
+        width: 100,
         padding: 15,
         borderRadius: 20,
         alignItems: 'center'
@@ -227,7 +227,7 @@ export const fiufitStyles = StyleSheet.create({
     },
     trainingsList: { 
         height: 55, 
-        width: 350, 
+        width: 320, 
         marginBottom: 3, 
         backgroundColor: tertiaryColor,
         borderRadius: 10
