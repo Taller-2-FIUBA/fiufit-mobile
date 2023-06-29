@@ -34,21 +34,20 @@ const goalsService = {
 
     async getMetricsProgress(userId, days) {
         try {
-            const response1 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/distance?days=${days}`);
-            const response2 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/fat?days=${days}`);
-            const response3 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/muscle?days=${days}`);
-            const response4 = await axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/steps?days=${days}`);
+            const distancePromise = axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/distance?days=${days}`);
+            const fatPromise = axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/fat?days=${days}`);
+            const musclePromise = axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/muscle?days=${days}`);
+            const stepsPromise = axiosInstance.get(`${requests.GOALS}/${userId}/metricsProgress/steps?days=${days}`);
 
-            console.log(response1.data);
-            console.log(response2.data);
-            console.log(response3.data);
+            const promises = [distancePromise, fatPromise, musclePromise, stepsPromise];
 
+            const [distanceResponse, fatResponse, muscleResponse, stepsResponse] = await Promise.all(promises);
             return { 
                 time: days,
-                distance: response1.data.progress,
-                lost_weight: response2.data.progress,
-                muscle: response3.data.progress,
-                steps: response4.data.progress,
+                distance: distanceResponse.data.progress,
+                lost_weight: fatResponse.data.progress,
+                muscle: muscleResponse.data.progress,
+                steps: stepsResponse.data.progress,
             };   
         } catch (error) {
             console.log(error);

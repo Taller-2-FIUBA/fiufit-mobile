@@ -252,6 +252,7 @@ const TrainingsScreen = () => {
         const copyTraining = {title: trainings[index].title, description: trainings[index].description, media: trainings[index].media};    
         try {
             await updateTraining(copyTraining, trainings[index].id);
+            await fetchGetTrainingsById(isTrainer);
         } catch (error) {
             console.log(error);
         }
@@ -347,9 +348,9 @@ const TrainingsScreen = () => {
                 }}>
                 Trainings
             </Text>
-
+            <ScrollView contentContainerStyle={{flexGrow: 1}}>
             {isTrainer && trainings?.length > 0 && (
-                <View style={{width: 350}}>
+                <View style={{width: 380}}>
                     <Searchbar
                         placeholder="Search"
                         onSubmitEditing={handleSearch}
@@ -386,7 +387,7 @@ const TrainingsScreen = () => {
 
             {loading 
                 ?  <ActivityIndicator size="large" color={theme.colors.secondary} style={{flex: 1}}/>
-                :  <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                :  <View >
 
                         {trainings?.length === 0 && (
                             <Text style={{
@@ -440,15 +441,34 @@ const TrainingsScreen = () => {
                                     editable={false}
                                 />
                                 {isTrainer && editable && 
-                                    <Picker
-                                        selectedValue={training.difficulty}
-                                        style={fiufitStyles.trainingPickerSelect}
-                                        onValueChange={(itemValue) => handleInputChange(index, 'difficulty', itemValue)}
-                                    >
-                                        <Picker.Item label="Easy" value="Easy" />
-                                        <Picker.Item label="Medium" value="Medium" />
-                                        <Picker.Item label="Hard" value="Hard" />
-                                    </Picker>
+                                    <View style={{flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-evenly', alignContent: 'center'}}>
+                                        <Picker
+                                            selectedValue={training.difficulty}
+                                            style={{...fiufitStyles.trainingPickerSelect, alignSelf: 'center'}}
+                                            onValueChange={(itemValue) => handleInputChange(index, 'difficulty', itemValue)}
+                                        >
+                                            <Picker.Item label="Easy" value="Easy" />
+                                            <Picker.Item label="Medium" value="Medium" />
+                                            <Picker.Item label="Hard" value="Hard" />
+                                        </Picker>
+                                        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                                            <Text style={{
+                                                color: tertiaryColor,
+                                                marginBottom: -7,
+                                                marginTop: 10,
+                                            }}>Image (optional)</Text>
+                                            <PapperButton onPress={() => pickImage(index)}
+                                                    style={fiufitStyles.imagePickerButton}>
+                                                <Icon name={"camera"} style={{
+                                                    fontSize: 22,
+                                                    color: secondaryColor,
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'center',
+                                                }}/>
+                                            </PapperButton>
+                                        </View>
+                                        
+                                    </View>
                                 }
                                 {!editable && <TrainingItem
                                     value={trainings[index].difficulty}
@@ -488,43 +508,28 @@ const TrainingsScreen = () => {
                                             marginTop: 10,
                                             marginBottom: 5,
                                             borderRadius: 5,
+                                            alignSelf: 'center',
                                         }}
                                     />
                                 }
                                 {isTrainer && editable && training.media &&
-                                        <FastImage
-                                            source={{
-                                                uri: showImage(training.media, true),
-                                                priority: FastImage.priority.normal,
-                                            }}
-                                            style={{
-                                                width: 120,
-                                                height: 120,
-                                                marginTop: 10,
-                                                borderRadius: 5,
-                                            }}
-                                        />
-                                    }
-                                {isTrainer && editable && <View>
-                                        <Text style={{
-                                            color: tertiaryColor,
-                                            marginBottom: -7,
+                                    <FastImage
+                                        source={{
+                                            uri: showImage(training.media, true),
+                                            priority: FastImage.priority.normal,
+                                        }}
+                                        style={{
+                                            width: 120,
+                                            height: 120,
                                             marginTop: 10,
-                                        }}>Image (optional)</Text>
-                                        <PapperButton onPress={() => pickImage(index)}
-                                                style={fiufitStyles.imagePickerButton}>
-                                            <Icon name={"camera"} style={{
-                                                fontSize: 22,
-                                                color: secondaryColor,
-                                                flexDirection: 'row',
-                                                justifyContent: 'center',
-                                            }}/>
-                                        </PapperButton>
-                                    </View>
-                                } 
+                                            borderRadius: 5,
+                                            alignSelf: 'center',
+                                        }}
+                                    />
+                                }
                                 {isTrainer && editable && 
                                     <View style={fiufitStyles.trainingButtonContainer}>
-                                        <TouchableOpacity style={{...fiufitStyles.trainingActionButton, marginRight: 5}} onPress={() => handleSaveAction(index)}>
+                                        <TouchableOpacity style={fiufitStyles.trainingActionButton} onPress={() => handleSaveAction(index)}>
                                             <Text style={fiufitStyles.trainingActionButtonText}>{'Save'}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={fiufitStyles.trainingActionButton} onPress={handleCancelAction}>
@@ -544,9 +549,9 @@ const TrainingsScreen = () => {
                             color={tertiaryColor}
                             />
                         }
-                   </ScrollView>   
+                    </View> 
                 }
-          
+            </ScrollView>
         </View>
     );
   };

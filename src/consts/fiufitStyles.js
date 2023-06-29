@@ -196,16 +196,16 @@ export const fiufitStyles = StyleSheet.create({
     },
     trainingButtonContainer: {
         flexDirection: 'row',
-        width: '55%',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 2,
+        alignContent: 'center',
+        marginTop: 10,
         marginBottom: 5,
-        marginLeft: 50
+        maxWidth: 350,
     },
     trainingActionButton: {
         backgroundColor: secondaryColor,
-        width: '100%',
+        width: 150,
         padding: 15,
         borderRadius: 20,
         alignItems: 'center'
@@ -249,7 +249,10 @@ export const fiufitStyles = StyleSheet.create({
         backgroundColor: secondaryColor,
         padding: 10,
         marginVertical: 10,
-        borderRadius: 5,
+        borderRadius: 10,
+        marginHorizontal: 20,
+        paddingVertical: 10,
+       alignItems: 'center',
       },
       userName: {
         fontSize: 16,

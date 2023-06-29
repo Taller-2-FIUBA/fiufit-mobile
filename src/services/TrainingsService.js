@@ -102,7 +102,6 @@ const getTrainingByTrainerTypeDifficultyAndTitle = async (type, difficulty, titl
             url = addParamToUrl(url, 'difficulty', difficulty);
         }
     }
-    console.log("url ", url);
     try {
         const response = await axios.get(url);
         const trainings = response.data.items.filter(training => !training.blocked);
