@@ -6,6 +6,7 @@ import {UserService} from "../services/userService";
 import {useNavigation} from "@react-navigation/native";
 import {Avatar, useTheme} from "react-native-paper";
 import {showImage} from "../services/imageService";
+import {validateHeight, validateLocation, validateName, validateUsername, validateWeight} from "../utils/validations";
 
 
 const ProfileItem = ({iconName, value, editable, onChange}) => {
@@ -83,16 +84,58 @@ const ProfileScreen = () => {
     });
     const [image, setImage] = useState(null);
     const [editable, setEditable] = useState(false);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         console.log("Fetching user profile...");
         getUserData();
     }, []);
 
+    const validateProfile = (profile) => {
+        let valid = true;
+
+        if (!validateName(profile.name)) {
+            valid = false;
+            setError("Please enter a valid name");
+        }
+
+        if (!validateName(profile.surname)) {
+            valid = false;
+            setError("Please enter a valid surname");
+        }
+
+        if (!validateUsername(profile.username)) {
+            valid = false;
+            setError("Please enter a valid username");
+        }
+
+        if (!validateLocation(profile.location)) {
+            valid = false;
+            setError("Please enter a valid location");
+        }
+
+        if (!validateHeight(profile.height)) {
+            valid = false;
+            setError("Please enter a valid height");
+        }
+
+        if (!validateWeight(profile.weight)) {
+            valid = false;
+            setError("Please enter a valid weight");
+        }
+
+        return valid;
+    }
+
     const updateProfile = () => {
         let copyProfile = {...userProfile};
         delete copyProfile.email
+        if (!validateProfile(copyProfile)) {
+            getUserData();
+            setEditable(false);
+            Alert.alert("Error updating data", error);
+            return;
+        }
         console.log("Updating user profile...");
         UserService.updateUser(copyProfile)
             .then(() => {
@@ -114,7 +157,6 @@ const ProfileScreen = () => {
                     });
             })
             .catch((error) => {
-                setError(error);
                 console.log(error);
             });
     }
