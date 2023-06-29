@@ -32,8 +32,9 @@ const FollowersScreen = ({ route }) => {
                     <Text>No followers found.</Text>
                 </View>
             )}
-            {usersSearch && usersSearch.length > 0 && usersSearch.map(user => (
+            {usersSearch && usersSearch.length > 0 && usersSearch.map((user, index) => (
                 <TouchableOpacity
+                    key={index}
                     style={fiufitStyles.userContainer}
                     onPress={() => navigation.navigate("ProfilePublic", {user: user})}>
                         <Text style={fiufitStyles.userName}>{user.username}</Text>

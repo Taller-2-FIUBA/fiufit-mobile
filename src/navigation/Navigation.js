@@ -55,6 +55,7 @@ const AuthStack = () => {
 
     const initUserInfo = async () => {
         const username = await AsyncStorage.getItem('@fiufit_username');
+        await registerToken();
         if (username) {
             UserService.getUserByUsername(username)
                 .then((userData) => {

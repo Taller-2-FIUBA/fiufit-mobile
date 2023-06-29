@@ -31,8 +31,9 @@ const FollowedsScreen = ({ route }) => {
                     <Text>No followeds found.</Text>
                 </View>
             )}
-            {followeds && followeds.length > 0 && followeds.map(user => (
+            {followeds && followeds.length > 0 && followeds.map((user, index) => (
                 <TouchableOpacity
+                    key={index}
                     style={fiufitStyles.userContainer}
                     onPress={() => navigation.navigate("ProfilePublic", {user: user})}>
                         <Text style={fiufitStyles.userName}>{user.username}</Text>
