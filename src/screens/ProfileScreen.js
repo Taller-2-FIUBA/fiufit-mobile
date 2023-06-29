@@ -40,26 +40,26 @@ const ProfileAvatar = ({image, name, surname, editable}) => {
                 }}>
                     <Icon name="pencil"></Icon>
                 </TouchableOpacity>
-                ) : (
-                   <View>
-                       {image ? (
-                           <Image source={{uri: showImage(image)}} style={{
-                               width: 80,
-                               height: 80,
-                               borderRadius: 50,
-                               marginTop: 20,
-                               marginBottom: 20,
-                           }}/>
-                       ) : (
-                           <Avatar.Text size={80} color={theme.colors.secondary}
-                                        style={{
-                                            backgroundColor: theme.colors.primary
-                                        }}
-                                        label={name?.charAt(0) + surname?.charAt(0)}
-                           />
-                       )}
-                   </View>
-                )}
+            ) : (
+                <View>
+                    {image ? (
+                        <Image source={{uri: showImage(image)}} style={{
+                            width: 80,
+                            height: 80,
+                            borderRadius: 50,
+                            marginTop: 20,
+                            marginBottom: 20,
+                        }}/>
+                    ) : (
+                        <Avatar.Text size={80} color={theme.colors.secondary}
+                                     style={{
+                                         backgroundColor: theme.colors.primary
+                                     }}
+                                     label={name?.charAt(0) + surname?.charAt(0)}
+                        />
+                    )}
+                </View>
+            )}
         </View>
     )
 }
@@ -82,16 +82,31 @@ const ProfileScreen = () => {
         is_blocked: false,
     });
     const [image, setImage] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [editable, setEditable] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         console.log("Fetching user profile...");
-        setLoading(true);
+        getUserData();
+    }, []);
+
+    const updateProfile = () => {
+        let copyProfile = {...userProfile};
+        delete copyProfile.email
+        console.log("Updating user profile...");
+        UserService.updateUser(copyProfile)
+            .then(() => {
+                getUserData();
+            })
+            .catch((error) => {
+                console.log(error);
+                Alert.alert("Error", "Something went wrong while updating user profile. Please try again later.");
+            });
+    };
+
+    const getUserData = () => {
         UserService.getUser()
-            .then(async (profile) => {
-                setLoading(false);
+            .then((profile) => {
                 setUserProfile(profile);
                 UserService.getUserByUsername(profile.username)
                     .then((userData) => {
@@ -99,31 +114,18 @@ const ProfileScreen = () => {
                     });
             })
             .catch((error) => {
-                setLoading(false);
                 setError(error);
                 console.log(error);
             });
-    }, []);
-
-
-    const updateProfile = () => {
-        let copyProfile = {...userProfile};
-        delete copyProfile.email
-        UserService.updateUser(copyProfile).then((profile) => {
-            setUserProfile(profile);
-        }).catch((error) => {
-            console.log(error);
-            Alert.alert("Error", "Something went wrong while updating user profile. Please try again later.");
-        });
-    };
+    }
 
     const handleEditAction = () => {
         setEditable(true);
     }
 
     const handleSaveAction = () => {
-        updateProfile();
         setEditable(false);
+        updateProfile();
     };
 
     const handleCancelAction = () => {

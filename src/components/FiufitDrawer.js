@@ -18,7 +18,6 @@ const FiufitDrawer = (props) => {
     useEffect(() => {
         UserService.getUserUsername()
             .then((username) => {
-                console.log(username)
                 UserService.getUserByUsername(username)
                     .then((userData) => {
                         setUserName(username?.toString());
