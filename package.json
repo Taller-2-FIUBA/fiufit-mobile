@@ -1,11 +1,10 @@
 {
-  "name": "fiufit-mobile",
+  "name": "FiuFit",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest"
   },
@@ -28,7 +27,7 @@
     "axios": "^1.4.0",
     "base-64": "^1.0.0",
     "dotenv": "^16.0.3",
-    "expo": "~48.0.9",
+    "expo": "~48.0.18",
     "expo-application": "~5.1.1",
     "expo-auth-session": "^4.0.3",
     "expo-clipboard": "~4.1.2",
@@ -43,7 +42,7 @@
     "jest-expo": "^48.0.2",
     "progress-circle-react-native": "^1.0.2",
     "react": "18.2.0",
-    "react-native": "0.71.7",
+    "react-native": "0.71.8",
     "react-native-blob-util": "^0.18.3",
     "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "~2.9.0",
@@ -55,7 +54,8 @@
     "react-native-screens": "^3.20.0",
     "react-native-tab-view": "^3.5.1",
     "react-native-vector-icons": "^9.2.0",
-    "expo-sharing": "~11.2.2"
+    "expo-sharing": "~11.2.2",
+    "expo-splash-screen": "~0.18.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
