@@ -1,23 +1,34 @@
 {
-  "cli": {
-    "version": ">= 3.14.0"
-  },
   "build": {
-    "development": {
-      "distribution": "internal",
+    "preview": {
       "android": {
-        "gradleCommand": ":app:assembleDebug"
-      },
-      "ios": {
-        "buildConfiguration": "Debug"
+        "buildType": "apk"
       }
     },
-    "preview": {
-      "distribution": "internal"
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
     },
-    "production": {}
-  },
-  "submit": {
-    "production": {}
+    "preview3": {
+      "developmentClient": true
+    },
+    "production": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "BASE_URL": "",
+        "ANDROID_CLIENT_ID": "",
+        "EXPO_CLIENT_ID": "",
+        "FIREBASE_API_KEY": "",
+        "FIREBASE_AUTH_DOMAIN": "",
+        "FIREBASE_PROJECT_ID":"taller2-fiufit",
+        "FIREBASE_STORAGE_BUCKET": "",
+        "FIREBASE_MESSAGING_SENDER_ID":"306390698180",
+        "FIREBASE_API_ID": "",
+        "FIREBASE_SERVER_KEY": ""
+      }
+    }
   }
 }
